@@ -14,7 +14,7 @@ import '../notification/notification_service.dart';
 import '../recrypt/recrypt_service.dart';
 import 'add_group_member_input.dart';
 import 'create_group_input.dart';
-import '../../../adapter/storage/storage.dart';
+import '../../storage/storage.dart';
 import 'delete_group_input.dart';
 import 'deregister_member_input.dart';
 import 'group_utils.dart';
@@ -46,7 +46,7 @@ class GroupAddMemberFailed implements Exception {}
 
 class GroupService {
   GroupService({
-    required IStorage storage,
+    required Storage storage,
     required NotificationService notificationService,
     required GroupDidManager groupDidManager,
     required DidResolver didResolver,
@@ -57,7 +57,7 @@ class GroupService {
         _didResolver = didResolver,
         _logger = logger;
 
-  final IStorage _storage;
+  final Storage _storage;
   final NotificationService _notificationService;
   final GroupDidManager _groupDidManager;
   final RecryptService _recryptService = RecryptService.getInstance();

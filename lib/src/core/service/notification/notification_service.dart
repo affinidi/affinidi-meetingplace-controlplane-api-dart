@@ -11,7 +11,7 @@ import 'create_notification_channel_input.dart';
 import 'notify_acceptance_input.dart';
 import 'notify_channel_input.dart';
 import 'notify_finalise_acceptance_input.dart';
-import '../../../adapter/storage/storage.dart';
+import '../../storage/storage.dart';
 import '../../../utils/hash.dart';
 import '../../../utils/platform_type.dart';
 import '../device_mapping/device_token_mapping_service.dart';
@@ -34,7 +34,7 @@ class NotAuthorizedException implements Exception {}
 
 class NotificationService {
   NotificationService({
-    required IStorage storage,
+    required Storage storage,
     required DeviceTokenMappingService deviceTokenMappingService,
     required DeviceNotificationService deviceNotificationService,
     required Logger logger,
@@ -43,7 +43,7 @@ class NotificationService {
         _deviceNotificationService = deviceNotificationService,
         _logger = logger;
 
-  final IStorage _storage;
+  final Storage _storage;
   final DeviceTokenMappingService _deviceTokenMappingService;
   final DeviceNotificationService _deviceNotificationService;
   final Logger _logger;

@@ -3,7 +3,7 @@ import '../request_validation_exception.dart';
 import 'request_model.dart';
 import 'response_model.dart';
 import '../application_facade.dart';
-import '../../adapter/secret_manager/secret_manager.dart';
+import '../../core/secret_manager/secret_manager.dart';
 import '../../core/service/auth/didcomm_auth_challenge.dart';
 
 Future<Response> authChallenge(

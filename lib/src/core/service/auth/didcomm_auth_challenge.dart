@@ -1,7 +1,7 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import '../../config/config.dart';
-import '../../../adapter/secret_manager/secret_manager.dart';
+import '../../secret_manager/secret_manager.dart';
 import 'auth_token.dart';
 
 class DIDCommAuthChallenge {

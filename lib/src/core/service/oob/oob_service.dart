@@ -2,16 +2,16 @@ import '../../config/config.dart';
 import '../../entity/oob.dart';
 import '../../logger/logger.dart';
 import 'create_oob_input.dart';
-import '../../../adapter/storage/storage.dart';
+import '../../storage/storage.dart';
 import '../../../utils/ttl.dart';
 import 'package:uuid/uuid.dart';
 
 class OobService {
-  OobService({required IStorage storage, required Logger logger})
+  OobService({required Storage storage, required Logger logger})
       : _storage = storage,
         _logger = logger;
 
-  final IStorage _storage;
+  final Storage _storage;
   final Logger _logger;
 
   Future<Oob> create(CreateOobInput input) {

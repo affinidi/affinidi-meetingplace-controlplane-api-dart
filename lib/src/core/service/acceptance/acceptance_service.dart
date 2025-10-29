@@ -4,7 +4,7 @@ import 'accept_offer_input.dart';
 import 'finalise_acceptance_input.dart';
 import 'query_acceptance_input.dart';
 import '../notification/notify_finalise_acceptance_input.dart';
-import '../../../adapter/storage/storage.dart';
+import '../../storage/storage.dart';
 import '../../../utils/hash.dart';
 import '../../entity/offer.dart';
 import '../offer/offer_service.dart';
@@ -19,7 +19,7 @@ class AcceptanceNotFound implements Exception {
 
 class AcceptanceService {
   AcceptanceService({
-    required IStorage storage,
+    required Storage storage,
     required OfferService offerService,
     required DeviceTokenMappingService deviceTokenMappingService,
     required NotificationService notificationService,
@@ -30,7 +30,7 @@ class AcceptanceService {
         _notificationService = notificationService,
         _logger = logger;
 
-  final IStorage _storage;
+  final Storage _storage;
   final OfferService _offerService;
   final DeviceTokenMappingService _deviceTokenMappingService;
   final NotificationService _notificationService;

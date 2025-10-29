@@ -1,10 +1,11 @@
 import 'dart:async';
 import '../../config/config.dart';
-import '../../../adapter/storage/redis.dart';
 import '../../logger/logger.dart';
+import '../../storage/exception/already_exists_exception.dart';
+import '../../storage/exception/conditional_update_failed_exception.dart';
 import 'deregister_offer_input.dart';
 import 'register_offer_input.dart';
-import '../../../adapter/storage/storage.dart';
+import '../../storage/storage.dart';
 import '../../entity/offer.dart';
 import '../device_mapping/device_token_mapping_service.dart';
 import '../../../utils/hash.dart';
@@ -50,14 +51,14 @@ class InvalidOfferInput implements Exception {
 
 class OfferService {
   OfferService({
-    required IStorage storage,
+    required Storage storage,
     required DeviceTokenMappingService deviceTokenMappingService,
     required Logger logger,
   })  : _storage = storage,
         _deviceTokenMappingService = deviceTokenMappingService,
         _logger = logger;
 
-  final IStorage _storage;
+  final Storage _storage;
   final DeviceTokenMappingService _deviceTokenMappingService;
   final Logger _logger;
 

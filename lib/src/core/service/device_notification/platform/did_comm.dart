@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../config/config.dart';
 import '../../../config/env_config.dart';
-import '../../../did_resolver/did_resolver.dart';
+import '../../../../service/did_resolver/cached_did_resolver.dart';
 import '../../../logger/logger.dart';
 import '../../auth/auth_did_manager.dart';
 import '../../auth/didcomm_auth_builder.dart';

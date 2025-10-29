@@ -1,6 +1,6 @@
 import '../../config/config.dart';
 import 'register_device_input.dart';
-import '../../../adapter/storage/storage.dart';
+import '../../storage/storage.dart';
 import '../../../utils/hash.dart';
 import '../../../utils/platform_type.dart';
 import '../../entity/device_token_mapping.dart';
@@ -12,7 +12,7 @@ class DeviceTokenMappingNotFound implements Exception {
 
 class DeviceTokenMappingService {
   DeviceTokenMappingService(this._storage);
-  final IStorage _storage;
+  final Storage _storage;
 
   Future<DeviceTokenMapping> getDeviceTokenMapping({
     required PlatformType devicePlatform,

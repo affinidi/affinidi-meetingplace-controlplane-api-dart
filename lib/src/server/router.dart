@@ -1,6 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:shelf/shelf.dart';
+import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf_static/shelf_static.dart';
+
+import 'middleware/auth.dart';
+
 import '../api/accept_offer/route.dart';
 import '../api/accept_offer_group/route.dart';
 import '../api/check_offer_phrase/route.dart';
@@ -20,7 +26,6 @@ import '../api/notify_outreach/route.dart';
 import '../api/register_device/route.dart';
 import '../api/register_offer_group/route.dart';
 import '../core/web_manager/did_document_manager.dart';
-import 'middleware/auth.dart';
 import '../api/finalise_acceptance/route.dart';
 import '../api/auth_authenticate/route.dart';
 import '../api/auth_challenge/route.dart';
@@ -30,9 +35,6 @@ import '../api/register_notification/route.dart';
 import '../api/deregister_offer/route.dart';
 import '../api/query_offer/route.dart';
 import '../api/register_offer/route.dart';
-import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
-import 'package:shelf_static/shelf_static.dart';
 
 publicPipeline(handler, ApplicationFacade facade) {
   return Pipeline().addHandler((Request req) => handler(req, facade));

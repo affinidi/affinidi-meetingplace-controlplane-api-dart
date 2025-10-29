@@ -1,9 +1,9 @@
 import 'package:ssi/ssi.dart';
 
-import '../../adapter/secret_manager/secret_manager.dart';
+import '../secret_manager/secret_manager.dart';
 import '../logger/logger.dart';
 import '../service/device_notification/push_notification_provider.dart';
-import '../../adapter/storage/storage.dart';
+import '../storage/storage.dart';
 import '../web_manager/did_document_manager.dart';
 import '../did_manager/group_did_manager.dart';
 
@@ -18,7 +18,7 @@ class ServerConfig {
     required this.logger,
   });
 
-  final IStorage storage;
+  final Storage storage;
   final SecretManager secretManager;
   final GroupDidManager groupDidManager;
   final PushNotificationProvider pushNotificationProvider;

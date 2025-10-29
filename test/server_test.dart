@@ -26,7 +26,7 @@ import 'package:api_meetingplace_dart_oss/src/api/query_offer/request_model.dart
 import 'package:api_meetingplace_dart_oss/src/api/register_device/request_model.dart';
 import 'package:api_meetingplace_dart_oss/src/api/register_notification/request_model.dart';
 import 'package:api_meetingplace_dart_oss/src/core/config/env_config.dart';
-import 'package:api_meetingplace_dart_oss/src/core/did_resolver/did_resolver.dart';
+import 'package:api_meetingplace_dart_oss/src/service/did_resolver/cached_did_resolver.dart';
 import 'package:api_meetingplace_dart_oss/src/core/entity/offer.dart';
 import 'package:api_meetingplace_dart_oss/src/utils/platform_type.dart';
 import 'package:didcomm/didcomm.dart';

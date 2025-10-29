@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:api_meetingplace_dart_oss/src/core/config/env_config.dart';
-import 'package:api_meetingplace_dart_oss/src/core/did_resolver/did_local_resolver.dart';
+import 'package:api_meetingplace_dart_oss/meeting_place_control_plane_api.dart';
+
 import 'package:didcomm/didcomm.dart';
 import 'package:dio/dio.dart';
 import 'package:ssi/ssi.dart';
