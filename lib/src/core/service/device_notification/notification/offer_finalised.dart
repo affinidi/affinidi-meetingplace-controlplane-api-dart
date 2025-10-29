@@ -8,7 +8,7 @@ class OfferFinalisedDeviceNotification extends DeviceNotification {
     required super.data,
   }) : super(
           subtitle: 'Connection completed!',
-          body: 'Completed',
+          body: 'Connection request approved!',
           notificationType: NotificationItemType.offerFinalised,
           threadId: NotificationStackGroupingTypes.offerFinalised.value,
         );
