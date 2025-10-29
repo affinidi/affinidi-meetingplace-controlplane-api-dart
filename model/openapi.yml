@@ -1,0 +1,2086 @@
+openapi: 3.0.3
+info:
+  title: Meeting Place Control Plane API
+  version: 1.0.0
+  description: Meeting Place Controle API for managing connection offers and notifications.
+  contact:
+    name: Affinidi 
+    email: info@affinidi.com
+servers:
+  - url: /
+tags:
+  - name: cors
+    description: CORS Definitions
+components:
+  securitySchemes:
+    DidCommTokenAuth:
+      type: apiKey
+      name: authorization
+      in: header
+  headers:
+    Access-Control-Allow-Origin: &ref_0
+      schema:
+        type: string
+    Access-Control-Allow-Methods: *ref_0
+    Access-Control-Allow-Headers: *ref_0
+  requestBodies:
+    RegisterDeviceInput:
+      description: List of required parameters to register a device.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterDeviceInput'
+    FinaliseOfferInput:
+      description: List of required and optional parameters to finalise the acceptance of an offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinaliseOfferInput'
+    DeletePendingNotificationsInput:
+      description: List of required and optional parameters to delete the given list of pending notifications.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeletePendingNotificationsInput'
+    GetPendingNotificationsInput:
+      description: List of required and optional parameters to retrieve pending notifications.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetPendingNotificationsInput'
+    AcceptOfferGroupInput:
+      description: List of required and optional parameters to accept group chat offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AcceptOfferGroupInput'
+    AcceptOfferInput:
+      description: List of required and optional parameters to accept an offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AcceptOfferInput'
+    NotifyAcceptOfferInput:
+      description: List of required and optional parameters for notifying the user of offer acceptance.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyAcceptOfferInput'
+    NotifyAcceptOfferGroupInput:
+      description: List of required and optional parameters for notifying the user of group chat offer acceptance.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyAcceptOfferGroupInput'
+    QueryOfferInput:
+      description: List of required and optional parameters to find an offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QueryOfferInput'
+    RegisterOfferInput:
+      description: List of required and optional parameters to register a connection offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterOfferInput'
+    GroupAddMemberInput:
+      description: List of required and optional parameters to add a member to the group chat.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupAddMemberInput'
+    RegisterOfferGroupInput:
+      description: List of required and optional parameters to register a connection offer for group chat.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterOfferGroupInput'
+    DeregisterOfferInput:
+      description: List of required and optional parameters to deregister a connection offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeregisterOfferInput'
+    CreateOobInput:
+      description: List of required and optional parameters to create an Out-of-Band (OOB) offer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateOobInput'
+    RegisterNotificationInput:
+      description: List of required and optional parameters to register a notification.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterNotificationInput'
+    CheckOfferPhraseInput:
+      description: List of required parameters to check the availability of the phrase.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckOfferPhraseInput'
+    DeregisterNotificationInput:
+      description: List of required and optional parameters to deregister a notification.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeregisterNotificationInput'
+    NotifyChannelInput:
+      description: List of required and optional parameters to send notification using a channel.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyChannelInput'
+    NotifyOutreachInput:
+      description: List of required and optional parameters to send outreach notification.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyOutreachInput'
+    DidAuthenticate:
+      description: List of required parameters to authenticate the user.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DidAuthenticate'
+    DidChallenge:
+      description: List of required parameters to initiate authentication process.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DidChallenge'
+    GroupSendMessage:
+      description: List of required and optional parameters to send a group chat message.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupSendMessage'
+    GroupMemberDeregisterInput:
+      description: List of required and optional parameters to remove a member from the group chat.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupDeregisterMemberInput'
+    GroupDeleteInput:
+      description: List of required parameters to delete a group chat.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupDeleteInput'
+  responses:
+    RegisterOfferOK:
+      description: RegisterOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterOfferOK'
+    GroupAddMemberOK:
+      description: GroupAddMemberOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupAddMemberOK'
+    RegisterOfferGroupOK:
+      description: RegisterOfferGroupOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterOfferGroupOK'
+    DeregisterOfferOK:
+      description: DeregisterOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeregisterOfferOK'
+    FinaliseOfferOK:
+      description: FinaliseOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinaliseOfferOK'
+    AcceptOfferGroupOK:
+      description: AcceptOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AcceptOfferGroupOK'
+    AcceptOfferOK:
+      description: AcceptOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AcceptOfferOK'
+    NotifyAcceptOfferOK:
+      description: NotifyAcceptOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyAcceptOfferOK'
+    NotifyAcceptOfferGroupOK:
+      description: NotifyAcceptOfferGroupOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyAcceptOfferGroupOK'
+    QueryOfferOK:
+      description: QueryOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QueryOfferOK'
+    RegisterDeviceOK:
+      description: RegisterDeviceOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterDeviceOK'
+    GetPendingNotificationsOK:
+      description: GetPendingNotificationsOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetPendingNotificationsOK'
+    DeletePendingNotificationsOK:
+      description: DeletePendingNotificationsOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeletePendingNotificationsOK'
+    GetOobOK:
+      description: GetOobOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetOobOK'
+    CreateOobOK:
+      description: CreateOobOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateOobOK'
+    RegisterNotificationOK:
+      description: RegisterNotificationOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterNotificationOK'
+    NotifyChannelOK:
+      description: NotifyChannelOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyChannelOK'
+    NotifyOutreachOK:
+      description: NotifyOutreachOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotifyOutreachOK'
+    CheckOfferPhraseOK:
+      description: CheckOfferPhraseOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckOfferPhraseOK'
+    DeregisterNotificationOK:
+      description: DeregisterNotificationOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeregisterNotificationOK'
+    DidAuthenticateOK:
+      description: DidAuthenticateOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DidAuthenticateOK'
+    GroupDeleteOK:
+      description: GroupDeleteOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupDeleteOK'
+    GroupMemberDeregisterOK:
+      description: GroupMemberDeregisterOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupMemberDeregisterOK'
+    GroupSendMessageOK:
+      description: GroupSendMessageOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupSendMessageOK'
+    DidChallengeOK:
+      description: DidChallengeOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DidChallengeOK'
+    RegisterOfferToConnectConflictError:
+      description: ConflictError
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OfferPhraseInUseError'
+    RegisterOfferToConnectGroupConflictError:
+      description: ConflictError
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OfferPhraseInUseError'
+    AcceptOfferToConnectNotFoundError:
+      description: NotFoundError
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/InvalidOfferError'
+              - $ref: '#/components/schemas/OfferLimitExceededError'
+              - $ref: '#/components/schemas/InvalidAcceptanceError'
+    FinaliseOfferAcceptanceNotFoundError:
+      description: NotFoundError
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/InvalidAcceptanceError'
+              - $ref: '#/components/schemas/ExpiredAcceptanceError'
+    QueryOfferNotFoundError:
+      description: NotFoundError
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/InvalidOfferError'
+              - $ref: '#/components/schemas/OfferLimitExceededError'
+              - $ref: '#/components/schemas/InvalidAcceptanceError'
+              - $ref: '#/components/schemas/ExpiredAcceptanceError'
+    GetOobNotFoundError:
+      description: NotFoundError
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetOobNotFoundError'
+  schemas:
+    QueryOfferInput:
+      description: List of required and optional parameters to find an offer.
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+      required:
+        - mnemonic
+        - did
+    FinaliseOfferInput:
+      description: List of required and optional parameters to finalise the acceptance of an offer.
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        did:
+          type: string
+          description: Channel DID to use to finalise the acceptance of an offer.
+        offerLink:
+          type: string
+          maxLength: 256
+          description: Offer link associated with the channel.
+        theirDid:
+          type: string
+          description: Decentralised Identifier (DID) of the user who accepted the offer.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is processed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+      required:
+        - mnemonic
+        - offerLink
+        - did
+        - theirDid
+    NotifyOutreachInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        senderInfo:
+          type: string
+          description: Sender info to be shown in notification message.
+      required:
+        - mnemonic
+        - senderInfo
+    NotifyAcceptOfferInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        did:
+          type: string
+          description: Permanent channel DID of the user upon approval of the connection request.
+        offerLink:
+          type: string
+          description: The offer link associated with the published offer.
+        senderInfo:
+          type: string
+          description: Sender info to be shown in notification message.
+      required:
+        - mnemonic
+        - did
+        - offerLink
+        - senderInfo
+    NotifyAcceptOfferGroupInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        did:
+          type: string
+          description: Permanent channel DID of the user upon approval of the connection request.
+        offerLink:
+          type: string
+          description: The offer link associated with the published offer.
+        senderInfo:
+          type: string
+          description: Sender info to be shown in notification message.
+      required:
+        - mnemonic
+        - did
+        - offerLink
+        - senderInfo
+    AcceptOfferGroupInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        did:
+          type: string
+          description: Permanent channel DID of the user upon approval of the connection request.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is processed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+        vcard:
+          type: string
+          maxLength: 409600
+          description: A vCard containing the details of the offer encoded in base64 format.
+        offerLink:
+          type: string
+      required:
+        - mnemonic
+        - did
+        - deviceToken
+        - platformType
+        - vcard
+        - offerLink
+    AcceptOfferInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        did:
+          type: string
+          description: Permanent channel DID of the user upon approval of the connection request.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is processed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+        vcard:
+          type: string
+          maxLength: 409600
+          description: A vCard containing the details of the offer encoded in base64 format.
+        offerLink:
+          type: string
+      required:
+        - mnemonic
+        - did
+        - deviceToken
+        - platformType
+        - vcard
+        - offerLink
+    DeletePendingNotificationsInput:
+      type: object
+      additionalProperties: false
+      properties:
+        notificationIds:
+          type: array
+          items:
+            type: string
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is processed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+      required:
+        - deviceToken
+        - platformType
+        - notificationIds
+    GetPendingNotificationsInput:
+      type: object
+      additionalProperties: false
+      properties:
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is processed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+      required:
+        - deviceToken
+        - platformType
+    CreateOobInput:
+      type: object
+      additionalProperties: false
+      properties:
+        didcommMessage:
+          type: string
+          description: A plaintext DIDComm message containing the offer encoded in base64.
+        mediatorDid:
+          type: string
+          description: The mediator DID use to register the offer.
+        mediatorEndpoint:
+          type: string
+          description: The mediator endpoint to register the offer.
+        mediatorWSSEndpoint:
+          type: string
+          description: The websocket endpoint of the mediator to register the offer.
+      required:
+        - didcommMessage
+        - mediatorDid
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+    NotifyChannelInput:
+      type: object
+      additionalProperties: false
+      properties:
+        notificationChannelId:
+          type: string
+          description: The channel ID to send the notification.
+        did:
+          type: string
+          description: The DID for identifying the activity.
+        type:
+          type: string
+          description: The type of activity.
+      required:
+        - notificationChannelId
+        - did
+        - type
+    CheckOfferPhraseInput:
+      type: object
+      additionalProperties: false
+      properties:
+        offerPhrase:
+          type: string
+          description: The offer phrase for checking the availability.
+      required:
+        - offerPhrase
+    DeregisterNotificationInput:
+      type: object
+      additionalProperties: false
+      properties:
+        notificationToken:
+          type: string
+          maxLength: 256
+          description: Notification token to deregister the target device.
+      required:
+        - notificationToken
+    DeregisterOfferInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          maxLength: 256
+          description: A unique phrase used to publish and identify the offer.
+        offerLink:
+          type: string
+          maxLength: 256
+          description: Offer link to deregister.
+      required:
+        - mnemonic
+        - offerLink
+    RegisterNotificationInput:
+      type: object
+      additionalProperties: false
+      properties:
+        myDid:
+          type: string
+          description: Current user's DID for the channel.
+        theirDid:
+          type: string
+          description: Other user's DID for the channel.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is accessed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+      required:
+        - myDid
+        - theirDid
+        - platformType
+        - deviceToken
+    GroupAddMemberInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          description: A unique phrase used to publish and identify the offer.
+        offerLink:
+          type: string
+          description: The offer link
+        groupId:
+          type: string
+          description: Unique identifier of the group chat to which the member will be added.
+        memberDid:
+          type: string
+          description: Decentralised Identifier (DID) of the member to add to the group chat.
+        acceptOfferAsDid:
+          type: string
+          description: Decentralised Identifier (DID) of when the member accepted the offer.
+        reencryptionKey:
+          type: string
+          description: The reencryption key for the group chat member.
+        publicKey:
+          type: string
+          description: The public key information of the group chat member.
+        vcard:
+          type: string
+          description: The vCard of the member to add to the group chat.
+      required:
+        - mnemonic
+        - groupId
+        - offerLink
+        - memberDid
+        - reencryptionKey
+        - publicKey
+        - vcard
+        - acceptOfferAsDid
+    RegisterOfferInput:
+      type: object
+      additionalProperties: false
+      properties:
+        offerName:
+          type: string
+          description: Name of the offer.
+        offerDescription:
+          type: string
+          description: Describes the purpose of the connection offer.
+        offerType:
+          type: integer
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+          description: >- 
+            Specifies the type of the offer: 1-Chat, 2-Poll, 3-Group Chat, and 4-Outreach.
+        didcommMessage:
+          type: string
+          description: A plaintext DIDComm message containing the offer encoded in base64 format.
+        vcard:
+          type: string
+          description: A vCard of the user who registered the offer encoded in base64 format.
+        validUntil:
+          type: string
+          description: >-
+            The validity date and time in ISO-8601 format, e.g., 2023-09-20T07:12:13 
+            or an empty string for no expiry.
+        maximumUsage:
+          type: number
+          description: >-
+            The maximum number of times other users can claim the offer. Set 0 for unlimited claims.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is accessed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+        contactAttributes:
+          type: number
+          description: A bitfield of contact attributes.
+        mediatorDid:
+          type: string
+          description: The mediator DID use to register the offer.
+        mediatorEndpoint:
+          type: string
+          description: The mediator endpoint to register the offer.
+        mediatorWSSEndpoint:
+          type: string
+          description: The websocket endpoint of the mediator to register the offer.
+        customPhrase:
+          type: string
+          description: A custom phrase to find and claim the offer by another user.
+        isSearchable:
+          type: boolean
+          description: Indicates whether the offer is searchable by other users.
+        metadata:
+          type: string
+          description: Metadata containing additional information about the offer.
+      required:
+        - offerName
+        - didcommMessage
+        - deviceToken
+        - platformType
+        - vcard
+        - mediatorDid
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+        - contactAttributes
+    RegisterOfferGroupInput:
+      description: List of required and optional parameters to register a connection offer for group chat.
+      type: object
+      additionalProperties: false
+      properties:
+        offerName:
+          type: string
+          description: Name of the offer.
+        offerDescription:
+          type: string
+          description: Describes the purpose of the connection offer.
+        didcommMessage:
+          type: string
+          description: A plaintext DIDComm message containing the offer encoded in base64 format.
+        vcard:
+          type: string
+          description: A vCard of the user who registered the offer encoded in base64 format.
+        validUntil:
+          type: string
+          description: >-
+            The validity date and time in ISO-8601 format, e.g., 2023-09-20T07:12:13 
+            or an empty string for no expiry.
+        maximumUsage:
+          type: number
+          description: >-
+            The maximum number of times other users can claim the offer. Set 0 for unlimited claims.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: >-
+            The device token for push notification when the offer is accessed. 
+            Maximum length of 2048 characters.
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+        mediatorDid:
+          type: string
+          description: The mediator DID use to register the offer.
+        mediatorEndpoint:
+          type: string
+          description: The mediator endpoint to register the offer.
+        mediatorWSSEndpoint:
+          type: string
+          description: The websocket endpoint of the mediator to register the offer.
+        customPhrase:
+          type: string
+          description: A custom phrase to find and claim the offer by another user.
+        isSearchable:
+          type: boolean
+          description: Indicates whether the offer is searchable by other users.
+        metadata:
+          type: string
+          description: Metadata containing additional information about the offer.
+        adminReencryptionKey:
+          type: string
+          description: Reencryption key for the group chat admin.
+        adminDid:
+          type: string
+          description: The Decentralised Identifier (DUD) of the group chat admin.
+        adminPublicKey:
+          type: string
+          description: The public key information of the group chat admin.
+        memberVCard:
+          type: string
+          description: A vCard of the group chat member encoded in base64 format.
+      required:
+        - offerName
+        - offerDescription
+        - didcommMessage
+        - deviceToken
+        - platformType
+        - vcard
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+        - mediatorDid
+        - adminDid
+        - adminPublicKey
+        - adminReencryptionKey
+        - memberVCard
+    RegisterDeviceInput:
+      type: object
+      additionalProperties: false
+      properties:
+        platformType:
+          enum:
+            - DIDCOMM
+            - PUSH_NOTIFICATION
+            - NONE
+          type: string
+          description: Platform type for sending notification.
+        deviceToken:
+          type: string
+          maxLength: 2048
+          description: A unique, platform-specific device token used to register the device. Maximum length of 2048 characters.
+      required:
+        - deviceToken
+        - platformType
+    RegisterDeviceOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        deviceToken:
+          type: string
+          description: A unique, platform-specific device token used to register the device.
+        platformType:
+          type: string
+          description: Platform type for sending notification.
+      required:
+        - deviceToken
+        - platformType
+    GroupAddMemberOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    RegisterOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        message:
+          type: string
+        mnemonic:
+          type: string
+        validUntil:
+          type: string
+        maximumUsage:
+          type: number
+        offerLink:
+          type: string
+      required:
+        - mnemonic
+        - offerLink
+    RegisterOfferGroupOK:
+      type: object
+      additionalProperties: false
+      properties:
+        message:
+          type: string
+        mnemonic:
+          type: string
+        validUntil:
+          type: string
+        maximumUsage:
+          type: number
+        offerLink:
+          type: string
+        groupId:
+          type: string
+        groupDid:
+          type: string
+      required:
+        - mnemonic
+        - offerLink
+        - groupId
+        - groupDid
+        - memberVCard
+    DeregisterOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    FinaliseOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        notificationToken:
+          type: string
+      required:
+        - offerLink
+        - notificationToken
+    NotifyAcceptOfferGroupOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    NotifyOutreachOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    NotifyAcceptOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    AcceptOfferGroupOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        didcommMessage:
+          type: string
+        offerLink:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        validUntil:
+          type: string
+          description: validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13
+        vcard:
+          type: string
+          description: A vCard containing the details of the offer encoded in base64 format.
+        mediatorDid:
+          type: string
+          description: The mediator DID use to register the offer.
+        mediatorEndpoint:
+          type: string
+          description: The mediator endpoint to register the offer.
+        mediatorWSSEndpoint:
+          type: string
+          description: The websocket endpoint of the mediator to register the offer.
+      required:
+        - didcommMessage
+        - offerLink
+        - name
+        - description
+        - vcard
+        - mediatorDid
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+    AcceptOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        didcommMessage:
+          type: string
+        offerLink:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        validUntil:
+          type: string
+          description: validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13
+        maximumUsage:
+          type: number
+        vcard:
+          type: string
+          description: A vCard containing the details of the offer encoded in base64 format.
+        mediatorDid:
+          type: string
+          description: The mediator DID use to register the offer.
+        mediatorEndpoint:
+          type: string
+          description: The mediator endpoint to register the offer.
+        mediatorWSSEndpoint:
+          type: string
+          description: The websocket endpoint of the mediator to register the offer.
+      required:
+        - didcommMessage
+        - offerLink
+        - name
+        - description
+        - vcard
+        - mediatorDid
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+    QueryOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        offerLink:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        validUntil:
+          type: string
+          description: validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13
+        vcard:
+          type: string
+          description: A vCard containing the details of the offer encoded in base64 format.
+        contactAttributes:
+          type: number
+          description: A bitfield of contact attributes
+        offerType:
+          type: number
+          description: Offer type information
+        mediatorDid:
+          type: string
+          description: The mediator DID use to register the offer.
+        mediatorEndpoint:
+          type: string
+          description: The mediator endpoint to register the offer.
+        mediatorWSSEndpoint:
+          type: string
+          description: The websocket endpoint of the mediator to register the offer.
+        didcommMessage:
+          type: string
+          description: The didcomm message connected to this offer
+        maximumUsage:
+          type: number
+          description: >-
+            maximum number of times this offer can be claimed, or 0 for
+            unlimited
+        groupId:
+          type: string
+        groupDid:
+          type: string
+      required:
+        - didcommMessage
+        - offerLink
+        - name
+        - status
+        - description
+        - vcard
+        - contactAttributes
+        - mediatorDid
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+    CorsRegisterDeviceOK:
+      type: object
+      additionalProperties: false
+      properties:
+        corsRegisterDeviceOk:
+          type: string
+    NotFoundError:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          enum:
+            - NotFoundError
+        message:
+          type: string
+          enum:
+            - 'Not found: ${param}.'
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    InvalidOfferError:
+      type: object
+      additionalProperties: false
+      description: >-
+        The details to identify the offer may be valid, 
+        but it may have exceeded its usage limit or already expired.
+      properties:
+        name:
+          type: string
+          enum:
+            - InvalidOfferError
+        message:
+          type: string
+          enum:
+            - No valid offer found that matches the details provided.
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    InvalidAcceptanceError:
+      type: object
+      additionalProperties: false
+      description: >-
+        The details to identify the offer may be valid, but it may 
+        have already expired, or the offerLink provided is invalid.
+      properties:
+        name:
+          type: string
+          enum:
+            - InvalidAcceptanceError
+        message:
+          type: string
+          enum:
+            - No valid acceptance found that matches the details provided.
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    ExpiredAcceptanceError:
+      type: object
+      additionalProperties: false
+      description: >-
+        The offer is no longer valid due to max usage or validity 
+        date expiration.
+      properties:
+        name:
+          type: string
+          enum:
+            - ExpiredAcceptanceError
+        message:
+          type: string
+          enum:
+            - The acceptance has expired
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    OfferExpiredError:
+      type: object
+      additionalProperties: false
+      description: >-
+        The details to identify the offer may be valid, but it may 
+        have exceeded its usage limit or already expired.
+      properties:
+        name:
+          type: string
+          enum:
+            - OfferExpiredError
+        message:
+          type: string
+          enum:
+            - The offer has expired
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    OfferLimitExceededError:
+      type: object
+      additionalProperties: false
+      description: Either the maxQuery, maxClaim or validity date is not valid.
+      properties:
+        name:
+          type: string
+          enum:
+            - OfferLimitExceededError
+        message:
+          type: string
+          enum:
+            - The offer is no longer valid
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    GetPendingNotificationsOK:
+      type: object
+      additionalProperties: false
+      properties:
+        notifications:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id:
+                type: string
+                description: The notification identifier
+              type:
+                type: string
+                description: The type of notification
+              payload:
+                type: string
+                description: The raw payload that was sent via push notification
+              notificationDate:
+                type: string
+                description: date and time the refresh token expires in ISO-8601 format
+    CreateOobOK:
+      type: object
+      additionalProperties: false
+      properties:
+        oobUrl:
+          type: string
+          description: The full URL of the OOB offer created
+        oobId:
+          type: string
+          description: The unique identifier of the OOB offer created.
+      required:
+        - oobUrl
+        - oobId
+    GetOobOK:
+      type: object
+      additionalProperties: false
+      properties:
+        didcommMessage:
+          type: string
+          description: The payload of the OOB offer
+        mediatorDid:
+          type: string
+          description: Mediator did for the OOB offer
+        mediatorEndpoint:
+          type: string
+          description: Mediator endpoint for the OOB offer
+        mediatorWSSEndpoint:
+          type: string
+          description: Websocket endpoint for the mediator
+      required:
+        - didcommMessage
+        - mediatorDid
+        - mediatorEndpoint
+        - mediatorWSSEndpoint
+    RegisterNotificationOK:
+      type: object
+      additionalProperties: false
+      properties:
+        notificationToken:
+          type: string
+          description: The token for the notification
+      required:
+        - notificationToken
+    CheckOfferPhraseOK:
+      type: object
+      additionalProperties: false
+      properties:
+        isInUse:
+          type: boolean
+          description: Whether the offer phrase is already in use
+      required:
+        - isInUse
+    DeregisterNotificationOK:
+      type: object
+      additionalProperties: false
+      properties: {}
+    NotifyChannelOK:
+      type: object
+      additionalProperties: false
+      properties:
+        notificationId:
+          type: string
+          description: The notification identifier
+      required:
+        - notificationId
+    GroupSendMessageOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    DeletePendingNotificationsOK:
+      type: object
+      additionalProperties: false
+      properties:
+        deletedIds:
+          type: array
+          items:
+            type: string
+            required:
+              - id
+        notifications:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              id:
+                type: string
+                description: The notification identifier
+              offerLink:
+                type: string
+                description: offer link for the notification
+              deviceHash:
+                type: string
+                description: Hash of the device identifier/owner
+              did:
+                type: string
+                description: >-
+                  The consumer did that registered the device, and confirms
+                  ownership of the deviceId
+              payload:
+                type: string
+                description: The raw payload that was sent via push notification
+        examples: {}
+    OfferPhraseInUseError:
+      type: object
+      additionalProperties: false
+      description: The offer phrase is already in use by another offer
+      properties:
+        name:
+          type: string
+          enum:
+            - OfferPhraseInUseError
+        message:
+          type: string
+          enum:
+            - The offer phrase is already in use by another offer
+        httpStatusCode:
+          type: number
+          enum:
+            - 409
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+    DidAuthenticate:
+      description: List of required parameters to authenticate the user.
+      type: object
+      additionalProperties: false
+      properties:
+        challenge_response:
+          type: string
+          description: >-
+            A base64 encoded string containing the encrypted DIDComm 
+            message signed with the user's private key associated with 
+            their Decentralised Identifier (DID).
+    GroupDeleteInput:
+      description: List of required parameters to delete a group chat.
+      type: object
+      additionalProperties: false
+      properties:
+        groupId:
+          type: string
+          description: Unique identifier of the group chat to delete.
+        messageToRelay:
+          type: string
+          description: Message to send to the group chat members upon deletion.
+      required:
+        - groupId
+        - messageToRelay
+    GroupDeregisterMemberInput:
+      description: List of required and optional parameters to remove a member from the group chat.
+      type: object
+      additionalProperties: false
+      properties:
+        memberDid:
+          type: string
+          description: Decentralised Identifier (DID) of the member to remove.
+        groupId:
+          type: string
+          description: The unique identifier of the group chat to remove the member from.
+        messageToRelay:
+          type: string
+          description: An encrypted DIDComm message to send to the remaining group chat members in base64 format.
+      required:
+        - memberDid
+        - groupId
+    GroupSendMessage:
+      description: List of required and optional parameters to send a group chat message.
+      type: object
+      additionalProperties: false
+      properties:
+        offerLink:
+          type: string
+          description: The Offer link associated with the group chat.
+        fromDid:
+          type: string
+          description: The Decentralised Identifier (DID) of the message sender.
+        groupDid:
+          type: string
+          description: The channel DID for the group chat.
+        payload:
+          type: string
+          description: Input payload containing the message to send to the group chat.
+        ephemeral:
+          type: boolean
+          description: Indicates whether the message is ephemeral and should not be stored persistently.
+        expiresTime:
+          type: string
+          description: >-
+            The date and time of when the message expires in ISO-8601 format, e.g.,
+            2023-09-20T07:12:13.
+        notify:
+          type: boolean
+          description: >-
+            Indicates whether to send a notification to the group chat members using push notification.
+        incSeqNo:
+          type: boolean
+          description: Indicates whether to increment the sequence number of the message in the group chat.
+      required:
+        - offerLink
+        - fromDid
+        - groupDid
+        - payload
+    DidChallenge:
+      description: List of required parameters to initiate authentication process.
+      type: object
+      additionalProperties: false
+      properties:
+        did:
+          description: >- 
+            Decentralised Identifier (DID) of the user to initialise the 
+            authentication process and generate the challenge token.
+          type: string
+    GroupDeleteOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    GroupMemberDeregisterOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    DidAuthenticateOK:
+      type: object
+      additionalProperties: false
+      properties:
+        access_token:
+          type: string
+        access_expires_at:
+          type: string
+          description: >-
+            date and time the access token expires in ISO-8601 format, e.g.
+            2023-09-20T07:12:13
+        refresh_token:
+          type: string
+        refresh_expires_at:
+          type: string
+          description: >-
+            date and time the refresh token expires in ISO-8601 format, e.g.
+            2023-09-20T07:12:13
+    DidChallengeOK:
+      type: object
+      additionalProperties: false
+      properties:
+        challenge:
+          type: string
+    GetOobNotFoundError:
+      type: object
+      additionalProperties: false
+      description: The oob could not be found
+      properties:
+        name:
+          type: string
+          enum:
+            - GetOobNotFoundError
+        message:
+          type: string
+          enum:
+            - The oob could not be found
+        httpStatusCode:
+          type: number
+          enum:
+            - 404
+        traceId:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              issue:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              location:
+                type: string
+            required:
+              - issue
+      required:
+        - name
+        - message
+        - httpStatusCode
+        - traceId
+  examples: {}
+paths:
+  /v1/register-device:
+    post:
+      operationId: registerDevice
+      description: Registers the device for push notifications.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/RegisterDeviceInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/RegisterDeviceOK'
+  /v1/register-offer:
+    post:
+      operationId: registerOfferToConnect
+      description: >-
+        Registers an Out-of-Band (OOB) offer, and the device for push notification when the
+        offer is accessed.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/RegisterOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/RegisterOfferOK'
+        '409':
+          $ref: '#/components/responses/RegisterOfferToConnectConflictError'
+  /v1/register-offer-group:
+    post:
+      operationId: registerOfferToConnectGroup
+      description: Registers an offer to connect to a group chat.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/RegisterOfferGroupInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/RegisterOfferGroupOK'
+        '409':
+          $ref: '#/components/responses/RegisterOfferToConnectGroupConflictError'
+  /v1/group-add-member:
+    post:
+      operationId: groupAddMember
+      description: Adds a member to a group chat.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/GroupAddMemberInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/GroupAddMemberOK'
+  /v1/deregister-offer:
+    post:
+      operationId: deregisterOfferToConnect
+      description: Deregisters an Out-of-Band (OOB) offer.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/DeregisterOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeregisterOfferOK'
+  /v1/accept-offer:
+    post:
+      operationId: acceptOfferToConnect
+      description: Accepts an Out-of-Band (OOB) offer to connect.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/AcceptOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/AcceptOfferOK'
+        '404':
+          $ref: '#/components/responses/AcceptOfferToConnectNotFoundError'
+  /v1/accept-offer-group:
+    post:
+      operationId: acceptOfferToConnectGroup
+      description: Accepts an offer to connect to a group chat.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/AcceptOfferGroupInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/AcceptOfferGroupOK'
+  /v1/notify-acceptance:
+    post:
+      operationId: notifyAcceptance
+      description: Notifies the user who registered the offer when another user accepts it.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/NotifyAcceptOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/NotifyAcceptOfferOK'
+  /v1/notify-acceptance-group:
+    post:
+      operationId: notifyAcceptanceGroup
+      description: Notifies the user who registered the group chat offer when another user accepts it.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/NotifyAcceptOfferGroupInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/NotifyAcceptOfferGroupOK'
+  /v1/finalise-acceptance:
+    post:
+      operationId: finaliseOfferAcceptance
+      description: Finalises the acceptance of the Out-of-Band (OOB) offer.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/FinaliseOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/FinaliseOfferOK'
+        '404':
+          $ref: '#/components/responses/FinaliseOfferAcceptanceNotFoundError'
+  /v1/query-offer:
+    post:
+      operationId: queryOffer
+      description: Finds a published connection offer.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/QueryOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/QueryOfferOK'
+        '404':
+          $ref: '#/components/responses/QueryOfferNotFoundError'
+  /v1/notifications:
+    post:
+      operationId: getPendingNotifications
+      description: Retrieves all pending notifications queued for the target device.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/GetPendingNotificationsInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPendingNotificationsOK'
+  /v1/delete-notifications:
+    post:
+      operationId: deletePendingNotifications
+      description: Deletes the given list of pending notifications for the target device.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/DeletePendingNotificationsInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeletePendingNotificationsOK'
+  /v1/create-oob:
+    post:
+      operationId: createOOB
+      description: Creates an Out-of-Band (OOB) record for interactive connection.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/CreateOobInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/CreateOobOK'
+  /v1/oob/{oobId}:
+    get:
+      operationId: getOOB
+      description: Retrieves an Out-of-Band (OOB) record for interactive connection.
+      security:
+        - DidCommTokenAuth: []
+      parameters:
+        - in: path
+          name: oobId
+          description: Unique identifier for the Out-of-Band (OOB) offer created.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/GetOobOK'
+        '404':
+          $ref: '#/components/responses/GetOobNotFoundError'
+  /v1/register-notification:
+    post:
+      operationId: registerNotification
+      description: Registers a notification for the target device.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/RegisterNotificationInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/RegisterNotificationOK'
+  /v1/notify-channel:
+    post:
+      operationId: notifyChannel
+      description: Sends a notification using a channel.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/NotifyChannelInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/NotifyChannelOK'
+  /v1/notify-outreach:
+    post:
+      operationId: notifyOutreach
+      description: Sends a notification using a channel.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/NotifyOutreachInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/NotifyOutreachOK'
+  /v1/deregister-notification:
+    post:
+      operationId: deregisterNotification
+      description: Deregisters a notification for the target device.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/DeregisterNotificationInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeregisterNotificationOK'
+  /v1/check-offer-phrase:
+    post:
+      operationId: checkOfferPhrase
+      description: Checks whether an offer phrase is still valid and available for use.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/CheckOfferPhraseInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/CheckOfferPhraseOK'
+  /v1/authenticate:
+    post:
+      operationId: didAuthenticate
+      description: Authenticates a user and generates an access token by validating an encrypted DIDComm message signed with the user's private key associated with their Decentralised Identifier (DID).
+      security: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/DidAuthenticate'
+      responses:
+        '200':
+          $ref: '#/components/responses/DidAuthenticateOK'
+  /v1/authenticate/challenge:
+    post:
+      operationId: didChallenge
+      description: Initiates the authentication process by generating an auth challenge token for the specified Decentralised Identifier (DID).
+      security: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/DidChallenge'
+      responses:
+        '200':
+          $ref: '#/components/responses/DidChallengeOK'
+  /v1/group-send-message:
+    post:
+      operationId: groupSendMessage
+      description: Sends a message to the group chat.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/GroupSendMessage'
+      responses:
+        '200':
+          $ref: '#/components/responses/GroupSendMessageOK'
+  /v1/group-delete:
+    post:
+      operationId: groupDelete
+      description: Deletes a group chat by ID.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/GroupDeleteInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/GroupDeleteOK'
+  /v1/group-member-deregister:
+    post:
+      operationId: groupMemberDeregister
+      description: Removes a member from the group chat.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/GroupMemberDeregisterInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/GroupMemberDeregisterOK'

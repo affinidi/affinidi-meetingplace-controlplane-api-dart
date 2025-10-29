@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>Meeting Place Control Plane API</title>
+    <style type="text/css">
+      body {
+        background-color: #000;
+        color: #fff;
+      }
+
+      .container {
+        margin: 0; /* Remove default margin */
+        display: flex; /* Use flexbox layout */
+        justify-content: center; /* Align items horizontally */
+        align-items: center; /* Align items vertically */
+        text-align: center; /* Center text inside elements */
+        vertical-align: middle;
+        gap: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    
+    <div class="container">
+      <div class="item" style="background-color: #fff;">
+        <img src="./asset/meetingplace-banner.svg" />
+      </div>
+    </div>
+    <div class="container" style="position: relative; top: -100px;">
+        <div id="qrcode" style="float: left; border: 5px #fff solid;"></div>
+        <div style="width: 250px; font-size: 26px;">Scan code to use your Meeting Place Control Plane API instance</div>
+    </div>
+
+
+    <script>
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open( "GET", `${window.location.href}discover`, false ); // false for synchronous request
+      xmlHttp.send( null );
+      
+      var response = JSON.parse(xmlHttp.responseText).token;
+      const qrcode = new QRCode(document.getElementById('qrcode'), {
+        text: response,
+        width: 256,
+        height: 256,
+        colorDark : '#000',
+        colorLight : '#fff',
+        correctLevel : QRCode.CorrectLevel.H
+      });
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,20 @@
+name: client_examples
+description: Client implementation examples for Meeting Place Control Plane API
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  ssi: ^2.10.3
+  didcomm: ^1.1.1
+  dio: ^5.7.0
+  uuid: ^4.5.1
+  dotenv: ^4.2.0
+  http: ^1.0.0
+  api_meetingplace_dart_oss:
+    path: ../..
+
+dev_dependencies:
+  lints: ^5.0.0

@@ -1,0 +1,13 @@
+
+version: '3.8'
+services:
+  storage:
+    image: valkey/valkey:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"  # Redis Insight UI
+    volumes:
+      - storage_data:/data
+
+volumes:
+  storage_data:

@@ -1,0 +1,74 @@
+.default-non-release-rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE =~ /merge_request_event|schedule/
+      when: never
+    - if: "$CI_COMMIT_TAG"
+      when: never
+    - if: '$CI_COMMIT_MESSAGE =~ /^chore\(release\): .*/'
+      when: never
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
+      when: on_success
+      changes:
+        - $RULES_CHANGES_PATH
+
+.non-default-branch-rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE =~ /merge_request_event|schedule/
+      when: never
+    - if: "$CI_COMMIT_TAG"
+      when: never
+    - if: '$CI_COMMIT_MESSAGE =~ /^chore\(release\): .*/'
+      when: never
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
+      when: never
+    - when: always
+
+.branch-manual-non-release-rules:
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      when: never
+    - if: '$CI_COMMIT_MESSAGE =~ /^chore\(release\): .*/'
+      when: never
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
+      when: never
+    - when: manual
+
+.release-rules:
+  rules:
+    - if: $CI_COMMIT_TAG == ""
+      when: never
+    - if: $CI_COMMIT_REF_NAME != $CI_COMMIT_TAG
+      when: never
+    - when: manual
+
+.auto-release-rules:
+  rules:
+    - if: $CI_COMMIT_TAG == ""
+      when: never
+    - if: $CI_COMMIT_REF_NAME != $CI_COMMIT_TAG
+      when: never
+    - when: always
+
+.non-release-rules:
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      when: never
+    - if: '$CI_COMMIT_MESSAGE =~ /^chore\(release\): .*/'
+      when: never
+    - when: on_success
+
+.manual-on-branch-non-release-rules:
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      when: never
+    - if: '$CI_COMMIT_MESSAGE =~ /^chore\(release\): .*/'
+      when: never
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
+      when: on_success
+    - when: manual
+
+.hotfix-manual-release-rules:
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^hotfix\/.*/'
+      when: manual
+    - when: never

@@ -1,0 +1,29 @@
+acceptance:
+  maximumRetries: 5
+
+auth:
+  accessTokenExpiryInMinutes: 15
+  refreshTokenExpiryInMinutes: 720
+  challengeTokenAudience: "https://affinidi.com/meetingplace/mobileapp"
+  challengeTokenIssuer: "https://affinidi.com/meetingplace/authenticate"
+  tokenAudience: "https://affinidi.com/meetingplace/client"
+  tokenIssuer: "https://affinidi.com/meetingplace/1.0/authenticate"
+  refreshTokenIssuer: "https://affinidi.com/meetingplace/1.0/authenticate/refresh"
+  didResolverUrl: "https://dev.uniresolver.io"
+  mpxRegistrationDidcommType: "https://affinidi.com/atm/client-actions/mpx-registration"
+  mpxRegistrationTokenExpiryInMinutes: 1440
+
+deviceNotification:
+  title: "Meeting Place"
+  titleIncludeDev: true
+  pushNotificationCustomKeyProperty: affinidiInfo
+  maxPendingNotificationsToDeleteInBatch: 10
+
+offer:
+  mnemonicWordSeparator: ' '
+  mnemonicWordCount: 5
+  ttlInMinutesAfterValidUntil: 60
+
+oob:
+  oobUrlPath: "/v1/get-oob/__OOB_ID__"
+  ttlInMinutes: 1440
