@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:ssi/ssi.dart';
 
-import 'package:api_meetingplace_dart_oss/meeting_place_control_plane_api.dart';
+import 'package:meeting_place_control_plane_api/meeting_place_control_plane_api.dart';
 
 void main(List<String> args) async {
   // Use any available host or container IP (usually `0.0.0.0`).

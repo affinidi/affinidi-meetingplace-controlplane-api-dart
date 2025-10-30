@@ -5,10 +5,10 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: da0d9209ca76bde579f2da330aeb9df62b6319c834fa7baae052021b0462401f
+      sha256: c209688d9f5a5f26b2fb47a188131a6fb9e876ae9e47af3737c0b4f58a93470d
       url: "https://pub.dev"
     source: hosted
-    version: "85.0.0"
+    version: "91.0.0"
   adaptive_number:
     dependency: transitive
     description:
@@ -21,26 +21,10 @@ packages:
     dependency: transitive
     description:
       name: analyzer
-      sha256: "974859dc0ff5f37bc4313244b3218c791810d03ab3470a579580279ba971a48d"
+      sha256: f51c8499b35f9b26820cfe914828a6a98a94efd5cc78b37bb7d03debae3a1d08
       url: "https://pub.dev"
     source: hosted
-    version: "7.7.1"
-  api_client:
-    dependency: transitive
-    description:
-      path: "packages/meeting_place_control_plane/api_client"
-      ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      resolved-ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      url: "https://gitlab.com/affinidi/foundational/mpx/libs/mpx-sdk.git"
-    source: git
-    version: "1.0.0"
-  api_meetingplace_dart_oss:
-    dependency: "direct main"
-    description:
-      path: "../.."
-      relative: true
-    source: path
-    version: "1.0.0"
+    version: "8.4.1"
   archive:
     dependency: transitive
     description:
@@ -149,18 +133,18 @@ packages:
     dependency: transitive
     description:
       name: build
-      sha256: "51dc711996cbf609b90cbe5b335bbce83143875a9d58e4b5c6d3c4f684d3dda7"
+      sha256: dfb67ccc9a78c642193e0c2d94cb9e48c2c818b3178a86097d644acdcde6a8d9
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4"
+    version: "4.0.2"
   build_config:
     dependency: transitive
     description:
       name: build_config
-      sha256: "4ae2de3e1e67ea270081eaee972e1bd8f027d459f249e0f1186730784c2e7e33"
+      sha256: "4f64382b97504dc2fcdf487d5aae33418e08b4703fc21249e4db6d804a4d0187"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.0"
   build_daemon:
     dependency: transitive
     description:
@@ -169,30 +153,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
-  build_resolvers:
-    dependency: transitive
-    description:
-      name: build_resolvers
-      sha256: ee4257b3f20c0c90e72ed2b57ad637f694ccba48839a821e87db762548c22a62
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.4"
   build_runner:
     dependency: transitive
     description:
       name: build_runner
-      sha256: "382a4d649addbfb7ba71a3631df0ec6a45d5ab9b098638144faf27f02778eb53"
+      sha256: a9461b8e586bf018dd4afd2e13b49b08c6a844a4b226c8d1d10f3a723cdd78c3
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4"
-  build_runner_core:
-    dependency: transitive
-    description:
-      name: build_runner_core
-      sha256: "85fbbb1036d576d966332a3f5ce83f2ce66a40bea1a94ad2d5fc29a19a0d3792"
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.1.2"
+    version: "2.10.1"
   built_collection:
     dependency: transitive
     description:
@@ -285,18 +253,18 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "8a0e5fba27e8ee025d2ffb4ee820b4e6e2cf5e4246a6b1a477eb66866947e0bb"
+      sha256: c87dfe3d56f183ffe9106a18aebc6db431fc7c98c31a54b952a77f3d54a85697
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.1"
+    version: "3.1.2"
   didcomm:
     dependency: "direct main"
     description:
       name: didcomm
-      sha256: c8e2bcf15c88f96b5dbf9d08b5c8646e126f87cbf6d0b3f7319ebe1879b8e481
+      sha256: "4f18c62fdfd98eb011d7613517840cc7c905fd0028c2716ebee4a74fcdcf6d0f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "2.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -385,14 +353,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  frontend_server_client:
-    dependency: transitive
-    description:
-      name: frontend_server_client
-      sha256: f64a0333a82f30b0cca061bc3d143813a486dc086b574bfb233b7c1372427694
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0"
   glob:
     dependency: transitive
     description:
@@ -493,10 +453,10 @@ packages:
     dependency: transitive
     description:
       name: json_serializable
-      sha256: c50ef5fc083d5b5e12eef489503ba3bf5ccc899e487d691584699b4bdefeea8c
+      sha256: "33a040668b31b320aafa4822b7b1e177e163fc3c1e835c6750319d4ab23aa6fe"
       url: "https://pub.dev"
     source: hosted
-    version: "6.9.5"
+    version: "6.11.1"
   lints:
     dependency: "direct dev"
     description:
@@ -513,6 +473,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  lucid_validation:
+    dependency: transitive
+    description:
+      name: lucid_validation
+      sha256: "45cb775d8c694483b63c7aeb939aaa53f052b257f0e857c91224b9404860ce14"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.1"
   matcher:
     dependency: transitive
     description:
@@ -524,30 +492,34 @@ packages:
   meeting_place_control_plane:
     dependency: transitive
     description:
-      path: "packages/meeting_place_control_plane"
-      ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      resolved-ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      url: "https://gitlab.com/affinidi/foundational/mpx/libs/mpx-sdk.git"
-    source: git
-    version: "1.0.0-dev"
+      name: meeting_place_control_plane
+      sha256: "6b0aa422a336d2193c0dbe5057e89f0c54790721775777ceab25b5c2fc9e8d20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1-dev.4"
+  meeting_place_control_plane_api:
+    dependency: "direct main"
+    description:
+      path: "../.."
+      relative: true
+    source: path
+    version: "0.0.1-dev.1"
   meeting_place_core:
     dependency: transitive
     description:
-      path: "packages/meeting_place_core"
-      ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      resolved-ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      url: "https://gitlab.com/affinidi/foundational/mpx/libs/mpx-sdk.git"
-    source: git
-    version: "1.0.0-dev.1"
+      name: meeting_place_core
+      sha256: "223100dd7905cf3fe1694f5ce29323349669b10d5f48d56372d82bded9ed091c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1-dev.5"
   meeting_place_mediator:
     dependency: transitive
     description:
-      path: "packages/meeting_place_mediator"
-      ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      resolved-ref: "992d7096c98a1a4a087e42e99bfae0c9479b95ba"
-      url: "https://gitlab.com/affinidi/foundational/mpx/libs/mpx-sdk.git"
-    source: git
-    version: "1.0.0-dev.1"
+      name: meeting_place_mediator
+      sha256: "702d0c58f37668ae67bec45bd4a5dd4de034669cf816deda4048f81404e4a624"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1-dev.2"
   meta:
     dependency: transitive
     description:
@@ -760,18 +732,18 @@ packages:
     dependency: transitive
     description:
       name: source_gen
-      sha256: "35c8150ece9e8c8d263337a265153c3329667640850b9304861faea59fc98f6b"
+      sha256: "9098ab86015c4f1d8af6486b547b11100e73b193e1899015033cb3e14ad20243"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "4.0.2"
   source_helper:
     dependency: transitive
     description:
       name: source_helper
-      sha256: a447acb083d3a5ef17f983dd36201aeea33fedadb3228fa831f2f0c92f0f3aca
+      sha256: "6a3c6cc82073a8797f8c4dc4572146114a39652851c157db37e964d9c7038723"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.7"
+    version: "1.3.8"
   source_span:
     dependency: transitive
     description:
@@ -792,10 +764,10 @@ packages:
     dependency: "direct main"
     description:
       name: ssi
-      sha256: "740ad653aeb891a05d22623a617d2d7808459e5a3e6d52c7247ae0615866268e"
+      sha256: "0062be14e2704696685084b9468f1948798d15c5c7614639cd869d0a9553c74c"
       url: "https://pub.dev"
     source: hosted
-    version: "2.15.0"
+    version: "2.16.0"
   stack_trace:
     dependency: transitive
     description:
@@ -828,6 +800,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      sha256: c254ade258ec8282947a0acbbc90b9575b4f19673533ee46f2f6e9b3aeefd7c0
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.0"
   term_glyph:
     dependency: transitive
     description:
@@ -844,14 +824,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.7"
-  timing:
-    dependency: transitive
-    description:
-      name: timing
-      sha256: "62ee18aca144e4a9f29d212f5a4c6a053be252b895ab14b5821996cff4ed90fe"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
   typed_data:
     dependency: transitive
     description:
@@ -925,4 +897,4 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.8.0 <4.0.0"
+  dart: ">=3.9.0 <4.0.0"

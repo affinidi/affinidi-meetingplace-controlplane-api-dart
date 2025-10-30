@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:api_meetingplace_dart_oss/src/core/config/env_config.dart';
+import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dio/dio.dart';
 import 'package:test/test.dart';

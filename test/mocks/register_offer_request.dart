@@ -1,5 +1,5 @@
-import 'package:api_meetingplace_dart_oss/src/api/register_offer/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/utils/platform_type.dart';
+import 'package:meeting_place_control_plane_api/src/api/register_offer/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 
 RegisterOfferRequest getRegisterOfferRequestMock({
   required String deviceToken,

@@ -1,5 +1,5 @@
-import 'package:api_meetingplace_dart_oss/src/api/accept_offer_group/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/utils/platform_type.dart';
+import 'package:meeting_place_control_plane_api/src/api/accept_offer_group/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 
 AcceptOfferGroupRequest getAcceptOfferGroupRequest({
   required String did,

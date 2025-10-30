@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:api_meetingplace_dart_oss/meeting_place_control_plane_api.dart';
+import 'package:meeting_place_control_plane_api/meeting_place_control_plane_api.dart';
 
 import 'package:didcomm/didcomm.dart';
 import 'package:dio/dio.dart';

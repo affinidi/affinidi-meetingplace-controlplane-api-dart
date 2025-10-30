@@ -2,33 +2,32 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:api_meetingplace_dart_oss/src/api/accept_offer/response_error_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/check_offer_phrase/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/create_oob/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/delete_pending_notifications/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/deregister_notification/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/deregister_offer/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/finalise_acceptance/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/get_pending_notifications/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_add_member/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_add_member/response_error_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_delete/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_delete/response_error_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_member_deregister/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_member_deregister/response_error_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/group_send_message/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/notify_acceptance/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/notify_channel/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/notify_outreach/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/query_offer/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/register_device/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/api/register_notification/request_model.dart';
-import 'package:api_meetingplace_dart_oss/src/core/config/env_config.dart';
-import 'package:api_meetingplace_dart_oss/src/service/did_resolver/cached_did_resolver.dart';
-import 'package:api_meetingplace_dart_oss/src/core/entity/offer.dart';
-import 'package:api_meetingplace_dart_oss/src/utils/platform_type.dart';
+import 'package:meeting_place_control_plane_api/src/api/accept_offer/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/check_offer_phrase/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/create_oob/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/delete_pending_notifications/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/deregister_notification/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/deregister_offer/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/finalise_acceptance/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/get_pending_notifications/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_add_member/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_add_member/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_delete/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_delete/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_member_deregister/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_member_deregister/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_send_message/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/notify_acceptance/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/notify_channel/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/notify_outreach/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/query_offer/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/register_device/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/register_notification/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
+import 'package:meeting_place_control_plane_api/src/service/did_resolver/cached_did_resolver.dart';
+import 'package:meeting_place_control_plane_api/src/core/entity/offer.dart';
+import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:didcomm/didcomm.dart';
 import 'package:dio/dio.dart';
 import 'package:meeting_place_core/meeting_place_core.dart'
@@ -46,15 +45,6 @@ import 'mocks/register_offer_request.dart';
 import 'utils/authoritzation.dart';
 import 'utils/did_generator.dart';
 import 'utils/recrypt.dart';
-
-Uint8List generateRandomSeed(int length) {
-  final random = Random.secure(); // Cryptographically secure
-  final bytes = Uint8List(length);
-  for (var i = 0; i < length; i++) {
-    bytes[i] = random.nextInt(256); // value from 0 to 255
-  }
-  return bytes;
-}
 
 void main() {
   final apiEndpoint = getEnv('API_ENDPOINT');
@@ -126,6 +116,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
       maximumUsage: 100,
       validUntil: DateTime.now()
           .toUtc()
@@ -145,7 +136,7 @@ void main() {
     final findOfferResponse = await dio.post(
       '$apiEndpoint/v1/query-offer',
       data: {
-        'did': await DidGenerator.generateDidKey(),
+        'did': await DidGenerator.generateDidKey(aliceWallet),
         'mnemonic': response.data['mnemonic'],
       },
       options: Options(headers: {
@@ -362,6 +353,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -589,8 +581,8 @@ void main() {
     final registerNotificationResponse = await dio.post(
       '$apiEndpoint/v1/register-notification',
       data: RegisterNotificationRequest(
-        myDid: await DidGenerator.generateDidKey(),
-        theirDid: await DidGenerator.generateDidKey(),
+        myDid: await DidGenerator.generateDidKey(aliceWallet),
+        theirDid: await DidGenerator.generateDidKey(bobWallet),
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
@@ -622,8 +614,8 @@ void main() {
     final registerNotificationResponse = await dio.post(
       '$apiEndpoint/v1/register-notification',
       data: RegisterNotificationRequest(
-        myDid: await DidGenerator.generateDidKey(),
-        theirDid: await DidGenerator.generateDidKey(),
+        myDid: await DidGenerator.generateDidKey(aliceWallet),
+        theirDid: await DidGenerator.generateDidKey(bobWallet),
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
@@ -676,8 +668,8 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/register-notification',
       data: RegisterNotificationRequest(
-        myDid: await DidGenerator.generateDidKey(),
-        theirDid: await DidGenerator.generateDidKey(),
+        myDid: await DidGenerator.generateDidKey(aliceWallet),
+        theirDid: await DidGenerator.generateDidKey(bobWallet),
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
@@ -847,7 +839,7 @@ void main() {
       '$apiEndpoint/v1/finalise-acceptance',
       data: FinaliseAcceptanceRequest(
         did: BobDevice.offerAcceptanceDid,
-        theirDid: await DidGenerator.generateDidKey(),
+        theirDid: await DidGenerator.generateDidKey(aliceWallet),
         mnemonic: registerOfferResponse.data['mnemonic'],
         offerLink: registerOfferResponse.data['offerLink'],
         deviceToken: BobDevice.deviceToken,
@@ -869,7 +861,7 @@ void main() {
         '$apiEndpoint/v1/finalise-acceptance',
         data: FinaliseAcceptanceRequest(
           did: BobDevice.offerAcceptanceDid,
-          theirDid: await DidGenerator.generateDidKey(),
+          theirDid: await DidGenerator.generateDidKey(bobWallet),
           mnemonic: 'mnemonic',
           offerLink: 'offer-link',
           deviceToken: BobDevice.deviceToken,
@@ -1113,8 +1105,8 @@ void main() {
     final registerNotificationResponse = await dio.post(
       '$apiEndpoint/v1/register-notification',
       data: RegisterNotificationRequest(
-        myDid: await DidGenerator.generateDidKey(),
-        theirDid: await DidGenerator.generateDidKey(),
+        myDid: await DidGenerator.generateDidKey(aliceWallet),
+        theirDid: await DidGenerator.generateDidKey(bobWallet),
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
@@ -1129,7 +1121,7 @@ void main() {
       data: NotifyChannelRequest(
         notificationChannelId:
             registerNotificationResponse.data['notificationToken'],
-        did: await DidGenerator.generateDidKey(),
+        did: await DidGenerator.generateDidKey(bobWallet),
         type: 'chat-activity',
       ).toJson(),
       options: Options(headers: {
@@ -1168,6 +1160,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -1303,6 +1296,7 @@ void main() {
     final registerOfferRequestMock = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -1537,7 +1531,7 @@ void main() {
     final findOfferResponse = await dio.post(
       '$apiEndpoint/v1/query-offer',
       data: {
-        'did': await DidGenerator.generateDidKey(),
+        'did': await DidGenerator.generateDidKey(aliceWallet),
         'mnemonic': response.data['mnemonic'],
       },
       options: Options(headers: {
@@ -1614,6 +1608,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -1748,6 +1743,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -1817,6 +1813,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -1896,6 +1893,7 @@ void main() {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final registerOfferResponse = await dio.post(
@@ -1992,6 +1990,7 @@ void main() {
     final registerOfferGroupRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final response = await dio.post(
@@ -2045,6 +2044,7 @@ void main() {
     final registerOfferGroupRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
     );
 
     final response = await dio.post(

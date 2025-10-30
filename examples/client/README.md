@@ -62,7 +62,7 @@ CONTROL_PLANE_DID=did:localhost:3000
 1. Add dependency in `pubspec.yaml`:
 ```yaml
 dependencies:
-  api_meetingplace_dart_oss:
+  meeting_place_control_plane_api:
     path: ../../  # Adjust path to the API project
 ```
 

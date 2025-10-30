@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:api_meetingplace_dart_oss/src/core/config/env_config.dart';
+import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:cryptography/helpers.dart';
 

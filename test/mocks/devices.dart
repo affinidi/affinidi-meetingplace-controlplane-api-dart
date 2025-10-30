@@ -1,4 +1,4 @@
-import 'package:api_meetingplace_dart_oss/src/utils/platform_type.dart';
+import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:uuid/uuid.dart';
 
 class AliceDevice {
