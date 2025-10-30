@@ -1,0 +1,74 @@
+name: Tests
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      redis:
+        image: valkey/valkey:latest
+        options: >-
+          --entrypoint redis-server
+        ports:
+          - 6379:6379
+
+    
+    permissions:
+      contents: read
+      id-token: write  # Required for OIDC token
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      
+      - name: Create directories and setup secrets
+        run: |
+          mkdir -p ./secrets
+          mkdir -p ./params
+          mkdir -p keys
+      
+      - name: Setup configuration files
+        run: |
+          cp examples/config/config.example.yml config.yml
+          cp .env.ci .env
+      
+      - name: Generate SSL keys
+        run: |
+          openssl ecparam -name secp256k1 -genkey -noout -out ./keys/secp256k1.pem
+          openssl ecparam -name prime256v1 -genkey -noout -out ./keys/p256.pem
+          openssl genpkey -algorithm Ed25519 -out ./keys/ed25519.pem
+          openssl pkey -in keys/ed25519.pem -pubout -out ./keys/ed25519-pub.pem
+      
+      - name: Install dependencies
+        run: dart pub get
+      
+      - name: Run setup script
+        run: dart run script/setup.dart
+      
+      - name: Start server in background
+        run: |
+          dart run ./bin/server_local.dart > /dev/null 2>&1 &
+          sleep 5
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+      
+      - name: Run tests with coverage
+        run: env MEDIATOR_DID=$MEDIATOR_DID dart test --chain-stack-traces --coverage=.coverage
+        env:
+          MEDIATOR_DID: ${{ secrets.MEDIATOR_DID || vars.MEDIATOR_DID }}
+      
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: .coverage/
