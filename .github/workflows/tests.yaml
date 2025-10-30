@@ -83,10 +83,9 @@ jobs:
       
       - name: Run tests with coverage
         run: |
-          echo "Mediator DID: $MEDIATOR_DID"
           dart test --chain-stack-traces --coverage=.coverage
         env:
-          MEDIATOR_DID: ${{ secrets.MEDIATOR_DID || vars.MEDIATOR_DID }}
+          MEDIATOR_DID: ${{ secrets.MEDIATOR_DID }}
       
       - name: Upload coverage
         if: always()
