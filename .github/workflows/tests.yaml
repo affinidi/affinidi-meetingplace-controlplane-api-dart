@@ -57,9 +57,6 @@ jobs:
         run: |
           dart run ./bin/server_local.dart > /tmp/server.log 2>&1 &
           echo $! > server.pid
-        env:
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
       
       - name: Wait for server to be ready
         run: |
