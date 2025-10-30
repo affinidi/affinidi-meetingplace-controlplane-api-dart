@@ -18,7 +18,7 @@ void main(List<String> args) async {
   _registerSecrets(secretManager: secretManager, config: config);
 
   // Environment dependent configuration
-  final logger = BasicLogger();
+  final logger = ProdLogger();
   final storage = await Redis.init(logger: logger);
   final serverConfig = ServerConfig(
     secretManager: secretManager,
