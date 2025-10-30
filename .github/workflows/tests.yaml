@@ -55,7 +55,7 @@ jobs:
       
       - name: Start server in background
         run: |
-          dart run ./bin/server_local.dart > /server.log 2>&1 &
+          dart run ./bin/server_local.dart > /tmp/server.log 2>&1 &
           echo $! > server.pid
         env:
           REDIS_HOST: localhost
@@ -79,7 +79,7 @@ jobs:
             sleep 1
           done
           echo "Server failed to start within expected time. Checking logs:"
-          cat /server.log
+          cat /tmp/server.log
           exit 1
   
       
