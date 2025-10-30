@@ -4,7 +4,7 @@ Affinidi Meeting Place - Control Plane API provides capabilities to enable the d
 
 The Control Plane API is built on Dart for a high-performance server, which provides optimal speed and stability for handling API requests.
 
-DISCLAIMER: Affinidi provides this API as a developer tool to facilitate decentralized discovery and messaging. Any personal data exchanged or stored via this tool is entirely initiated and controlled by end-users. Affinidi does not collect, access, or process such data. Implementing parties are responsible for ensuring that their applications comply with applicable privacy laws and user transparency obligations.
+> DISCLAIMER: Affinidi provides this API as a developer tool to facilitate decentralized discovery and messaging. Any personal data exchanged or stored via this tool is entirely initiated and controlled by end-users. Affinidi does not collect, access, or process such data. Implementing parties are responsible for ensuring that their applications comply with applicable privacy laws and user transparency obligations.
 
 ## Tables of Contents
 
