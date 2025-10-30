@@ -55,7 +55,7 @@ jobs:
       
       - name: Start server in background
         run: |
-          dart run ./bin/server_local.dart > /dev/null 2>&1 &
+          dart run ./bin/server_local.dart &
           sleep 5
         env:
           REDIS_HOST: localhost
