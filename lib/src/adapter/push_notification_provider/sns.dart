@@ -65,11 +65,17 @@ class SNSProvider implements PushNotificationProvider {
     required String payload,
   }) async {
     final client = await _getClient();
+
+    _logger.debug(
+        'Send push notification to ARN: $targetArn using payload: $payload');
     final response = await client.publish(
       message: payload,
       targetArn: targetArn,
       messageStructure: 'json',
     );
+
+    _logger.debug(
+        'Push notification triggered successfully for ARN: $targetArn using payload: $payload');
     _logger.info('Publishing success, messsage id: ${response.messageId}');
   }
 
