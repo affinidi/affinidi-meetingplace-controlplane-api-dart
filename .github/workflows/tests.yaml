@@ -55,7 +55,7 @@ jobs:
       
       - name: Start server in background
         run: |
-          dart run ./bin/server_local.dart > /dev/null 2>&1 &
+          dart run ./bin/server_local.dart > /server.log 2>&1 &
           echo $! > server.pid
         env:
           REDIS_HOST: localhost
@@ -78,6 +78,10 @@ jobs:
             echo "Attempt $ATTEMPT/$MAX_ATTEMPTS - Server not ready yet..."
             sleep 1
           done
+          echo "Server failed to start within expected time. Checking logs:"
+          cat /server.log
+          exit 1
+  
       
       - name: Run tests with coverage
         run: env MEDIATOR_DID=$MEDIATOR_DID dart test --chain-stack-traces --coverage=.coverage
