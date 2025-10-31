@@ -1,0 +1,33 @@
+import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
+
+import '../request_validation_exception.dart';
+import 'request_validator.dart';
+
+part 'request_model.g.dart';
+
+@JsonSerializable()
+class NotifyChannelRequest {
+  NotifyChannelRequest({
+    required this.notificationChannelId,
+    required this.did,
+    required this.type,
+  });
+
+  factory NotifyChannelRequest.fromRequestParams(String requestParams) {
+    final params = jsonDecode(requestParams);
+
+    final validationResult = NotifyChannelRequestValidator().validate(params);
+
+    if (!validationResult.isValid) {
+      throw RequestValidationException.fromValidationResult(validationResult);
+    }
+
+    return _$NotifyChannelRequestFromJson(params);
+  }
+  final String notificationChannelId;
+  final String did;
+  final String type;
+
+  toJson() => _$NotifyChannelRequestToJson(this);
+}

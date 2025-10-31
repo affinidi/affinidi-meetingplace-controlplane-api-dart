@@ -1,0 +1,31 @@
+import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
+
+import '../request_validation_exception.dart';
+import 'request_validator.dart';
+
+part 'request_model.g.dart';
+
+@JsonSerializable()
+class DeregisterOfferRequest {
+  DeregisterOfferRequest({
+    required this.offerLink,
+    required this.mnemonic,
+  });
+
+  factory DeregisterOfferRequest.fromRequestParams(String requestParams) {
+    final params = jsonDecode(requestParams);
+
+    final validationResult = DeregisterOfferRequestValidator().validate(params);
+
+    if (!validationResult.isValid) {
+      throw RequestValidationException.fromValidationResult(validationResult);
+    }
+
+    return _$DeregisterOfferRequestFromJson(params);
+  }
+  final String offerLink;
+  final String mnemonic;
+
+  toJson() => _$DeregisterOfferRequestToJson(this);
+}

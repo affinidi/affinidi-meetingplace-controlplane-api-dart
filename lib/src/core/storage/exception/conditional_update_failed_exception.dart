@@ -1,0 +1,1 @@
+class ConditionalUpdateFailed implements Exception {}

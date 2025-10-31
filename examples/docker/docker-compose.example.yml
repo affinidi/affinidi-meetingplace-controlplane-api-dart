@@ -1,0 +1,45 @@
+services:
+  api:
+    build:
+      context: .
+      secrets:
+        - gitlab-token
+    ports:
+      - "3000:8080"
+    environment:
+      - ENV=DEV
+      - SERVER_PORT=8080
+      - API_ENDPOINT=http://localhost:3000
+      - CONTROL_PLANE_DID=did:localhost:3000
+      - STORAGE_ENDPOINT=storage
+      - STORAGE_PORT=6380
+      - DIDCOMM_AUTH_SECRET=/run/secrets/didcommauth
+      - HASH_SECRET=/run/secrets/hash-secret
+      - DID_DOCUMENT=/run/params/did_document
+      - PUSH_NOTIFICATION_PROVIDER=none
+      - AWS_REGION=
+      - AWS_ACCESS_KEY=
+      - AWS_SECRET_KEY=
+      - AWS_SESSION_TOKEN=
+      - GROUP_COUNT_LIMIT=10
+    secrets:
+      - didcommauth
+    depends_on:
+      - storage
+
+  storage:
+    image: valkey/valkey:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001" # Redis Insight UI
+    volumes:
+      - storage_data:/data
+
+volumes:
+  storage_data:
+
+secrets:
+  didcommauth:
+    file: ./secrets/didcommauth.json
+  gitlab-token:
+    file: ./secrets/gitlab-token
