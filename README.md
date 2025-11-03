@@ -1,6 +1,8 @@
 # Affinidi Meeting Place - Control Plane API for Dart
 
-Affinidi Meeting Place - Control Plane API provides capabilities to enable the discovery of other participants to establish a connection and communicate securely. The Control Plane API enables participants to publish a connection offer that allows them to be discoverable and facilitates the creation of a secure communication channel with other participants.
+![image](README/meetingplace-banner.png)
+
+The **Affinidi Meeting Place - Control Plane API** provides capabilities to enable the discovery of other participants to establish a connection and communicate securely. The Control Plane API enables participants to publish a connection offer that allows them to be discoverable and facilitates the creation of a secure communication channel with other participants.
 
 The Control Plane API is built on Dart for a high-performance server, which provides optimal speed and stability for handling API requests.
 
