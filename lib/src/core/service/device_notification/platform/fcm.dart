@@ -10,11 +10,14 @@ import 'platform.dart';
 class FCMPayload implements IPayload {
   late Map<String, dynamic> notification;
   late Map<String, dynamic> data;
+  late int badgeCount;
 
   withNotification({
     required String body,
     required String tag,
+    required int badge,
   }) {
+    badgeCount = badge;
     notification = {
       'title': Config().get('deviceNotification')['title'],
       'body': body,
@@ -38,7 +41,27 @@ class FCMPayload implements IPayload {
   String build() {
     final JsonEncoder encoder = JsonEncoder();
     return encoder.convert({
-      'GCM': encoder.convert({'notification': notification, 'data': data})
+      'GCM': encoder.convert({
+        'fcmV1Message': {
+          'message': {
+            'notification': notification,
+            'data': data,
+            'apns': {
+              'payload': {
+                'aps': {
+                  'badge': badgeCount,
+                  'sound': 'default',
+                }
+              }
+            },
+            'android': {
+              'notification': {
+                'notification_count': badgeCount,
+              }
+            },
+          }
+        }
+      })
     });
   }
 
@@ -81,6 +104,7 @@ class FCM extends Platform implements IPlatform {
       ..withNotification(
         body: notification.getBody(),
         tag: notification.threadId,
+        badge: notification.badgeCount,
       )
       ..withData(
         type: notification.notificationType,
