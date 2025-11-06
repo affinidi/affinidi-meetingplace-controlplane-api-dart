@@ -53,9 +53,6 @@ melos:
   scripts:
     pubget:
       exec: dart pub get
-      packageFilters:
-        fileExists:
-          - pubspec.yaml
 
     analyze:
       exec: dart analyze .

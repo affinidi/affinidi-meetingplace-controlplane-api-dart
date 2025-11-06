@@ -155,8 +155,10 @@ void main() {
     });
 
     test('validates valid ISO8601 UTC date for validUntil', () {
-      final futureDate =
-          DateTime.now().toUtc().add(Duration(days: 1)).toIso8601String();
+      final futureDate = DateTime.now()
+          .toUtc()
+          .add(Duration(days: 1))
+          .toIso8601String();
 
       final request = RegisterOfferRequest(
         offerName: 'test',
@@ -177,8 +179,10 @@ void main() {
     });
 
     test('fails when validUntil is in the past', () {
-      final pastDate =
-          DateTime.now().toUtc().subtract(Duration(days: 1)).toIso8601String();
+      final pastDate = DateTime.now()
+          .toUtc()
+          .subtract(Duration(days: 1))
+          .toIso8601String();
 
       final request = RegisterOfferRequest(
         offerName: 'test',
@@ -258,8 +262,9 @@ void main() {
         memberVCard: 'membervcard',
       );
 
-      final result =
-          RegisterOfferGroupRequestValidator().validate(request.toJson());
+      final result = RegisterOfferGroupRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
@@ -280,16 +285,21 @@ void main() {
         memberVCard: 'membervcard',
       );
 
-      final result =
-          RegisterOfferGroupRequestValidator().validate(request.toJson());
+      final result = RegisterOfferGroupRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(
-          result.exceptions.any((e) => e.key == 'adminReencryptionKey'), true);
+        result.exceptions.any((e) => e.key == 'adminReencryptionKey'),
+        true,
+      );
     });
 
     test('validates valid ISO8601 UTC date for validUntil', () {
-      final futureDate =
-          DateTime.now().toUtc().add(Duration(days: 1)).toIso8601String();
+      final futureDate = DateTime.now()
+          .toUtc()
+          .add(Duration(days: 1))
+          .toIso8601String();
 
       final request = RegisterOfferGroupRequest(
         offerName: 'test',
@@ -308,14 +318,17 @@ void main() {
         validUntil: futureDate,
       );
 
-      final result =
-          RegisterOfferGroupRequestValidator().validate(request.toJson());
+      final result = RegisterOfferGroupRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
     test('fails when validUntil is in the past', () {
-      final pastDate =
-          DateTime.now().toUtc().subtract(Duration(days: 1)).toIso8601String();
+      final pastDate = DateTime.now()
+          .toUtc()
+          .subtract(Duration(days: 1))
+          .toIso8601String();
 
       final request = RegisterOfferGroupRequest(
         offerName: 'test',
@@ -334,8 +347,9 @@ void main() {
         validUntil: pastDate,
       );
 
-      final result =
-          RegisterOfferGroupRequestValidator().validate(request.toJson());
+      final result = RegisterOfferGroupRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'validUntil'), true);
     });
@@ -414,22 +428,20 @@ void main() {
 
   group('CheckOfferPhraseRequestValidator', () {
     test('validates valid request', () {
-      final request = CheckOfferPhraseRequest(
-        offerPhrase: 'word1 word2 word3',
-      );
+      final request = CheckOfferPhraseRequest(offerPhrase: 'word1 word2 word3');
 
-      final result =
-          CheckOfferPhraseRequestValidator().validate(request.toJson());
+      final result = CheckOfferPhraseRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
     test('fails when offerPhrase is empty', () {
-      final request = CheckOfferPhraseRequest(
-        offerPhrase: '',
-      );
+      final request = CheckOfferPhraseRequest(offerPhrase: '');
 
-      final result =
-          CheckOfferPhraseRequestValidator().validate(request.toJson());
+      final result = CheckOfferPhraseRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'offerPhrase'), true);
     });
@@ -445,8 +457,9 @@ void main() {
         vcard: 'vcard',
       );
 
-      final result =
-          AcceptOfferGroupRequestValidator().validate(request.toJson());
+      final result = AcceptOfferGroupRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
@@ -459,8 +472,9 @@ void main() {
         vcard: 'vcard',
       );
 
-      final result =
-          AcceptOfferGroupRequestValidator().validate(request.toJson());
+      final result = AcceptOfferGroupRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'did'), true);
     });
@@ -473,8 +487,9 @@ void main() {
         platformType: PlatformType.DIDCOMM,
       );
 
-      final result =
-          RegisterDeviceRequestValidator().validate(request.toJson());
+      final result = RegisterDeviceRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
@@ -484,8 +499,9 @@ void main() {
         platformType: PlatformType.DIDCOMM,
       );
 
-      final result =
-          RegisterDeviceRequestValidator().validate(request.toJson());
+      final result = RegisterDeviceRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'deviceToken'), true);
     });
@@ -496,8 +512,9 @@ void main() {
         platformType: PlatformType.DIDCOMM,
       );
 
-      final result =
-          RegisterDeviceRequestValidator().validate(request.toJson());
+      final result = RegisterDeviceRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'deviceToken'), true);
     });
@@ -511,8 +528,9 @@ void main() {
         notificationIds: ['id1', 'id2'],
       );
 
-      final result = DeletePendingNotificationsRequestValidator()
-          .validate(request.toJson());
+      final result = DeletePendingNotificationsRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
@@ -523,8 +541,9 @@ void main() {
         notificationIds: ['id1'],
       );
 
-      final result = DeletePendingNotificationsRequestValidator()
-          .validate(request.toJson());
+      final result = DeletePendingNotificationsRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'deviceToken'), true);
     });
@@ -536,8 +555,9 @@ void main() {
         notificationIds: [],
       );
 
-      final result = DeletePendingNotificationsRequestValidator()
-          .validate(request.toJson());
+      final result = DeletePendingNotificationsRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'notificationIds'), true);
     });
@@ -549,8 +569,9 @@ void main() {
         notificationIds: ['id1'],
       );
 
-      final result = DeletePendingNotificationsRequestValidator()
-          .validate(request.toJson());
+      final result = DeletePendingNotificationsRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'deviceToken'), true);
     });
@@ -562,18 +583,18 @@ void main() {
         notificationToken: 'token123',
       );
 
-      final result =
-          DeregisterNotificationRequestValidator().validate(request.toJson());
+      final result = DeregisterNotificationRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, true);
     });
 
     test('fails when notificationToken is empty', () {
-      final request = DeregisterNotificationRequest(
-        notificationToken: '',
-      );
+      final request = DeregisterNotificationRequest(notificationToken: '');
 
-      final result =
-          DeregisterNotificationRequestValidator().validate(request.toJson());
+      final result = DeregisterNotificationRequestValidator().validate(
+        request.toJson(),
+      );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'notificationToken'), true);
     });
