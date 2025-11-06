@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../application_facade.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
@@ -26,8 +28,14 @@ Future<Response> queryOffer(Request request, ApplicationFacade facade) async {
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } on OfferQueryLimitExceeded {
-    return Response.badRequest(
+    return Response(
+      HttpStatus.unprocessableEntity,
       body: QueryOfferErrorResponse.limitExceeded().toString(),
+    );
+  } on OfferExpired {
+    return Response(
+      HttpStatus.unprocessableEntity,
+      body: QueryOfferErrorResponse.offerExpired().toString(),
     );
   } catch (e, stackTrace) {
     facade.logError('Query offer failed: $e', error: e, stackTrace: stackTrace);

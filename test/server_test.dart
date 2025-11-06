@@ -22,6 +22,7 @@ import 'package:meeting_place_control_plane_api/src/api/notify_acceptance/reques
 import 'package:meeting_place_control_plane_api/src/api/notify_channel/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/notify_outreach/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/query_offer/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/query_offer/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_device/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_notification/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
@@ -1345,6 +1346,56 @@ void main() {
     }
   });
 
+  test('query-offer: fails if offer expired', () async {
+    final registerOfferRequestMock = getRegisterOfferRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      maximumUsage: 1,
+      validUntil: DateTime.now()
+          .toUtc()
+          .add(Duration(milliseconds: 500))
+          .toIso8601String(),
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer',
+      data: registerOfferRequestMock.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await Future.delayed(Duration(seconds: 1));
+
+    expect(
+      () => dio.post(
+        '$apiEndpoint/v1/query-offer',
+        data: QueryOfferRequest(
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate(
+          (e) =>
+              e is DioException &&
+              e.response?.statusCode == HttpStatus.unprocessableEntity &&
+              e.response?.data['errorCode'] ==
+                  QueryOfferErrorCodes.offerExpired.value &&
+              e.response?.data['errorMessage'] == 'The offer has expired',
+        ),
+      ),
+    );
+  });
+
   test('query-offer: fails if query limit exceeded', () async {
     final registerOfferRequestMock = getRegisterOfferRequestMock(
       deviceToken: AliceDevice.deviceToken,
@@ -1384,7 +1435,7 @@ void main() {
         }),
       );
     } on DioException catch (e) {
-      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(e.response?.statusCode, HttpStatus.unprocessableEntity);
       expect(e.response?.data, {
         'errorCode': 'QUERY_LIMIT_EXCEEDED',
         'errorMessage': 'Offer query limit exceeded',
