@@ -3,7 +3,6 @@ import 'package:didcomm/didcomm.dart';
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../config/config.dart';
 import '../../../config/env_config.dart';
 import '../../../../service/did_resolver/cached_did_resolver.dart';
 import '../../../logger/logger.dart';
@@ -40,7 +39,8 @@ const _notificationTypeToMessageType = {
 };
 
 DidCommMessageType didCommMessageTypeForNotificationType(
-    NotificationItemType type) {
+  NotificationItemType type,
+) {
   return _notificationTypeToMessageType[type] ??
       (throw Exception('Unsupported notification item type: ${type.name}'));
 }
@@ -62,12 +62,10 @@ class DidCommPayload implements IPayload {
     final didcommMessage = PlainTextMessage(
       id: Uuid().v4(),
       type: Uri.parse(
-          '''${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/${didCommMessageTypeForNotificationType(type).value}'''),
+        '''${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/${didCommMessageTypeForNotificationType(type).value}''',
+      ),
       createdTime: DateTime.now().toUtc(),
-      body: {
-        ...data.toJson(),
-        'text': body,
-      },
+      body: {...data.toJson(), 'text': body},
     );
     return jsonEncode(didcommMessage.toJson());
   }
@@ -82,8 +80,8 @@ class DidComm extends Platform implements IPlatform {
   DidComm({
     required MeetingPlaceMediatorSDK mediatorSDK,
     required Logger logger,
-  })  : _logger = logger,
-        _mediatorSDK = mediatorSDK;
+  }) : _logger = logger,
+       _mediatorSDK = mediatorSDK;
 
   final Logger _logger;
   final MeetingPlaceMediatorSDK _mediatorSDK;
@@ -100,8 +98,9 @@ class DidComm extends Platform implements IPlatform {
     final payload = getPayload(notification);
 
     final didcommAuth = await DIDCommAuthBuilder(logger: _logger).build();
-    final authDidManager =
-        await AuthDidManager.getInstance(jwks: didcommAuth.jwk);
+    final authDidManager = await AuthDidManager.getInstance(
+      jwks: didcommAuth.jwk,
+    );
     final senderDidDoc = await authDidManager.didManager.getDidDocument();
 
     final recipientDidDoc = await CachedDidResolver().resolveDid(recipientDid);
@@ -118,11 +117,6 @@ class DidComm extends Platform implements IPlatform {
 
     _logger.info('notification sent');
     return payload.getData();
-  }
-
-  @override
-  String getPlatformArn() {
-    return Config().get('deviceNotification')['platformArns']['FCM'];
   }
 
   @override

@@ -11,12 +11,9 @@ class SNSProvider implements PushNotificationProvider {
     required String region,
     required sns.AwsClientCredentials credentials,
     required Logger logger,
-  })  : _credentials = credentials,
-        _logger = logger {
-    snsClient = sns.SNS(
-      region: region,
-      credentials: credentials,
-    );
+  }) : _credentials = credentials,
+       _logger = logger {
+    snsClient = sns.SNS(region: region, credentials: credentials);
   }
 
   final Logger _logger;
@@ -36,18 +33,17 @@ class SNSProvider implements PushNotificationProvider {
 
   @override
   Future<String> createPlatformEndpoint({
-    required String platformApplicationArn,
     required String deviceToken,
     String? metadata,
   }) async {
     try {
       final client = await _getClient();
-      final sns.CreateEndpointResponse(:endpointArn) =
-          await client.createPlatformEndpoint(
-        platformApplicationArn: platformApplicationArn,
-        token: deviceToken,
-        customUserData: metadata,
-      );
+      final sns.CreateEndpointResponse(:endpointArn) = await client
+          .createPlatformEndpoint(
+            platformApplicationArn: getEnv('AWS_PLATFORM_APPLICATION_ARN'),
+            token: deviceToken,
+            customUserData: metadata,
+          );
 
       if (endpointArn == null) {
         throw Exception('Received endpoint arn is empty');
@@ -67,7 +63,8 @@ class SNSProvider implements PushNotificationProvider {
     final client = await _getClient();
 
     _logger.debug(
-        'Send push notification to ARN: $targetArn using payload: $payload');
+      'Send push notification to ARN: $targetArn using payload: $payload',
+    );
     final response = await client.publish(
       message: payload,
       targetArn: targetArn,
@@ -75,7 +72,8 @@ class SNSProvider implements PushNotificationProvider {
     );
 
     _logger.debug(
-        'Push notification triggered successfully for ARN: $targetArn using payload: $payload');
+      'Push notification triggered successfully for ARN: $targetArn using payload: $payload',
+    );
     _logger.info('Publishing success, messsage id: ${response.messageId}');
   }
 
