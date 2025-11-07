@@ -14,7 +14,6 @@ abstract interface class IPlatform {
     required String platformEndpointArn,
     required DeviceNotification notification,
   });
-  String getPlatformArn();
 }
 
 class DeviceNotificationService {
@@ -22,9 +21,9 @@ class DeviceNotificationService {
     required Logger logger,
     required PushNotificationProvider provider,
     required MeetingPlaceMediatorSDK mediatorSDK,
-  })  : _logger = logger,
-        _provider = provider,
-        _mediatorSDK = mediatorSDK;
+  }) : _logger = logger,
+       _provider = provider,
+       _mediatorSDK = mediatorSDK;
 
   final Logger _logger;
   final PushNotificationProvider _provider;
@@ -57,9 +56,7 @@ class DeviceNotificationService {
     required String deviceToken,
     required String consumerDid,
   }) async {
-    final platform = getByDevicePlatform(platformType);
     final endpointArn = await _provider.createPlatformEndpoint(
-      platformApplicationArn: platform.getPlatformArn(),
       deviceToken: deviceToken,
       metadata: '[Authenticated as ] $consumerDid',
     );

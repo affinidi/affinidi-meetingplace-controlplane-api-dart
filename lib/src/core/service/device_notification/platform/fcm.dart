@@ -1,6 +1,5 @@
 import 'dart:convert';
 import '../../../config/config.dart';
-import '../../../config/env_config.dart';
 import '../push_notification_provider.dart';
 import '../device_notification.dart';
 import '../device_notification_service.dart';
@@ -11,10 +10,7 @@ class FCMPayload implements IPayload {
   late Map<String, dynamic> notification;
   late Map<String, dynamic> data;
 
-  withNotification({
-    required String body,
-    required String tag,
-  }) {
+  withNotification({required String body, required String tag}) {
     notification = {
       'title': Config().get('deviceNotification')['title'],
       'body': body,
@@ -30,7 +26,7 @@ class FCMPayload implements IPayload {
       Config().get('deviceNotification')['pushNotificationCustomKeyProperty']: {
         'type': type.name,
         'data': data,
-      }
+      },
     };
   }
 
@@ -38,14 +34,15 @@ class FCMPayload implements IPayload {
   String build() {
     final JsonEncoder encoder = JsonEncoder();
     return encoder.convert({
-      'GCM': encoder.convert({'notification': notification, 'data': data})
+      'GCM': encoder.convert({'notification': notification, 'data': data}),
     });
   }
 
   @override
   DeviceNotificationData getData() {
-    final key =
-        Config().get('deviceNotification')['pushNotificationCustomKeyProperty'];
+    final key = Config().get(
+      'deviceNotification',
+    )['pushNotificationCustomKeyProperty'];
     return data[key]['data'];
   }
 }
@@ -71,20 +68,12 @@ class FCM extends Platform implements IPlatform {
   }
 
   @override
-  String getPlatformArn() {
-    return getEnv('AWS_PLATFORM_APPLICATION_ARN');
-  }
-
-  @override
   FCMPayload getPayload(DeviceNotification notification) {
     return FCMPayload()
       ..withNotification(
         body: notification.getBody(),
         tag: notification.threadId,
       )
-      ..withData(
-        type: notification.notificationType,
-        data: notification.data,
-      );
+      ..withData(type: notification.notificationType, data: notification.data);
   }
 }
