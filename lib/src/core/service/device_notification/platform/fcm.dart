@@ -1,6 +1,5 @@
 import 'dart:convert';
 import '../../../config/config.dart';
-import '../../../config/env_config.dart';
 import '../push_notification_provider.dart';
 import '../device_notification.dart';
 import '../device_notification_service.dart';
@@ -33,7 +32,7 @@ class FCMPayload implements IPayload {
       Config().get('deviceNotification')['pushNotificationCustomKeyProperty']: {
         'type': type.name,
         'data': data,
-      }
+      },
     };
   }
 
@@ -66,8 +65,9 @@ class FCMPayload implements IPayload {
 
   @override
   DeviceNotificationData getData() {
-    final key =
-        Config().get('deviceNotification')['pushNotificationCustomKeyProperty'];
+    final key = Config().get(
+      'deviceNotification',
+    )['pushNotificationCustomKeyProperty'];
     return data[key]['data'];
   }
 }
@@ -93,11 +93,6 @@ class FCM extends Platform implements IPlatform {
   }
 
   @override
-  String getPlatformArn() {
-    return getEnv('AWS_PLATFORM_APPLICATION_ARN');
-  }
-
-  @override
   FCMPayload getPayload(DeviceNotification notification) {
     return FCMPayload()
       ..withNotification(
@@ -105,9 +100,6 @@ class FCM extends Platform implements IPlatform {
         tag: notification.threadId,
         badge: notification.badgeCount,
       )
-      ..withData(
-        type: notification.notificationType,
-        data: notification.data,
-      );
+      ..withData(type: notification.notificationType, data: notification.data);
   }
 }

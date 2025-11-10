@@ -9,7 +9,6 @@ class NoneProvider implements PushNotificationProvider {
 
   @override
   Future<String> createPlatformEndpoint({
-    required String platformApplicationArn,
     required String deviceToken,
     String? metadata,
   }) async {

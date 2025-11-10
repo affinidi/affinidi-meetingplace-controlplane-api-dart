@@ -372,6 +372,12 @@ components:
             oneOf:
               - $ref: '#/components/schemas/InvalidAcceptanceError'
               - $ref: '#/components/schemas/ExpiredAcceptanceError'
+    QueryOfferUnProcessableEntityError:
+      description: Offer is either expired or the limit has been exceeded.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OfferUnprocessableEntityError'
     QueryOfferNotFoundError:
       description: NotFoundError
       content:
@@ -1220,6 +1226,18 @@ components:
         - message
         - httpStatusCode
         - traceId
+    OfferUnprocessableEntityError:
+      type: object
+      additionalProperties: false
+      description: The offer is no longer valid due to max usage or validity date expiration.
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
+      required:
+        - errorCode
+        - errorMessage
     InvalidOfferError:
       type: object
       additionalProperties: false
@@ -1912,6 +1930,8 @@ paths:
           $ref: '#/components/responses/QueryOfferOK'
         '404':
           $ref: '#/components/responses/QueryOfferNotFoundError'
+        '422':
+          $ref: '#/components/responses/QueryOfferUnProcessableEntityError'
   /v1/notifications:
     post:
       operationId: getPendingNotifications

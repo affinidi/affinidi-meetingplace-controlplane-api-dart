@@ -9,7 +9,10 @@ enum QueryOfferErrorCodes {
   queryLimitExceeded('QUERY_LIMIT_EXCEEDED'),
 
   @JsonValue('NOT_FOUND')
-  notFound('NOT_FOUND');
+  notFound('NOT_FOUND'),
+
+  @JsonValue('OFFER_EXPIRED')
+  offerExpired('OFFER_EXPIRED');
 
   const QueryOfferErrorCodes(this.value);
 
@@ -36,6 +39,14 @@ class QueryOfferErrorResponse {
       errorMessage: 'Offer query limit exceeded',
     );
   }
+
+  factory QueryOfferErrorResponse.offerExpired() {
+    return QueryOfferErrorResponse(
+      errorCode: QueryOfferErrorCodes.offerExpired.value,
+      errorMessage: 'The offer has expired',
+    );
+  }
+
   final String errorCode;
   final String errorMessage;
 
