@@ -50,7 +50,6 @@ class FCMPayload implements IPayload {
               'payload': {
                 'aps': {
                   'badge': badgeCount,
-                  'sound': 'default',
                 }
               }
             },
