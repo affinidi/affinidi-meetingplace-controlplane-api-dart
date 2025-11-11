@@ -1,6 +1,7 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import '../../config/config.dart';
+import '../../config/env_config.dart';
 import '../../secret_manager/secret_manager.dart';
 import 'auth_token.dart';
 
@@ -9,19 +10,12 @@ class DIDCommAuthChallenge {
   final JWTKey _privateKey;
 
   String _getAuthChallengeToken(String did) {
-    Map config = Config().get('auth');
-
-    final audience = config['challengeTokenAudience'];
-    final issuer = config['challengeTokenIssuer'];
-
-    if (audience == null || issuer == null) {
-      throw Exception('Audience or issuer for challenge token not defined.');
-    }
+    final apiEndpoint = getEnv('API_ENDPOINT');
 
     return AuthToken(
       did: did,
-      audience: audience,
-      issuer: issuer,
+      audience: apiEndpoint,
+      issuer: apiEndpoint,
       expiresInMinutes: 1,
     ).signAsJwt(_privateKey);
   }
@@ -39,11 +33,13 @@ class DIDCommAuthChallenge {
       throw Exception('Secrets not found.');
     }
 
-    final ed25519PrivateKeyJWTDoc =
-        secret.firstWhere((doc) => doc['privateKeyJwk']['crv'] == 'Ed25519');
+    final ed25519PrivateKeyJWTDoc = secret.firstWhere(
+      (doc) => doc['privateKeyJwk']['crv'] == 'Ed25519',
+    );
     final privateKey = JWTKey.fromJWK(ed25519PrivateKeyJWTDoc['privateKeyJwk']);
 
-    return DIDCommAuthChallenge(privateKey: privateKey)
-        ._getAuthChallengeToken(did);
+    return DIDCommAuthChallenge(
+      privateKey: privateKey,
+    )._getAuthChallengeToken(did);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
-import '../../config/config.dart';
+import '../../../../meeting_place_control_plane_api.dart';
 import '../../logger/logger.dart';
 import 'auth_response.dart';
 import 'auth_token.dart';
@@ -21,47 +21,34 @@ class DIDCommAuth {
     required JWTKey publicKey,
     required List<dynamic> jwk,
     required Logger logger,
-  })  : _privateKey = privateKey,
-        _publicKey = publicKey,
-        _jwk = jwk,
-        _logger = logger {
-    Map config = Config().get('auth');
+  }) : _privateKey = privateKey,
+       _publicKey = publicKey,
+       _jwk = jwk,
+       _logger = logger;
 
-    if (config['tokenAudience'] == null ||
-        config['tokenIssuer'] == null ||
-        config['refreshTokenIssuer'] == null) {
-      throw Exception('One of auth token configurations variables missing.');
-    }
-
-    _authTokenAudience = config['tokenAudience'];
-    _authTokenIssuer = config['tokenIssuer'];
-    _authRefreshTokenIssuer = config['refreshTokenIssuer'];
-  }
   final JWTKey _privateKey;
   final JWTKey _publicKey;
   final List<dynamic> _jwk;
   final Logger _logger;
 
-  late final String _authTokenAudience;
-  late final String _authTokenIssuer;
-  late final String _authRefreshTokenIssuer;
-
   get jwk => _jwk;
 
   String getAuthToken(String did, int expiresInMinutes) {
+    final apiEndpoint = getEnv('API_ENDPOINT');
     return AuthToken(
       did: did,
-      audience: _authTokenAudience,
-      issuer: _authTokenIssuer,
+      audience: apiEndpoint,
+      issuer: apiEndpoint,
       expiresInMinutes: expiresInMinutes,
     ).signAsJwt(_privateKey);
   }
 
   String getAuthRefreshToken(String did, int expiresInMinutes) {
+    final apiEndpoint = getEnv('API_ENDPOINT');
     return AuthToken(
       did: did,
-      audience: _authTokenAudience,
-      issuer: _authRefreshTokenIssuer,
+      audience: apiEndpoint,
+      issuer: apiEndpoint,
       expiresInMinutes: expiresInMinutes,
     ).signAsJwt(_privateKey);
   }
