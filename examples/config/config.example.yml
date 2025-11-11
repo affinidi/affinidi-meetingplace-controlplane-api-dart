@@ -1,3 +1,4 @@
+didcommMessageBaseType: "https://affinidi.com/didcomm/protocols/mpx/1.0/"
 acceptance:
   maximumRetries: 5
 

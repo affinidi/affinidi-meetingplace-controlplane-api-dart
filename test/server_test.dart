@@ -2433,7 +2433,7 @@ void main() {
       );
 
       final expectedMessageType =
-          '${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/invitation-accept';
+          'https://affinidi.com/didcomm/protocols/mpx/1.0/notification-invitation-accept';
 
       channel.listen((message) {
         if (message.type.toString() == expectedMessageType) {
