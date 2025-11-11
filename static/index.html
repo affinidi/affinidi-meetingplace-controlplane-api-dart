@@ -37,9 +37,8 @@
       xmlHttp.open( "GET", `${window.location.href}discover`, false ); // false for synchronous request
       xmlHttp.send( null );
       
-      var response = JSON.parse(xmlHttp.responseText).token;
       const qrcode = new QRCode(document.getElementById('qrcode'), {
-        text: response,
+        text: xmlHttp.responseText,
         width: 256,
         height: 256,
         colorDark : '#000',
