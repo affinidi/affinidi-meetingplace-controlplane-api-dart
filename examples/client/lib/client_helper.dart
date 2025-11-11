@@ -11,10 +11,7 @@ class ClientHelper {
   final String controlPlaneDid;
   late final Dio _dio;
 
-  ClientHelper({
-    required this.apiEndpoint,
-    required this.controlPlaneDid,
-  }) {
+  ClientHelper({required this.apiEndpoint, required this.controlPlaneDid}) {
     _dio = Dio();
   }
 
@@ -38,7 +35,7 @@ class ClientHelper {
 
     final plaintextMessage = PlainTextMessage(
       id: const Uuid().v4(),
-      type: Uri.parse('https://affinidi.io/mpx/control-plane/authenticate'),
+      type: Uri.parse('${Config().get('didcommMessageBaseType')}/authenticate'),
       body: {'challenge': challengeToken},
       to: [controlPlaneDid],
       from: didDocument.id,
@@ -48,9 +45,9 @@ class ClientHelper {
 
     final resolver = LocalDidResolver();
     final controlPlaneDidDoc = await resolver.resolveDid(controlPlaneDid);
-    final didKeyId = didDocument.matchKeysInKeyAgreement(
-      otherDidDocuments: [controlPlaneDidDoc],
-    ).first;
+    final didKeyId = didDocument
+        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc])
+        .first;
 
     final encrypted = await DidcommMessage.packIntoSignedAndEncryptedMessages(
       plaintextMessage,
@@ -77,11 +74,13 @@ class ClientHelper {
   }
 
   Dio getDioWithAuth(String accessToken) {
-    return Dio(BaseOptions(
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    ));
+    return Dio(
+      BaseOptions(
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
   }
 }

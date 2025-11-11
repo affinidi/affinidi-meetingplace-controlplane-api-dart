@@ -3,7 +3,7 @@ import 'package:didcomm/didcomm.dart';
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../config/env_config.dart';
+import '../../../../../meeting_place_control_plane_api.dart';
 import '../../../../service/did_resolver/cached_did_resolver.dart';
 import '../../../logger/logger.dart';
 import '../../auth/auth_did_manager.dart';
@@ -62,7 +62,7 @@ class DidCommPayload implements IPayload {
     final didcommMessage = PlainTextMessage(
       id: Uuid().v4(),
       type: Uri.parse(
-        '''${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/${didCommMessageTypeForNotificationType(type).value}''',
+        "${Config().get('didcommMessageBaseType')}/notification-${didCommMessageTypeForNotificationType(type).value}",
       ),
       createdTime: DateTime.now().toUtc(),
       body: {...data.toJson(), 'text': body},

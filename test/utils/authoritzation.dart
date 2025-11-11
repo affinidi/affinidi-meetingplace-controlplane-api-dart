@@ -18,7 +18,9 @@ PlainTextMessage buildPlaintextMessage({
 
   return PlainTextMessage(
     id: const Uuid().v4(),
-    type: Uri.parse('https://affinidi.io/mpx/control-plane/authenticate'),
+    type: Uri.parse(
+      'https://affinidi.com/didcomm/protocols/mpx/1.0/authenticate',
+    ),
     body: {'challenge': challengeToken},
     to: [getEnv('CONTROL_PLANE_DID')],
     from: did,
@@ -43,13 +45,14 @@ handleAuthorization(DidManager didManager, KeyPair keyPair) async {
     did: didDocument.id,
   );
 
-  final DidDocument meetingplaceDidDoc =
-      await LocalDidResolver().resolveDid(getEnv('CONTROL_PLANE_DID'));
+  final DidDocument meetingplaceDidDoc = await LocalDidResolver().resolveDid(
+    getEnv('CONTROL_PLANE_DID'),
+  );
 
   final senderDidDoc = await didManager.getDidDocument();
-  final didKeyId = didDocument.matchKeysInKeyAgreement(
-    otherDidDocuments: [meetingplaceDidDoc],
-  ).first;
+  final didKeyId = didDocument
+      .matchKeysInKeyAgreement(otherDidDocuments: [meetingplaceDidDoc])
+      .first;
 
   final encrypted = await DidcommMessage.packIntoSignedAndEncryptedMessages(
     plaintextMessage,
@@ -67,10 +70,10 @@ handleAuthorization(DidManager didManager, KeyPair keyPair) async {
   );
 
   final encodedEncrypted = base64Encode(utf8.encode(json.encode(encrypted)));
-  Response authenticateResponse =
-      await dioInstance.post('$apiEndpoint/v1/authenticate', data: {
-    'challenge_response': encodedEncrypted,
-  });
+  Response authenticateResponse = await dioInstance.post(
+    '$apiEndpoint/v1/authenticate',
+    data: {'challenge_response': encodedEncrypted},
+  );
 
   return authenticateResponse.data['access_token'];
 }
