@@ -29,7 +29,8 @@ class AwsCredentialsManager {
 
     if (relativeUri == null) {
       throw Exception(
-          '''AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is not set. Task role not available.''');
+        '''AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is not set. Task role not available.''',
+      );
     }
 
     final url = Uri.parse('http://169.254.170.2$relativeUri');
@@ -50,18 +51,55 @@ class AwsCredentialsManager {
   }
 
   static Future<shared.AwsClientCredentials> fromEnv() async {
+    final profile = getEnvOrNull('AWS_PROFILE');
+
+    if (profile != null) {
+      return await fromAwsProfile(profile);
+    }
+
     return shared.AwsClientCredentials(
-        accessKey: getEnv('AWS_ACCESS_KEY'),
-        secretKey: getEnv('AWS_SECRET_KEY'),
-        sessionToken: getEnv('AWS_SESSION_TOKEN'),
-        expiration: DateTime.now().add(const Duration(hours: 1)));
+      accessKey: getEnv('AWS_ACCESS_KEY'),
+      secretKey: getEnv('AWS_SECRET_KEY'),
+      sessionToken: getEnv('AWS_SESSION_TOKEN'),
+      expiration: DateTime.now().add(const Duration(hours: 1)),
+    );
+  }
+
+  static Future<shared.AwsClientCredentials> fromAwsProfile(
+    String profile,
+  ) async {
+    final result = await Process.run('aws', [
+      'configure',
+      'export-credentials',
+      '--profile',
+      profile,
+    ]);
+
+    if (result.exitCode != 0) {
+      throw Exception(
+        'Failed to get AWS credentials from profile $profile: ${result.stderr}',
+      );
+    }
+
+    final data = jsonDecode(result.stdout);
+
+    return shared.AwsClientCredentials(
+      accessKey: data['AccessKeyId'],
+      secretKey: data['SecretAccessKey'],
+      sessionToken: data['SessionToken'],
+      expiration: data['Expiration'] != null
+          ? DateTime.parse(data['Expiration'])
+          : DateTime.now().add(const Duration(hours: 1)),
+    );
   }
 
   static Future<shared.AwsClientCredentials?> refreshCredentialsIfNeeded(
-      shared.AwsClientCredentials? credentials) async {
+    shared.AwsClientCredentials? credentials,
+  ) async {
     if (credentials == null ||
-        DateTime.now()
-            .isAfter(credentials.expiration!.subtract(Duration(seconds: 60)))) {
+        DateTime.now().isAfter(
+          credentials.expiration!.subtract(Duration(seconds: 60)),
+        )) {
       return await getCredentials();
     }
     return null;

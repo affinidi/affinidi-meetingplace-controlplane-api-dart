@@ -7,6 +7,7 @@ export 'src/server/server.dart';
 export 'src/service/logger/logger.dart';
 export 'src/service/did_document_manager/did_document_manager.dart';
 export 'src/service/did_resolver/did_resolver.dart';
+export 'src/service/did_resolver/local_did_resolver.dart';
 export 'src/service/group_did_manager/group_did_manager.dart';
 export 'src/service/push_notification_provider/push_notification_provider.dart';
 export 'src/service/secret_manager/secret_manager.dart';
