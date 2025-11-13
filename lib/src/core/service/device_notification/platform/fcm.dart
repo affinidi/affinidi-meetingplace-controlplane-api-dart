@@ -28,11 +28,12 @@ class FCMPayload implements IPayload {
     required NotificationItemType type,
     required DeviceNotificationData data,
   }) {
+    final JsonEncoder encoder = JsonEncoder();
     this.data = {
-      Config().get('deviceNotification')['pushNotificationCustomKeyProperty']: {
+      Config().get('deviceNotification')['pushNotificationCustomKeyProperty']: encoder.convert({
         'type': type.name,
         'data': data,
-      },
+      }),
     };
   }
 
@@ -40,6 +41,7 @@ class FCMPayload implements IPayload {
   String build() {
     final JsonEncoder encoder = JsonEncoder();
     return encoder.convert({
+      'default': notification['body'],
       'GCM': encoder.convert({
         'fcmV1Message': {
           'message': {
@@ -68,7 +70,8 @@ class FCMPayload implements IPayload {
     final key = Config().get(
       'deviceNotification',
     )['pushNotificationCustomKeyProperty'];
-    return data[key]['data'];
+    final decodedData = jsonDecode(data[key]) as Map<String, dynamic>;
+    return decodedData['data'];
   }
 }
 
