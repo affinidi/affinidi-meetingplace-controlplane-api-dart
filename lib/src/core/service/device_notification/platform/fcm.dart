@@ -1,15 +1,17 @@
 import 'dart:convert';
+
 import '../../../config/config.dart';
-import '../push_notification_provider.dart';
+import '../../../entity/notification_item.dart';
 import '../device_notification.dart';
 import '../device_notification_service.dart';
-import '../../../entity/notification_item.dart';
+import '../push_notification_provider.dart';
 import 'platform.dart';
 
 class FCMPayload implements IPayload {
   late Map<String, dynamic> notification;
   late Map<String, dynamic> data;
   late int badgeCount;
+  late String notificationTag;
 
   withNotification({
     required String body,
@@ -17,10 +19,10 @@ class FCMPayload implements IPayload {
     required int badge,
   }) {
     badgeCount = badge;
+    notificationTag = tag;
     notification = {
       'title': Config().get('deviceNotification')['title'],
       'body': body,
-      'tag': tag,
     };
   }
 
@@ -30,10 +32,8 @@ class FCMPayload implements IPayload {
   }) {
     final JsonEncoder encoder = JsonEncoder();
     this.data = {
-      Config().get('deviceNotification')['pushNotificationCustomKeyProperty']: encoder.convert({
-        'type': type.name,
-        'data': data,
-      }),
+      Config().get('deviceNotification')['pushNotificationCustomKeyProperty']:
+          encoder.convert({'type': type.name, 'data': data}),
     };
   }
 
@@ -44,24 +44,35 @@ class FCMPayload implements IPayload {
       'default': notification['body'],
       'GCM': encoder.convert({
         'fcmV1Message': {
+          'validate_only': false,
           'message': {
             'notification': notification,
             'data': data,
+            'android': {
+              'priority': 'high',
+              'notification': {
+                'channel_id': 'default_channel_id',
+                'notification_priority': 'PRIORITY_HIGH',
+                'notification_count': badgeCount,
+                'sound': 'default',
+                'tag': notificationTag,
+              },
+            },
             'apns': {
               'payload': {
                 'aps': {
+                  'alert': {
+                    'title': notification['title'],
+                    'body': notification['body'],
+                  },
                   'badge': badgeCount,
-                }
-              }
+                  'sound': 'default',
+                },
+              },
             },
-            'android': {
-              'notification': {
-                'notification_count': badgeCount,
-              }
-            },
-          }
-        }
-      })
+          },
+        },
+      }),
     });
   }
 
@@ -71,7 +82,11 @@ class FCMPayload implements IPayload {
       'deviceNotification',
     )['pushNotificationCustomKeyProperty'];
     final decodedData = jsonDecode(data[key]) as Map<String, dynamic>;
-    return decodedData['data'];
+    final dataMap = decodedData['data'] as Map<String, dynamic>;
+    return DeviceNotificationData(
+      id: dataMap['id'] as String,
+      pendingCount: dataMap['pendingCount'] as int,
+    )..notificationDate = dataMap['notificationDate'] as String;
   }
 }
 
