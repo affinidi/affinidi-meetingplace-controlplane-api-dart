@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:didcomm/didcomm.dart';
+import 'package:meeting_place_core/meeting_place_core.dart';
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,28 +15,43 @@ import '../../../entity/notification_item.dart';
 import 'platform.dart';
 
 enum DidCommMessageType {
-  invitationAccept('invitation-accept'),
-  invitationGroupAccept('invitation-accept-group'),
-  invitationOutreach('invitation-outreach'),
-  offerFinalised('offer-finalised'),
-  channelActivity('channel-activity'),
-  groupMembershipFinalised('group-membership-finalised');
+  invitationAcceptance,
+  invitationAcceptanceGroup,
+  outreachInvitation,
+  connectionRequestApproval,
+  channelActivity,
+  groupMembershipFinalised;
 
-  const DidCommMessageType(this.value);
-
-  final String value;
+  String get value {
+    switch (this) {
+      case DidCommMessageType.invitationAcceptance:
+        return MeetingPlaceNotificationProtocol.invitationAcceptance.value;
+      case DidCommMessageType.invitationAcceptanceGroup:
+        return MeetingPlaceNotificationProtocol.invitationAcceptanceGroup.value;
+      case DidCommMessageType.outreachInvitation:
+        return MeetingPlaceNotificationProtocol.outreachInvitation.value;
+      case DidCommMessageType.connectionRequestApproval:
+        return MeetingPlaceNotificationProtocol.connectionRequestApproval.value;
+      case DidCommMessageType.channelActivity:
+        return MeetingPlaceNotificationProtocol.channelActivity.value;
+      case DidCommMessageType.groupMembershipFinalised:
+        return MeetingPlaceNotificationProtocol.groupMembershipFinalised.value;
+    }
+  }
 }
 
 const _notificationTypeToMessageType = {
-  NotificationItemType.invitationAccept: DidCommMessageType.invitationAccept,
+  NotificationItemType.invitationAccept:
+      DidCommMessageType.invitationAcceptance,
   NotificationItemType.invitationGroupAccept:
-      DidCommMessageType.invitationGroupAccept,
-  NotificationItemType.offerFinalised: DidCommMessageType.offerFinalised,
+      DidCommMessageType.invitationAcceptanceGroup,
+  NotificationItemType.offerFinalised:
+      DidCommMessageType.connectionRequestApproval,
   NotificationItemType.channelActivity: DidCommMessageType.channelActivity,
   NotificationItemType.groupMembershipFinalised:
       DidCommMessageType.groupMembershipFinalised,
   NotificationItemType.invitationOutreach:
-      DidCommMessageType.invitationOutreach,
+      DidCommMessageType.outreachInvitation,
 };
 
 DidCommMessageType didCommMessageTypeForNotificationType(
@@ -61,9 +77,7 @@ class DidCommPayload implements IPayload {
   String build() {
     final didcommMessage = PlainTextMessage(
       id: Uuid().v4(),
-      type: Uri.parse(
-        "${Config().get('didcommMessageBaseType')}/notification-${didCommMessageTypeForNotificationType(type).value}",
-      ),
+      type: Uri.parse(didCommMessageTypeForNotificationType(type).value),
       createdTime: DateTime.now().toUtc(),
       body: {...data.toJson(), 'text': body},
     );
