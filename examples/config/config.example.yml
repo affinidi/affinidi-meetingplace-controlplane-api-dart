@@ -4,13 +4,7 @@ acceptance:
 auth:
   accessTokenExpiryInMinutes: 15
   refreshTokenExpiryInMinutes: 720
-  challengeTokenAudience: "https://affinidi.io/mpx/control-plane/mobileapp"
-  challengeTokenIssuer: "https://affinidi.io/mpx/control-plane/authenticate"
-  tokenAudience: "https://affinidi.io/mpx/control-plane/client"
-  tokenIssuer: "https://affinidi.io/mpx/control-plane/authenticate"
-  refreshTokenIssuer: "https://affinidi.io/mpx/control-plane/authenticate/refresh"
   didResolverUrl: "https://dev.uniresolver.io"
-  meetingPlaceRegistrationDidcommType: "https://affinidi.io/mpx/control-plane/registration"
   meetingPlaceRegistrationTokenExpiryInMinutes: 1440
 
 deviceNotification:

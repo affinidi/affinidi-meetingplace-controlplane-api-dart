@@ -1,15 +1,13 @@
 name: Pull Request Checks
 
-on: 
+on:
   pull_request:
-     
+
 jobs:
   dart-pipeline:
     uses: affinidi/pipeline-dart/.github/workflows/check.yaml@main
     secrets: inherit
     with:
-      flutter-version: '3.35.3'
+      flutter-version: "3.35.3"
       env_vars: |
         MEDIATOR_DID=${{ vars.MEDIATOR_DID }}
-        MEDIATOR_DID_ALTERNATIVE=${{ vars.MEDIATOR_DID_ALTERNATIVE }}
-        CONTROL_PLANE_DID=${{ vars.CONTROL_PLANE_DID }}
