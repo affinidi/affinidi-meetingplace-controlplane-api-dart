@@ -1916,7 +1916,7 @@ void main() {
               'ciphertext': expCiphertext,
               'capsule': expCapsule,
               'iv': expIV,
-              'authenticationTag': expAuthenticationTag,
+              'authentication_tag': expAuthenticationTag,
             }),
           ),
         ),
@@ -1944,12 +1944,12 @@ void main() {
     expect(receivedMessage.body!['ciphertext'], equals(expCiphertext));
     expect(receivedMessage.body!['iv'], equals(expIV));
     expect(
-      receivedMessage.body!['authenticationTag'],
+      receivedMessage.body!['authentication_tag'],
       equals(expAuthenticationTag),
     );
-    expect(receivedMessage.body!['preCapsule'], isNotNull);
-    expect(receivedMessage.body!['fromDid'], registerOfferRequest.adminDid);
-    expect(receivedMessage.body!['seqNo'], equals(1));
+    expect(receivedMessage.body!['pre_capsule'], isNotNull);
+    expect(receivedMessage.body!['from_did'], registerOfferRequest.adminDid);
+    expect(receivedMessage.body!['seq_no'], equals(1));
   });
 
   test('group-add-member: fails due to missing permissions', () async {
