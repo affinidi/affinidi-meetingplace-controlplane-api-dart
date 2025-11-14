@@ -54,12 +54,16 @@ void main() {
     final recryptKeyPair = recrypt.generateKeyPair();
     final result = recrypt.encapsulate(recryptKeyPair.publicKey);
 
-    return base64.encode(utf8.encode(jsonEncode({
-      'ciphertext': 'cipher-sample',
-      'capsule': (result['capsule'] as Capsule).toBase64(),
-      'iv': 'iv-sample',
-      'authenticationTag': 'auth-tag-sample',
-    })));
+    return base64.encode(
+      utf8.encode(
+        jsonEncode({
+          'ciphertext': 'cipher-sample',
+          'capsule': (result['capsule'] as Capsule).toBase64(),
+          'iv': 'iv-sample',
+          'authentication_tag': 'auth-tag-sample',
+        }),
+      ),
+    );
   }
 
   late String aliceAccessToken;
