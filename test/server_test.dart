@@ -60,7 +60,7 @@ void main() {
           'ciphertext': 'cipher-sample',
           'capsule': (result['capsule'] as Capsule).toBase64(),
           'iv': 'iv-sample',
-          'authenticationTag': 'auth-tag-sample',
+          'authentication_tag': 'auth-tag-sample',
         }),
       ),
     );
