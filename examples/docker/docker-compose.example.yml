@@ -18,6 +18,10 @@ services:
       - DID_DOCUMENT=/run/params/did_document
       - PUSH_NOTIFICATION_PROVIDER=none
       - AWS_REGION=
+      # AWS credentials (choose one method)
+      # Method 1: Use AWS CLI profile
+      # - AWS_PROFILE=my-profile
+      # Method 2: Use direct credentials
       - AWS_ACCESS_KEY=
       - AWS_SECRET_KEY=
       - AWS_SESSION_TOKEN=

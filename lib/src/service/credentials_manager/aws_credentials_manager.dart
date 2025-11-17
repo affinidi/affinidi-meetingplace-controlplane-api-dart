@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_aws_api/shared.dart' as shared;
+
 import '../../core/config/env_config.dart';
 
 class AwsCredentialsManager {
@@ -68,20 +69,25 @@ class AwsCredentialsManager {
   static Future<shared.AwsClientCredentials> fromAwsProfile(
     String profile,
   ) async {
-    final result = await Process.run('aws', [
+    final result = await Process.start('aws', [
       'configure',
       'export-credentials',
       '--profile',
       profile,
-    ]);
+    ]).timeout(const Duration(seconds: 30));
 
-    if (result.exitCode != 0) {
-      throw Exception(
-        'Failed to get AWS credentials from profile $profile: ${result.stderr}',
-      );
+    final stdout = await result.stdout.transform(utf8.decoder).join();
+    final exitCode = await result.exitCode;
+    if (exitCode != 0) {
+      throw Exception('AWS profile "$profile" not found or CLI not configured');
     }
 
-    final data = jsonDecode(result.stdout);
+    late final Map<String, dynamic> data;
+    try {
+      data = jsonDecode(stdout) as Map<String, dynamic>;
+    } on FormatException catch (e) {
+      throw Exception('Invalid JSON response from AWS CLI: $e');
+    }
 
     return shared.AwsClientCredentials(
       accessKey: data['AccessKeyId'],
@@ -89,7 +95,7 @@ class AwsCredentialsManager {
       sessionToken: data['SessionToken'],
       expiration: data['Expiration'] != null
           ? DateTime.parse(data['Expiration'])
-          : DateTime.now().add(const Duration(hours: 1)),
+          : null,
     );
   }
 
@@ -97,9 +103,10 @@ class AwsCredentialsManager {
     shared.AwsClientCredentials? credentials,
   ) async {
     if (credentials == null ||
-        DateTime.now().isAfter(
-          credentials.expiration!.subtract(Duration(seconds: 60)),
-        )) {
+        (credentials.expiration != null &&
+            DateTime.now().isAfter(
+              credentials.expiration!.subtract(Duration(seconds: 60)),
+            ))) {
       return await getCredentials();
     }
     return null;
