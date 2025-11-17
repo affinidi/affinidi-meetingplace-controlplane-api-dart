@@ -95,7 +95,7 @@ class AwsCredentialsManager {
       sessionToken: data['SessionToken'],
       expiration: data['Expiration'] != null
           ? DateTime.parse(data['Expiration'])
-          : null,
+          : DateTime.now().add(const Duration(hours: 1)),
     );
   }
 
