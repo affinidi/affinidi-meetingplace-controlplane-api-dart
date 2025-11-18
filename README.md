@@ -68,27 +68,28 @@ The Control Plane API is built on Dart for a high-performance server, which prov
 
 List of the environment variables required to run the Control Plane API server.
 
-| Variable Name | Description |
-|---------------|-------------|
-| ENV           | Specifies the environment in which the server is running. By default, it is set to `DEV`. |
-| SERVER_PORT | Specifies the port on which the server listens for incoming requests. |
-| API_ENDPOINT | Defines the API endpoint (e.g., http://localhost) to receive requests from the callers. |
-| CONTROL_PLANE_DID | The DID used for authentication (e.g., did:web:yourdomain.com). The caller will resolve the CONTROL_PLANE_DID to fetch the public key information and encrypt the DIDComm message containing the auth challenge string. For testing or running the server locally, use the `did:local:8080` - replace the `8080` depending on your configured SERVER_PORT. |
-| STORAGE_ENDPOINT | Specifies the endpoint for the storage instance to access the stored data. Use `localhost` when running the instance locally. |
-| STORAGE_PORT | Specifies the port used by the storage instance to handle requests. For example, if you use the default Redis configuration, the port will be `6379`. |
-| DIDCOMM_AUTH_SECRET | Specifies path and filename containing the didcommauth secret (e.g., `secrets/didcommauth.json`) |
-| HASH_SECRET | A secret value to enhance the security of hashing operations within the application. |
-| DID_DOCUMENT | Specifies path and filename of the DID document parameter (e.g., `params/did_document.json`. |
+| Variable Name       | Description                                                                                                                                                                                                                                                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ENV                 | Specifies the environment in which the server is running. By default, it is set to `DEV`.                                                                                                                                                                                                                                                                  |
+| SERVER_PORT         | Specifies the port on which the server listens for incoming requests.                                                                                                                                                                                                                                                                                      |
+| API_ENDPOINT        | Defines the API endpoint (e.g., http://localhost) to receive requests from the callers.                                                                                                                                                                                                                                                                    |
+| CONTROL_PLANE_DID   | The DID used for authentication (e.g., did:web:yourdomain.com). The caller will resolve the CONTROL_PLANE_DID to fetch the public key information and encrypt the DIDComm message containing the auth challenge string. For testing or running the server locally, use the `did:local:8080` - replace the `8080` depending on your configured SERVER_PORT. |
+| STORAGE_ENDPOINT    | Specifies the endpoint for the storage instance to access the stored data. Use `localhost` when running the instance locally.                                                                                                                                                                                                                              |
+| STORAGE_PORT        | Specifies the port used by the storage instance to handle requests. For example, if you use the default Redis configuration, the port will be `6379`.                                                                                                                                                                                                      |
+| DIDCOMM_AUTH_SECRET | Specifies path and filename containing the didcommauth secret (e.g., `secrets/didcommauth.json`)                                                                                                                                                                                                                                                           |
+| HASH_SECRET         | A secret value to enhance the security of hashing operations within the application.                                                                                                                                                                                                                                                                       |
+| DID_DOCUMENT        | Specifies path and filename of the DID document parameter (e.g., `params/did_document.json`.                                                                                                                                                                                                                                                               |
 
 Configure the following environment variables if AWS is the selected option.
 
-| Variable Name | Description |
-|---------------|-------------|
-| AWS_REGION | Specifies the AWS region to access the AWS services. |
-| AWS_ACCESS_KEY | Specifies the AWS access key used when accessing AWS services. |
-| AWS_SECRET_KEY | Specifies the AWS secret key used when accessing AWS services. |
-| AWS_SESSION_TOKEN | Specifies the AWS session token used when accessing AWS services with temporary credentials. |
-|
+| Variable Name     | Description                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS_REGION        | Specifies the AWS region to access the AWS services.                                                                                                                                                                                                                                                                                    |
+| AWS_PROFILE       | (Optional) Specifies the AWS CLI profile name to use for credentials. When set, the server will use `aws configure export-credentials` to fetch credentials from the specified profile. This supports SSO, assumed roles, and standard profiles. If not set, falls back to `AWS_ACCESS_KEY`, `AWS_SECRET_KEY`, and `AWS_SESSION_TOKEN`. |
+| AWS_ACCESS_KEY    | Specifies the AWS access key used when accessing AWS services. Only required if `AWS_PROFILE` is not set.                                                                                                                                                                                                                               |
+| AWS_SECRET_KEY    | Specifies the AWS secret key used when accessing AWS services. Only required if `AWS_PROFILE` is not set.                                                                                                                                                                                                                               |
+| AWS_SESSION_TOKEN | Specifies the AWS session token used when accessing AWS services with temporary credentials. Only required if `AWS_PROFILE` is not set.                                                                                                                                                                                                 |
+|                   |
 
 ### Local Setup using SSI Persistent Wallet
 
@@ -344,10 +345,10 @@ If you wish to extend the list of supported secret managers or modify the existi
 
 To generate secrets automatically, run `dart run script/setup.dart`.
 
-| Secret Name | Description |
-|-------------|-------------|
+| Secret Name   | Description                                                                                                                                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `didcommauth` | To sign and verify tokens, generate and configure the `didcommauth` secret. This secret is stored differently depending on the secret manager in use. The secret is a JSON string containing a list of private JWKs. |
-| `hash_secret` | A secret value used to enhance the security of hashing operations within the application. |
+| `hash_secret` | A secret value used to enhance the security of hashing operations within the application.                                                                                                                            |
 
 ### Local Secret Manager
 
@@ -370,7 +371,27 @@ DIDCOMM_AUTH_SECRET=<MY_AWS_SECRET_NAME>
 
 ### AWS SNS Configuration
 
-When using AWS SNS, correctly configure the necessary AWS credentials (e.g., `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, and `AWS_SESSION_TOKEN` *(if needed)*) in your environment.
+When using AWS SNS, correctly configure the necessary AWS credentials in your environment using one of these methods:
+
+**Option 1: Using AWS Profile (Recommended)**
+```bash
+AWS_PROFILE=my-profile
+AWS_REGION=us-east-1
+```
+
+**Option 2: Using Direct Credentials**
+```bash
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_SESSION_TOKEN=...  # Optional, for temporary credentials
+AWS_REGION=us-east-1
+```
+
+When `AWS_PROFILE` is set, the server will use the AWS CLI to fetch credentials from the specified profile. This method supports:
+- Standard IAM user profiles
+- SSO (IAM Identity Center) profiles
+- Assumed role profiles
+- Temporary credentials with automatic expiration handling
 
 The AWS SNS provider requires specific IAM permissions to function correctly. Ensure that your IAM policies allow the following actions: 
 
