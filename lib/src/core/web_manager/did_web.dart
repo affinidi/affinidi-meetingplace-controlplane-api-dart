@@ -1,8 +1,6 @@
 import 'package:http/http.dart';
 import 'package:ssi/ssi.dart';
 
-import 'public_key_utils.dart';
-
 /// Converts a `did:web` identifier into a [Uri] pointing to its DID document.
 Uri didWebToUri(String didWeb) {
   var did = didWeb.replaceFirst('did:web:', '');
@@ -31,9 +29,7 @@ class DidWeb {
   /// [didToResolve] - The DID to resolve.
   ///
   /// Returns a [DidDocument] object.
-  static Future<DidDocument> resolve(
-    String didToResolve,
-  ) async {
+  static Future<DidDocument> resolve(String didToResolve) async {
     if (!didToResolve.startsWith('did:web')) {
       throw SsiException(
         message: '`$didToResolve` is not did:web DID',
@@ -41,11 +37,16 @@ class DidWeb {
       );
     }
 
-    var res = await get(didWebToUri(didToResolve),
-            headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 30), onTimeout: () {
-      return Response('Timeout', 408);
-    });
+    var res =
+        await get(
+          didWebToUri(didToResolve),
+          headers: {'Accept': 'application/json'},
+        ).timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {
+            return Response('Timeout', 408);
+          },
+        );
 
     if (res.statusCode == 200) {
       return DidDocument.fromJson(res.body);
@@ -74,12 +75,14 @@ class DidWeb {
     final vms = <VerificationMethodJwk>[];
     for (var i = 0; i < verificationMethodIds.length; i++) {
       final vmId = verificationMethodIds[i];
-      vms.add(VerificationMethodJwk(
-        id: vmId,
-        controller: did,
-        type: 'JsonWebKey2020',
-        publicKeyJwk: Jwk.fromJson(keyToJwk(publicKeys[i])),
-      ));
+      vms.add(
+        VerificationMethodJwk(
+          id: vmId,
+          controller: did,
+          type: 'JsonWebKey2020',
+          publicKeyJwk: Jwk.fromJson(keyToJwk(publicKeys[i])),
+        ),
+      );
     }
 
     final didDocument = DidDocument.create(

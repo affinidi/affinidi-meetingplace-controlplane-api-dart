@@ -1,5 +1,4 @@
-import 'package:meeting_place_core/meeting_place_core.dart'
-    show GroupMessage, GroupMessageBody;
+import 'package:meeting_place_core/meeting_place_core.dart' show GroupMessage;
 import 'package:mutex/mutex.dart';
 import 'dart:convert';
 
@@ -259,14 +258,12 @@ class GroupService {
         final messageToSend = GroupMessage.create(
           from: group.groupDid,
           to: [recipientDidDoc.id],
-          body: GroupMessageBody(
-            ciphertext: payload['ciphertext'],
-            iv: payload['iv'],
-            authenticationTag: payload['authentication_tag'],
-            preCapsule: payload['capsule'],
-            fromDid: sender.memberDid,
-            seqNo: group.seqNo,
-          ),
+          ciphertext: payload['ciphertext'],
+          iv: payload['iv'],
+          authenticationTag: payload['authentication_tag'],
+          preCapsule: payload['capsule'],
+          fromDid: sender.memberDid,
+          seqNo: group.seqNo,
         );
 
         try {
