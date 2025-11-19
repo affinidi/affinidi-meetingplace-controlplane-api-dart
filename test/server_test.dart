@@ -54,12 +54,16 @@ void main() {
     final recryptKeyPair = recrypt.generateKeyPair();
     final result = recrypt.encapsulate(recryptKeyPair.publicKey);
 
-    return base64.encode(utf8.encode(jsonEncode({
-      'ciphertext': 'cipher-sample',
-      'capsule': (result['capsule'] as Capsule).toBase64(),
-      'iv': 'iv-sample',
-      'authenticationTag': 'auth-tag-sample',
-    })));
+    return base64.encode(
+      utf8.encode(
+        jsonEncode({
+          'ciphertext': 'cipher-sample',
+          'capsule': (result['capsule'] as Capsule).toBase64(),
+          'iv': 'iv-sample',
+          'authentication_tag': 'auth-tag-sample',
+        }),
+      ),
+    );
   }
 
   late String aliceAccessToken;
@@ -1756,14 +1760,16 @@ void main() {
       data: GroupSendMessage(
         offerLink: registerOfferResponse.data['offerLink'],
         groupDid: registerOfferResponse.data['groupDid'],
-        payload: base64Encode(utf8.encode(jsonEncode(
-          {
-            'ciphertext': expCiphertext,
-            'capsule': expCapsule,
-            'iv': expIV,
-            'authenticationTag': expAuthenticationTag,
-          },
-        ))),
+        payload: base64Encode(
+          utf8.encode(
+            jsonEncode({
+              'ciphertext': expCiphertext,
+              'capsule': expCapsule,
+              'iv': expIV,
+              'authentication_tag': expAuthenticationTag,
+            }),
+          ),
+        ),
         ephemeral: false,
         expiresTime: DateTime.now()
             .toUtc()
@@ -1779,15 +1785,19 @@ void main() {
     );
 
     final receivedMessage = await receivedMessageCompleter.future;
-    expect(receivedMessage.type.toString(),
-        equals(MeetingPlaceProtocol.groupMessage.value));
+    expect(
+      receivedMessage.type.toString(),
+      equals(MeetingPlaceProtocol.groupMessage.value),
+    );
     expect(receivedMessage.body!['ciphertext'], equals(expCiphertext));
     expect(receivedMessage.body!['iv'], equals(expIV));
-    expect(receivedMessage.body!['authenticationTag'],
-        equals(expAuthenticationTag));
-    expect(receivedMessage.body!['preCapsule'], isNotNull);
-    expect(receivedMessage.body!['fromDid'], registerOfferRequest.adminDid);
-    expect(receivedMessage.body!['seqNo'], equals(1));
+    expect(
+      receivedMessage.body!['authentication_tag'],
+      equals(expAuthenticationTag),
+    );
+    expect(receivedMessage.body!['pre_capsule'], isNotNull);
+    expect(receivedMessage.body!['from_did'], registerOfferRequest.adminDid);
+    expect(receivedMessage.body!['seq_no'], equals(1));
   });
 
   test('group-add-member: fails due to missing permissions', () async {
@@ -2214,7 +2224,7 @@ void main() {
     );
 
     final expectedMessageType =
-        '${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/invitation-accept';
+        'https://affinidi.com/didcomm/protocols/mpx/1.0/notification-invitation-accept';
 
     channel.listen((message) {
       if (message.type.toString() == expectedMessageType) {

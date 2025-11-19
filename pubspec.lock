@@ -570,29 +570,32 @@ packages:
     source: hosted
     version: "0.12.17"
   meeting_place_control_plane:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: meeting_place_control_plane
-      sha256: "69f85ba8bea7122a9bb1e1d8b20434c564d444d2a6855bffdc6dff860b79afc6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1-dev.5"
+      path: "packages/meeting_place_control_plane"
+      ref: d3ee82c93c3301cd04ccff7d313cb37e15cf4c55
+      resolved-ref: d3ee82c93c3301cd04ccff7d313cb37e15cf4c55
+      url: "git@github.com:affinidi/affinidi-meetingplace-sdk-dart.git"
+    source: git
+    version: "0.0.1-dev.8"
   meeting_place_core:
     dependency: "direct main"
     description:
-      name: meeting_place_core
-      sha256: "3bcb924a880d87fcee82297ea9f7a52d497469df019a4080fa1df9b45d19777d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1-dev.7"
+      path: "packages/meeting_place_core"
+      ref: d3ee82c93c3301cd04ccff7d313cb37e15cf4c55
+      resolved-ref: d3ee82c93c3301cd04ccff7d313cb37e15cf4c55
+      url: "git@github.com:affinidi/affinidi-meetingplace-sdk-dart.git"
+    source: git
+    version: "0.0.1-dev.11"
   meeting_place_mediator:
     dependency: "direct main"
     description:
-      name: meeting_place_mediator
-      sha256: "0e93af54461e5b105dee4accd18221cde0d47981b623799457b6a21a395b83a3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1-dev.4"
+      path: "packages/meeting_place_mediator"
+      ref: d3ee82c93c3301cd04ccff7d313cb37e15cf4c55
+      resolved-ref: d3ee82c93c3301cd04ccff7d313cb37e15cf4c55
+      url: "git@github.com:affinidi/affinidi-meetingplace-sdk-dart.git"
+    source: git
+    version: "0.0.1-dev.6"
   melos:
     dependency: "direct dev"
     description:
@@ -909,10 +912,10 @@ packages:
     dependency: "direct main"
     description:
       name: ssi
-      sha256: "03ad3872ae5de1584bc9798c2049226470c1b98ca21662d974023f61c813b3d3"
+      sha256: "46ae887fd17b2c7fd81cebd36516e7cd22f5b650893503ae610e90a949c2c70e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.17.0"
+    version: "2.19.1"
   stack_trace:
     dependency: transitive
     description:
