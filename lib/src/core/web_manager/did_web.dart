@@ -1,8 +1,6 @@
 import 'package:http/http.dart';
 import 'package:ssi/ssi.dart';
 
-import 'public_key_utils.dart';
-
 /// Converts a `did:web` identifier into a [Uri] pointing to its DID document.
 Uri didWebToUri(String didWeb) {
   var did = didWeb.replaceFirst('did:web:', '');
