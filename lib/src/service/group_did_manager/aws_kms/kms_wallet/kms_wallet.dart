@@ -44,12 +44,12 @@ class KmsWallet implements Wallet {
     required String roleArn,
     required String deploymentId,
     required kms.AwsClientCredentials credentials,
-  })  : _kmsClient = kmsClient,
-        _stsClient = stsClient,
-        _store = store,
-        _roleArn = roleArn,
-        _deploymentId = deploymentId,
-        _credentials = credentials;
+  }) : _kmsClient = kmsClient,
+       _stsClient = stsClient,
+       _store = store,
+       _roleArn = roleArn,
+       _deploymentId = deploymentId,
+       _credentials = credentials;
 
   KMSWrapper _kmsClient;
   sts.STS _stsClient;
@@ -108,7 +108,8 @@ class KmsWallet implements Wallet {
 
   @override
   Future<List<SignatureScheme>> getSupportedSignatureSchemes(
-      String keyId) async {
+    String keyId,
+  ) async {
     final keyPair = await getKeyPair(keyId);
     return keyPair.supportedSignatureSchemes;
   }
@@ -139,8 +140,11 @@ class KmsWallet implements Wallet {
     final kmsClient = await _getKMSClient();
 
     if (keyId != null && await _store.contains(keyId)) {
-      return KmsKeyPair.createFromStore(_store,
-          kmsClient: kmsClient, keyId: keyId);
+      return KmsKeyPair.createFromStore(
+        _store,
+        kmsClient: kmsClient,
+        keyId: keyId,
+      );
     }
 
     if (keyId != null) {
@@ -159,7 +163,8 @@ class KmsWallet implements Wallet {
 
     if (keyUsage == null) {
       throw ArgumentError(
-          '''keyUsage is required for KmsWallet as it defines usage type of KMS key''');
+        '''keyUsage is required for KmsWallet as it defines usage type of KMS key''',
+      );
     }
 
     final stsClient = await _getStsClient();
@@ -182,17 +187,24 @@ class KmsWallet implements Wallet {
             "Resource": "*",
           },
           {
+            "Sid": "AllowDeletion",
+            "Effect": "Allow",
+            "Principal": {"AWS": getEnv('AWS_DELETE_INFRA_LAMBDA_ROLE_ARN')},
+            "Action": ["kms:ScheduleKeyDeletion"],
+            "Resource": "*",
+          },
+          {
             "Sid": "AllowFargateTaskToUse",
             "Effect": "Allow",
             "Principal": {"AWS": _roleArn},
             "Action": _getPolicyActionsByKeyUsage(keyUsage),
-            "Resource": "*"
+            "Resource": "*",
           },
         ],
       }),
       tags: [
         kms.Tag(tagKey: 'deploymentId', tagValue: _deploymentId),
-        kms.Tag(tagKey: 'service', tagValue: 'mpx')
+        kms.Tag(tagKey: 'service', tagValue: 'mpx'),
       ],
     );
 
@@ -232,8 +244,11 @@ class KmsWallet implements Wallet {
   Future<KmsKeyPair> getKeyPair(String keyId) async {
     final client = await _getKMSClient();
     if (await _store.contains(keyId)) {
-      return KmsKeyPair.createFromStore(_store,
-          kmsClient: client, keyId: keyId);
+      return KmsKeyPair.createFromStore(
+        _store,
+        kmsClient: client,
+        keyId: keyId,
+      );
     }
     return KmsKeyPair.create(client, keyId);
   }
