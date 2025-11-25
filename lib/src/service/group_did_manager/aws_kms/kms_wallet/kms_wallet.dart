@@ -189,7 +189,7 @@ class KmsWallet implements Wallet {
           {
             "Sid": "AllowDeletion",
             "Effect": "Allow",
-            "Principal": {"AWS": getEnv('AWS_DELETE_INFRA_LAMBDA_ROLE_ARN')},
+            "Principal": {"AWS": getEnv('AWS_KEY_DELETION_PRINCIPAL_ARN')},
             "Action": ["kms:ScheduleKeyDeletion"],
             "Resource": "*",
           },
