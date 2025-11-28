@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 
+import '../error_helper.dart';
+
 part 'response_error_model.g.dart';
 
 enum NotifyAcceptanceErrorCodes {
@@ -36,16 +38,9 @@ class NotifyAcceptanceErrorResponse {
   }
 
   factory NotifyAcceptanceErrorResponse.notificationError([String? message]) {
-    var errorMessage =
-        'Unable to send notification: upstream provider returned an error.';
-
-    if (message != null && message.isNotEmpty) {
-      errorMessage += ' Details: $message';
-    }
-
     return NotifyAcceptanceErrorResponse(
       errorCode: NotifyAcceptanceErrorCodes.notificationError.value,
-      errorMessage: errorMessage,
+      errorMessage: ErrorHelper.getMotificationErrorMessage(message),
     );
   }
 

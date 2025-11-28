@@ -11,10 +11,14 @@ import 'push_notification_provider.dart';
 class PlatformTypeNotSupported implements Exception {}
 
 abstract interface class IPlatform {
-  Future<DeviceNotificationData> notify({
+  Future<void> notify({
     required String platformEndpointArn,
     required DeviceNotification notification,
   });
+
+  DeviceNotificationData getDeviceNotificationData(
+    DeviceNotification notification,
+  );
 }
 
 class DeviceNotificationService {
@@ -30,13 +34,13 @@ class DeviceNotificationService {
   final PushNotificationProvider _provider;
   final MeetingPlaceMediatorSDK _mediatorSDK;
 
-  Future<DeviceNotificationData> notify({
+  Future<void> notify({
     required PlatformType platformType,
     required String platformEndpointArn,
     required DeviceNotification notification,
   }) {
     try {
-      return getByDevicePlatform(platformType).notify(
+      return _getByDevicePlatform(platformType).notify(
         platformEndpointArn: platformEndpointArn,
         notification: notification,
       );
@@ -48,7 +52,16 @@ class DeviceNotificationService {
     }
   }
 
-  IPlatform getByDevicePlatform(PlatformType platformType) {
+  DeviceNotificationData getDeviceNotificationData(
+    PlatformType platformType,
+    DeviceNotification notification,
+  ) {
+    return _getByDevicePlatform(
+      platformType,
+    ).getDeviceNotificationData(notification);
+  }
+
+  IPlatform _getByDevicePlatform(PlatformType platformType) {
     switch (platformType) {
       case PlatformType.DIDCOMM:
         return DidComm(mediatorSDK: _mediatorSDK, logger: _logger);

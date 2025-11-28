@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../../core/service/device_notification/device_notification_exception.dart';
+import '../error_helper.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
 import 'response_error_model.dart';
@@ -33,17 +34,11 @@ Future<Response> notifyAcceptance(
       body: NotifyAcceptanceErrorResponse.acceptanceNotFound().toString(),
     );
   } on DeviceNotificationException catch (e, stackTrace) {
-    facade.logError(
-      'Device notification error: ${e.message}',
+    return ErrorHelper.handleDeviceNotificationError(
       error: e,
       stackTrace: stackTrace,
-    );
-
-    return Response(
-      HttpStatus.badGateway,
-      body: NotifyAcceptanceErrorResponse.notificationError(
-        e.message,
-      ).toString(),
+      facade: facade,
+      errorResponse: NotifyAcceptanceErrorResponse.notificationError(e.message),
     );
   } catch (e, stackTrace) {
     facade.logError(

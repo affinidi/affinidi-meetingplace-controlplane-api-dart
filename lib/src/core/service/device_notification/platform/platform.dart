@@ -9,4 +9,11 @@ abstract interface class IPayload {
 
 abstract class Platform implements IPlatform {
   IPayload getPayload(DeviceNotification notification);
+
+  @override
+  DeviceNotificationData getDeviceNotificationData(
+    DeviceNotification notification,
+  ) {
+    return getPayload(notification).getData();
+  }
 }
