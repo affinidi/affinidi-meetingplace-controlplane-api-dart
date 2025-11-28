@@ -21,7 +21,7 @@ class ErrorHelper {
     return Response(HttpStatus.badGateway, body: errorResponse.toString());
   }
 
-  static getMotificationErrorMessage([String? message]) {
+  static getNotificationErrorMessage([String? message]) {
     final errorMessage =
         'Unable to send notification: upstream provider returned an error.';
 

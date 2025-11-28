@@ -42,7 +42,7 @@ class NotifyAcceptanceGroupErrorResponse {
   ]) {
     return NotifyAcceptanceGroupErrorResponse(
       errorCode: NotifyAcceptanceGroupErrorCodes.notificationError.value,
-      errorMessage: ErrorHelper.getMotificationErrorMessage(message),
+      errorMessage: ErrorHelper.getNotificationErrorMessage(message),
     );
   }
 

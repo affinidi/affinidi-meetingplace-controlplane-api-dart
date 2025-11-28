@@ -40,7 +40,7 @@ class NotifyAcceptanceErrorResponse {
   factory NotifyAcceptanceErrorResponse.notificationError([String? message]) {
     return NotifyAcceptanceErrorResponse(
       errorCode: NotifyAcceptanceErrorCodes.notificationError.value,
-      errorMessage: ErrorHelper.getMotificationErrorMessage(message),
+      errorMessage: ErrorHelper.getNotificationErrorMessage(message),
     );
   }
 

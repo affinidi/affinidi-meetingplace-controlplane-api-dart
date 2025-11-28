@@ -32,7 +32,7 @@ class NotifyOutreachErrorResponse {
   factory NotifyOutreachErrorResponse.notificationError([String? message]) {
     return NotifyOutreachErrorResponse(
       errorCode: NotifyOutreachErrorCodes.notificationError.value,
-      errorMessage: ErrorHelper.getMotificationErrorMessage(message),
+      errorMessage: ErrorHelper.getNotificationErrorMessage(message),
     );
   }
 

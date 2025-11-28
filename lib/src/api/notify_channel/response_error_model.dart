@@ -34,7 +34,7 @@ class NotifyChannelErrorResponse {
   factory NotifyChannelErrorResponse.notificationError([String? message]) {
     return NotifyChannelErrorResponse(
       errorCode: NotifyAcceptanceErrorCodes.notificationError.value,
-      errorMessage: ErrorHelper.getMotificationErrorMessage(message),
+      errorMessage: ErrorHelper.getNotificationErrorMessage(message),
     );
   }
 
