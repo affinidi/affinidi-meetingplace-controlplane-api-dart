@@ -3,6 +3,7 @@ import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import '../../../utils/platform_type.dart';
 import '../../logger/logger.dart';
 import 'device_notification.dart';
+import 'device_notification_exception.dart';
 import 'platform/did_comm.dart';
 import 'platform/fcm.dart';
 import 'push_notification_provider.dart';
@@ -10,10 +11,14 @@ import 'push_notification_provider.dart';
 class PlatformTypeNotSupported implements Exception {}
 
 abstract interface class IPlatform {
-  Future<DeviceNotificationData> notify({
+  Future<void> notify({
     required String platformEndpointArn,
     required DeviceNotification notification,
   });
+
+  DeviceNotificationData getDeviceNotificationData(
+    DeviceNotification notification,
+  );
 }
 
 class DeviceNotificationService {
@@ -29,18 +34,34 @@ class DeviceNotificationService {
   final PushNotificationProvider _provider;
   final MeetingPlaceMediatorSDK _mediatorSDK;
 
-  Future<DeviceNotificationData> notify({
+  Future<void> notify({
     required PlatformType platformType,
     required String platformEndpointArn,
     required DeviceNotification notification,
   }) {
-    return getByDevicePlatform(platformType).notify(
-      platformEndpointArn: platformEndpointArn,
-      notification: notification,
-    );
+    try {
+      return _getByDevicePlatform(platformType).notify(
+        platformEndpointArn: platformEndpointArn,
+        notification: notification,
+      );
+    } catch (e, stackTrace) {
+      Error.throwWithStackTrace(
+        DeviceNotificationException(e.toString()),
+        stackTrace,
+      );
+    }
   }
 
-  IPlatform getByDevicePlatform(PlatformType platformType) {
+  DeviceNotificationData getDeviceNotificationData(
+    PlatformType platformType,
+    DeviceNotification notification,
+  ) {
+    return _getByDevicePlatform(
+      platformType,
+    ).getDeviceNotificationData(notification);
+  }
+
+  IPlatform _getByDevicePlatform(PlatformType platformType) {
     switch (platformType) {
       case PlatformType.DIDCOMM:
         return DidComm(mediatorSDK: _mediatorSDK, logger: _logger);

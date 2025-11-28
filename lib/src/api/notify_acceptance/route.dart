@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import '../../core/service/device_notification/device_notification_exception.dart';
+import '../error_helper.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
 import 'response_error_model.dart';
@@ -16,10 +20,7 @@ Future<Response> notifyAcceptance(
       await request.readAsString(),
     );
 
-    await facade.notifyAcceptance(
-      notifyAcceptanceRequest,
-      getAuthDid(request),
-    );
+    await facade.notifyAcceptance(notifyAcceptanceRequest, getAuthDid(request));
 
     return Response.ok('');
   } on RequestValidationException catch (e) {
@@ -32,9 +33,19 @@ Future<Response> notifyAcceptance(
     return Response.badRequest(
       body: NotifyAcceptanceErrorResponse.acceptanceNotFound().toString(),
     );
+  } on DeviceNotificationException catch (e, stackTrace) {
+    return ErrorHelper.handleDeviceNotificationError(
+      error: e,
+      stackTrace: stackTrace,
+      facade: facade,
+      errorResponse: NotifyAcceptanceErrorResponse.notificationError(e.message),
+    );
   } catch (e, stackTrace) {
-    facade.logError('Error on notify acceptance: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on notify acceptance: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

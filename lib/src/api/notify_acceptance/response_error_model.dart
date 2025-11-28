@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 
+import '../error_helper.dart';
+
 part 'response_error_model.g.dart';
 
 enum NotifyAcceptanceErrorCodes {
   offerNotFound('OFFER_NOT_FOUND'),
-  acceptanceNotFound('ACCEPTANCE_NOT_FOUND');
+  acceptanceNotFound('ACCEPTANCE_NOT_FOUND'),
+  notificationError('NOTIFICATION_ERROR');
 
   const NotifyAcceptanceErrorCodes(this.value);
 
@@ -33,6 +36,14 @@ class NotifyAcceptanceErrorResponse {
       errorMessage: 'Acceptance not found, notify acceptance not possible',
     );
   }
+
+  factory NotifyAcceptanceErrorResponse.notificationError([String? message]) {
+    return NotifyAcceptanceErrorResponse(
+      errorCode: NotifyAcceptanceErrorCodes.notificationError.value,
+      errorMessage: ErrorHelper.getNotificationErrorMessage(message),
+    );
+  }
+
   final String errorCode;
   final String errorMessage;
 

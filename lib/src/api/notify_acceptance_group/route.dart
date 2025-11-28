@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import '../../core/service/device_notification/device_notification_exception.dart';
+import '../error_helper.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
 import 'response_error_model.dart';
@@ -14,7 +18,8 @@ Future<Response> notifyAcceptanceGroup(
   try {
     final notifyAcceptanceGroupRequest =
         NotifyAcceptanceGroupRequest.fromRequestParams(
-            await request.readAsString());
+          await request.readAsString(),
+        );
 
     await facade.notifyAcceptanceGroup(
       notifyAcceptanceGroupRequest,
@@ -32,9 +37,21 @@ Future<Response> notifyAcceptanceGroup(
     return Response.badRequest(
       body: NotifyAcceptanceGroupErrorResponse.acceptanceNotFound().toString(),
     );
+  } on DeviceNotificationException catch (e, stackTrace) {
+    return ErrorHelper.handleDeviceNotificationError(
+      error: e,
+      stackTrace: stackTrace,
+      facade: facade,
+      errorResponse: NotifyAcceptanceGroupErrorResponse.notificationError(
+        e.message,
+      ),
+    );
   } catch (e, stackTrace) {
-    facade.logError('Error on notify acceptance group: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on notify acceptance group: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }
