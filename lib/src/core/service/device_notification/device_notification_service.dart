@@ -3,6 +3,7 @@ import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import '../../../utils/platform_type.dart';
 import '../../logger/logger.dart';
 import 'device_notification.dart';
+import 'device_notification_exception.dart';
 import 'platform/did_comm.dart';
 import 'platform/fcm.dart';
 import 'push_notification_provider.dart';
@@ -34,10 +35,17 @@ class DeviceNotificationService {
     required String platformEndpointArn,
     required DeviceNotification notification,
   }) {
-    return getByDevicePlatform(platformType).notify(
-      platformEndpointArn: platformEndpointArn,
-      notification: notification,
-    );
+    try {
+      return getByDevicePlatform(platformType).notify(
+        platformEndpointArn: platformEndpointArn,
+        notification: notification,
+      );
+    } catch (e, stackTrace) {
+      Error.throwWithStackTrace(
+        DeviceNotificationException(e.toString()),
+        stackTrace,
+      );
+    }
   }
 
   IPlatform getByDevicePlatform(PlatformType platformType) {
