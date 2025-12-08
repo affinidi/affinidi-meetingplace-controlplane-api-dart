@@ -96,18 +96,15 @@ class FCM extends Platform implements IPlatform {
   final PushNotificationProvider _provider;
 
   @override
-  Future<DeviceNotificationData> notify({
+  Future<void> notify({
     required String platformEndpointArn,
     required DeviceNotification notification,
   }) async {
     final payload = getPayload(notification);
-
     await _provider.send(
       targetArn: platformEndpointArn,
       payload: payload.build(),
     );
-
-    return payload.getData();
   }
 
   @override

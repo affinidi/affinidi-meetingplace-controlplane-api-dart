@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 
+import '../error_helper.dart';
+
 part 'response_error_model.g.dart';
 
 enum NotifyOutreachErrorCodes {
-  offerNotFound('notify_outreach_offer_not_found');
+  offerNotFound('notify_outreach_offer_not_found'),
+  notificationError('notify_outreach_notification_error');
 
   const NotifyOutreachErrorCodes(this.value);
 
@@ -23,6 +26,13 @@ class NotifyOutreachErrorResponse {
     return NotifyOutreachErrorResponse(
       errorCode: NotifyOutreachErrorCodes.offerNotFound.value,
       errorMessage: 'Notify outreach exception: offer not found',
+    );
+  }
+
+  factory NotifyOutreachErrorResponse.notificationError([String? message]) {
+    return NotifyOutreachErrorResponse(
+      errorCode: NotifyOutreachErrorCodes.notificationError.value,
+      errorMessage: ErrorHelper.getNotificationErrorMessage(message),
     );
   }
 

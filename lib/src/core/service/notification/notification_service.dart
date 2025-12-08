@@ -38,10 +38,10 @@ class NotificationService {
     required DeviceTokenMappingService deviceTokenMappingService,
     required DeviceNotificationService deviceNotificationService,
     required Logger logger,
-  })  : _storage = storage,
-        _deviceTokenMappingService = deviceTokenMappingService,
-        _deviceNotificationService = deviceNotificationService,
-        _logger = logger;
+  }) : _storage = storage,
+       _deviceTokenMappingService = deviceTokenMappingService,
+       _deviceNotificationService = deviceNotificationService,
+       _logger = logger;
 
   final Storage _storage;
   final DeviceTokenMappingService _deviceTokenMappingService;
@@ -66,20 +66,22 @@ class NotificationService {
       return existingNotificationChannel;
     }
 
-    final deviceTokenMapping =
-        await _deviceTokenMappingService.getDeviceTokenMapping(
-      devicePlatform: input.platformType,
-      deviceToken: input.deviceToken,
-    );
+    final deviceTokenMapping = await _deviceTokenMappingService
+        .getDeviceTokenMapping(
+          devicePlatform: input.platformType,
+          deviceToken: input.deviceToken,
+        );
 
-    return _storage.create(NotificationChannel(
-      notificationChannelId: notificationChannelId,
-      did: input.didUsedForAcceptance,
-      peerDid: input.theirDid,
-      platformEndpointArn: deviceTokenMapping.platformEndpointArn,
-      platformType: deviceTokenMapping.platformType,
-      createdBy: authDid,
-    ));
+    return _storage.create(
+      NotificationChannel(
+        notificationChannelId: notificationChannelId,
+        did: input.didUsedForAcceptance,
+        peerDid: input.theirDid,
+        platformEndpointArn: deviceTokenMapping.platformEndpointArn,
+        platformType: deviceTokenMapping.platformType,
+        createdBy: authDid,
+      ),
+    );
   }
 
   Future<NotificationItem> saveNotificationItem(
@@ -125,8 +127,9 @@ class NotificationService {
     }
 
     final notificationId = _generateNotificationItemId();
-    final deviceHash = _deviceTokenMappingService
-        .generateDeviceHash(notificationChannel.platformEndpointArn);
+    final deviceHash = _deviceTokenMappingService.generateDeviceHash(
+      notificationChannel.platformEndpointArn,
+    );
 
     final pendingNotifications = await getPendingNotifications(deviceHash);
     final pendingNotificationCount =
@@ -140,20 +143,30 @@ class NotificationService {
       ),
     );
 
-    final payload = await _deviceNotificationService.notify(
+    final notificationData = _deviceNotificationService
+        .getDeviceNotificationData(
+          notificationChannel.platformType,
+          notifyChannelNotification,
+        );
+
+    final notificationItem = await saveNotificationItem(
+      NotificationItem.channelActivity(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: authDid,
+        acceptChannelDid: input.did,
+        type: input.type,
+        payload: notificationData,
+      ),
+    );
+
+    await _deviceNotificationService.notify(
       platformType: notificationChannel.platformType,
       platformEndpointArn: notificationChannel.platformEndpointArn,
       notification: notifyChannelNotification,
     );
 
-    return saveNotificationItem(NotificationItem.channelActivity(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: authDid,
-      acceptChannelDid: input.did,
-      type: input.type,
-      payload: payload,
-    ));
+    return notificationItem;
   }
 
   Future<NotificationItem> notifyChannelGroup({
@@ -165,8 +178,9 @@ class NotificationService {
   }) async {
     final notificationId = _generateNotificationItemId();
 
-    final deviceHash =
-        _deviceTokenMappingService.generateDeviceHash(platformEndpointArn);
+    final deviceHash = _deviceTokenMappingService.generateDeviceHash(
+      platformEndpointArn,
+    );
 
     final pendingNotifications = await getPendingNotifications(deviceHash);
     final pendingNotificationCount =
@@ -180,20 +194,27 @@ class NotificationService {
       ),
     );
 
-    final payload = await _deviceNotificationService.notify(
+    final notificationItem = saveNotificationItem(
+      NotificationItem.channelActivity(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: authDid,
+        acceptChannelDid: recipientDid,
+        type: type,
+        payload: _deviceNotificationService.getDeviceNotificationData(
+          platformType,
+          notifyChannelNotification,
+        ),
+      ),
+    );
+
+    await _deviceNotificationService.notify(
       platformType: platformType,
       platformEndpointArn: platformEndpointArn,
       notification: notifyChannelNotification,
     );
 
-    return saveNotificationItem(NotificationItem.channelActivity(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: authDid,
-      acceptChannelDid: recipientDid,
-      type: type,
-      payload: payload,
-    ));
+    return notificationItem;
   }
 
   Future<NotificationItem> notifyAcceptance(NotifyAcceptanceInput input) async {
@@ -205,28 +226,37 @@ class NotificationService {
     final pendingNotifications = await getPendingNotifications(deviceHash);
     final pendingNotificationCount = pendingNotifications.length + 1;
 
-    final payload = await _deviceNotificationService.notify(
-      platformType: input.offer.platformType,
-      platformEndpointArn: input.offer.platformEndpointArn,
-      notification: OfferAcceptanceNotification(
-        badgeCount: pendingNotificationCount,
-        offerName: input.offer.name,
-        sender: input.senderInfo,
-        data: DeviceNotificationData(
-          id: notificationId,
-          pendingCount: pendingNotificationCount,
+    final notification = OfferAcceptanceNotification(
+      badgeCount: pendingNotificationCount,
+      offerName: input.offer.name,
+      sender: input.senderInfo,
+      data: DeviceNotificationData(
+        id: notificationId,
+        pendingCount: pendingNotificationCount,
+      ),
+    );
+
+    final notificationItem = await saveNotificationItem(
+      NotificationItem.invitationAccept(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: input.authDid,
+        acceptChannelDid: input.didUsedForAcceptance,
+        offerLink: input.offer.offerLink,
+        payload: _deviceNotificationService.getDeviceNotificationData(
+          input.offer.platformType,
+          notification,
         ),
       ),
     );
 
-    return saveNotificationItem(NotificationItem.invitationAccept(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: input.authDid,
-      acceptChannelDid: input.didUsedForAcceptance,
-      offerLink: input.offer.offerLink,
-      payload: payload,
-    ));
+    await _deviceNotificationService.notify(
+      platformType: input.offer.platformType,
+      platformEndpointArn: input.offer.platformEndpointArn,
+      notification: notification,
+    );
+
+    return notificationItem;
   }
 
   Future<NotificationItem> notifyAcceptanceGroup(
@@ -240,27 +270,36 @@ class NotificationService {
     final pendingNotifications = await getPendingNotifications(deviceHash);
     final pendingNotificationCount = pendingNotifications.length + 1;
 
-    final payload = await _deviceNotificationService.notify(
-      platformType: input.offer.platformType,
-      platformEndpointArn: input.offer.platformEndpointArn,
-      notification: OfferAcceptanceGroupNotification(
-        badgeCount: pendingNotificationCount,
-        offerName: input.offer.name,
-        data: DeviceNotificationData(
-          id: notificationId,
-          pendingCount: pendingNotificationCount,
+    final notification = OfferAcceptanceGroupNotification(
+      badgeCount: pendingNotificationCount,
+      offerName: input.offer.name,
+      data: DeviceNotificationData(
+        id: notificationId,
+        pendingCount: pendingNotificationCount,
+      ),
+    );
+
+    final notificationItem = await saveNotificationItem(
+      NotificationItem.invitationGroupAccept(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: input.authDid,
+        acceptChannelDid: input.didUsedForAcceptance,
+        offerLink: input.offer.offerLink,
+        payload: _deviceNotificationService.getDeviceNotificationData(
+          input.offer.platformType,
+          notification,
         ),
       ),
     );
 
-    return saveNotificationItem(NotificationItem.invitationGroupAccept(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: input.authDid,
-      acceptChannelDid: input.didUsedForAcceptance,
-      offerLink: input.offer.offerLink,
-      payload: payload,
-    ));
+    await _deviceNotificationService.notify(
+      platformType: input.offer.platformType,
+      platformEndpointArn: input.offer.platformEndpointArn,
+      notification: notification,
+    );
+
+    return notificationItem;
   }
 
   Future<String?> notifyFinaliseAcceptance(
@@ -298,21 +337,27 @@ class NotificationService {
       ),
     );
 
-    final payload = await _deviceNotificationService.notify(
+    final notificationToken = notificationChannel?.notificationChannelId ?? '';
+
+    await saveNotificationItem(
+      NotificationItem.offerFinalised(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: input.authDid,
+        offerLink: input.acceptance.offerLink,
+        notificationToken: notificationToken,
+        payload: _deviceNotificationService.getDeviceNotificationData(
+          input.acceptance.platformType,
+          offerFinalisedNotification,
+        ),
+      ),
+    );
+
+    await _deviceNotificationService.notify(
       platformType: input.acceptance.platformType,
       platformEndpointArn: input.acceptance.platformEndpointArn,
       notification: offerFinalisedNotification,
     );
-
-    final notificationToken = notificationChannel?.notificationChannelId ?? '';
-    await saveNotificationItem(NotificationItem.offerFinalised(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: input.authDid,
-      offerLink: input.acceptance.offerLink,
-      notificationToken: notificationToken,
-      payload: payload,
-    ));
 
     return notificationToken;
   }
@@ -328,27 +373,34 @@ class NotificationService {
     final pendingNotifications = await getPendingNotifications(deviceHash);
     final pendingNotificationCount = pendingNotifications.length + 1;
 
-    final payload = await _deviceNotificationService.notify(
-      platformType: input.acceptance.platformType,
-      platformEndpointArn: input.acceptance.platformEndpointArn,
-      notification: GroupMembershipFinalisedNotification(
-        badgeCount: pendingNotificationCount,
-        data: DeviceNotificationData(
-          id: notificationId,
-          pendingCount: pendingNotificationCount,
+    final notification = GroupMembershipFinalisedNotification(
+      badgeCount: pendingNotificationCount,
+      data: DeviceNotificationData(
+        id: notificationId,
+        pendingCount: pendingNotificationCount,
+      ),
+    );
+
+    await saveNotificationItem(
+      NotificationItem.groupMembershipFinalised(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: input.authDid,
+        acceptChannelDid: input.acceptOfferAsDid,
+        offerLink: input.acceptance.offerLink,
+        startSeqNo: input.startSeqNo,
+        payload: _deviceNotificationService.getDeviceNotificationData(
+          input.acceptance.platformType,
+          notification,
         ),
       ),
     );
 
-    await saveNotificationItem(NotificationItem.groupMembershipFinalised(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: input.authDid,
-      acceptChannelDid: input.acceptOfferAsDid,
-      offerLink: input.acceptance.offerLink,
-      startSeqNo: input.startSeqNo,
-      payload: payload,
-    ));
+    await _deviceNotificationService.notify(
+      platformType: input.acceptance.platformType,
+      platformEndpointArn: input.acceptance.platformEndpointArn,
+      notification: notification,
+    );
   }
 
   Future<List<String>> deletePendingNotifications(
@@ -356,8 +408,9 @@ class NotificationService {
     List<String> notificationIds,
   ) async {
     List<String> deletedItems = [];
-    int batchSize = Config()
-        .get('deviceNotification')['maxPendingNotificationsToDeleteInBatch'];
+    int batchSize = Config().get(
+      'deviceNotification',
+    )['maxPendingNotificationsToDeleteInBatch'];
 
     for (final notificationId in notificationIds) {
       try {
@@ -370,8 +423,11 @@ class NotificationService {
         _logger.info('Notification deleted: $notificationId');
         deletedItems.add(notificationId);
       } catch (e, stackTrace) {
-        _logger.error('Error when deleting notification: $e',
-            error: e, stackTrace: stackTrace);
+        _logger.error(
+          'Error when deleting notification: $e',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
 
       if (deletedItems.length > batchSize) {
@@ -418,26 +474,33 @@ class NotificationService {
     final pendingNotifications = await getPendingNotifications(deviceHash);
     final pendingNotificationCount = pendingNotifications.length + 1;
 
-    final payload = await _deviceNotificationService.notify(
-      platformType: input.offer.platformType,
-      platformEndpointArn: input.offer.platformEndpointArn,
-      notification: NotifyInvitationOutreachNotification(
-        sender: input.senderInfo,
-        badgeCount: pendingNotificationCount,
-        data: DeviceNotificationData(
-          id: notificationId,
-          pendingCount: pendingNotificationCount,
+    final notification = NotifyInvitationOutreachNotification(
+      sender: input.senderInfo,
+      badgeCount: pendingNotificationCount,
+      data: DeviceNotificationData(
+        id: notificationId,
+        pendingCount: pendingNotificationCount,
+      ),
+    );
+
+    await saveNotificationItem(
+      NotificationItem.invitationOutreach(
+        id: notificationId,
+        deviceHash: deviceHash,
+        consumerAuthDid: authDid,
+        offerLink: input.offer.offerLink,
+        payload: _deviceNotificationService.getDeviceNotificationData(
+          input.offer.platformType,
+          notification,
         ),
       ),
     );
 
-    await saveNotificationItem(NotificationItem.invitationOutreach(
-      id: notificationId,
-      deviceHash: deviceHash,
-      consumerAuthDid: authDid,
-      offerLink: input.offer.offerLink,
-      payload: payload,
-    ));
+    await _deviceNotificationService.notify(
+      platformType: input.offer.platformType,
+      platformEndpointArn: input.offer.platformEndpointArn,
+      notification: notification,
+    );
   }
 
   Future<NotificationChannel?> _queryNotificationChannel(String id) async {
