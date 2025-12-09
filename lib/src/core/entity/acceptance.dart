@@ -23,7 +23,7 @@ class Acceptance extends Entity {
     required this.id,
     required this.did,
     required this.offerLink,
-    required this.vcard,
+    required this.contactCard,
     required this.status,
     required this.platformEndpointArn,
     required this.platformType,
@@ -46,7 +46,7 @@ class Acceptance extends Entity {
   final String id;
   final String did;
   final String offerLink;
-  final String vcard;
+  final String contactCard;
   final Status status;
   final String platformEndpointArn;
   final PlatformType platformType;

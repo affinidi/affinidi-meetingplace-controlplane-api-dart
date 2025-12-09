@@ -10,7 +10,7 @@ class QueryOfferResponse {
     required this.offerLink,
     required this.name,
     required this.description,
-    required this.vcard,
+    required this.contactCard,
     required this.validUntil,
     required this.maximumUsage,
     required this.mediatorDid,
@@ -28,7 +28,7 @@ class QueryOfferResponse {
       offerLink: offer.offerLink,
       name: offer.name,
       description: offer.description,
-      vcard: offer.vcard,
+      contactCard: offer.contactCard,
       validUntil: offer.validUntil,
       maximumUsage: offer.maximumClaims,
       mediatorDid: offer.mediatorDid,
@@ -44,7 +44,7 @@ class QueryOfferResponse {
   final String offerLink;
   final String name;
   final String description;
-  final String vcard;
+  final String contactCard;
   final String mediatorDid;
   final String mediatorEndpoint;
   final String mediatorWSSEndpoint;

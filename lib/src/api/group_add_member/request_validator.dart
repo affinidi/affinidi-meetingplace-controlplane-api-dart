@@ -31,10 +31,14 @@ class GroupAddMemberRequestValidator extends LucidValidator {
       (request) => request['reencryptionKey'] as String?,
       key: 'reencryptionKey',
     ).notEmptyOrNull();
-
     ruleFor(
       (request) => request['publicKey'] as String?,
       key: 'publicKey',
+    ).notEmptyOrNull();
+
+    ruleFor(
+      (request) => request['contactCard'] as String?,
+      key: 'contactCard',
     ).notEmptyOrNull();
   }
 }

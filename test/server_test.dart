@@ -179,7 +179,10 @@ void main() {
       equals(registerOfferRequest.offerDescription),
     );
 
-    expect(findOfferResponse.data['vcard'], equals(registerOfferRequest.vcard));
+    expect(
+      findOfferResponse.data['contactCard'],
+      equals(registerOfferRequest.contactCard),
+    );
 
     expect(
       findOfferResponse.data['validUntil'],
@@ -252,7 +255,10 @@ void main() {
       registerOfferRequest.offerDescription,
     );
 
-    expect(acceptOfferResponse.data['vcard'], registerOfferRequest.vcard);
+    expect(
+      acceptOfferResponse.data['contactCard'],
+      registerOfferRequest.contactCard,
+    );
 
     expect(
       acceptOfferResponse.data['validUntil'],
@@ -424,7 +430,10 @@ void main() {
       registerOfferRequest.offerDescription,
     );
 
-    expect(acceptOfferResponse.data['vcard'], registerOfferRequest.vcard);
+    expect(
+      acceptOfferResponse.data['contactCard'],
+      registerOfferRequest.contactCard,
+    );
 
     expect(
       acceptOfferResponse.data['validUntil'],
@@ -1353,7 +1362,7 @@ void main() {
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
         reencryptionKey: reencryptionKey.toBase64(),
         publicKey: reencryptKeyPair.publicKeyToBase64(),
-        vcard: '',
+        contactCard: '',
       ).toJson(),
       options: Options(
         headers: {
@@ -1402,7 +1411,7 @@ void main() {
       'offerLink': registerOfferResponse.data['offerLink'],
       'name': registerOfferRequestMock.offerName,
       'description': registerOfferRequestMock.offerDescription,
-      'vcard': registerOfferRequestMock.vcard,
+      'contactCard': registerOfferRequestMock.contactCard,
       'validUntil': registerOfferResponse.data['validUntil'],
       'maximumUsage': registerOfferResponse.data['maximumUsage'],
       'mediatorDid': registerOfferRequestMock.mediatorDid,
@@ -1887,7 +1896,7 @@ void main() {
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
         reencryptionKey: reencryptionKey.toBase64(),
         publicKey: reencryptKeyPair.publicKeyToBase64(),
-        vcard: '',
+        contactCard: '',
       ).toJson(),
       options: Options(
         headers: {
@@ -2010,7 +2019,7 @@ void main() {
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
           reencryptionKey: reencryptionKey.toBase64(),
           publicKey: reencryptKeyPair.publicKeyToBase64(),
-          vcard: '',
+          contactCard: '',
         ).toJson(),
         options: Options(
           headers: {
@@ -2090,7 +2099,7 @@ void main() {
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
         reencryptionKey: reencryptionKey.toBase64(),
         publicKey: reencryptKeyPair.publicKeyToBase64(),
-        vcard: '',
+        contactCard: '',
       ).toJson(),
       options: Options(
         headers: {
@@ -2181,7 +2190,7 @@ void main() {
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
           reencryptionKey: reencryptionKey.toBase64(),
           publicKey: reencryptKeyPair.toBase64(),
-          vcard: '',
+          contactCard: '',
         ).toJson(),
         options: Options(
           headers: {

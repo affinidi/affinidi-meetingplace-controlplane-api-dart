@@ -29,8 +29,8 @@ class AcceptOfferGroupRequestValidator extends LucidValidator {
     );
 
     ruleFor(
-      (request) => request['vcard'] as String?,
-      key: 'vcard',
+      (request) => request['contactCard'] as String?,
+      key: 'contactCard',
     ).notEmptyOrNull();
   }
 }
