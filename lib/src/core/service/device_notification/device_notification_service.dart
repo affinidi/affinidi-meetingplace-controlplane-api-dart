@@ -38,9 +38,9 @@ class DeviceNotificationService {
     required PlatformType platformType,
     required String platformEndpointArn,
     required DeviceNotification notification,
-  }) {
+  }) async {
     try {
-      return _getByDevicePlatform(platformType).notify(
+      await _getByDevicePlatform(platformType).notify(
         platformEndpointArn: platformEndpointArn,
         notification: notification,
       );
