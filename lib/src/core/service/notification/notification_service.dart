@@ -2,6 +2,7 @@ import 'dart:async';
 import '../../config/config.dart';
 import '../../logger/logger.dart';
 import '../device_notification/device_notification.dart';
+import '../device_notification/device_notification_exception.dart';
 import '../device_notification/notification/group_membership_finalised.dart';
 import '../device_notification/notification/notify_invitation_outreach.dart';
 import '../device_notification/notification/offer_acceptance.dart';
@@ -353,11 +354,15 @@ class NotificationService {
       ),
     );
 
-    await _deviceNotificationService.notify(
-      platformType: input.acceptance.platformType,
-      platformEndpointArn: input.acceptance.platformEndpointArn,
-      notification: offerFinalisedNotification,
-    );
+    try {
+      await _deviceNotificationService.notify(
+        platformType: input.acceptance.platformType,
+        platformEndpointArn: input.acceptance.platformEndpointArn,
+        notification: offerFinalisedNotification,
+      );
+    } on DeviceNotificationException {
+      return notificationToken;
+    }
 
     return notificationToken;
   }
