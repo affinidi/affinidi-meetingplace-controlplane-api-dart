@@ -13,7 +13,7 @@ class RegisterOfferRequest {
     required this.offerName,
     required this.offerDescription,
     required this.didcommMessage,
-    required this.vcard,
+    required this.contactCard,
     required this.deviceToken,
     required this.platformType,
     required this.mediatorDid,
@@ -40,7 +40,7 @@ class RegisterOfferRequest {
   final String offerName;
   final String offerDescription;
   final String didcommMessage;
-  final String vcard;
+  final String contactCard;
   final String deviceToken;
   final PlatformType platformType;
   final String mediatorDid;

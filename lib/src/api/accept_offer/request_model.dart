@@ -15,7 +15,7 @@ class AcceptOfferRequest {
     required this.mnemonic,
     required this.deviceToken,
     required this.platformType,
-    required this.vcard,
+    required this.contactCard,
   });
 
   factory AcceptOfferRequest.fromRequestParams(String requestParams) {
@@ -34,7 +34,7 @@ class AcceptOfferRequest {
   final String mnemonic;
   final String deviceToken;
   final PlatformType platformType;
-  final String vcard;
+  final String contactCard;
 
   toJson() => _$AcceptOfferRequestToJson(this);
 }

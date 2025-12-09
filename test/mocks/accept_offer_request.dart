@@ -11,5 +11,5 @@ AcceptOfferRequest getAcceptOfferRequest({
   mnemonic: mnemonic ?? 'offer-mnemonic',
   deviceToken: deviceToken,
   platformType: platformType,
-  vcard: 'dmNhcmQtdmFsdWUK',
+  contactCard: 'dmNhcmQtdmFsdWUK',
 );

@@ -46,7 +46,7 @@ class Offer extends Entity {
     required this.description,
     required this.offerType,
     required this.didcommMessage,
-    required this.vcard,
+    required this.contactCard,
     required this.platformEndpointArn,
     required this.platformType,
     required this.mediatorDid,
@@ -77,7 +77,7 @@ class Offer extends Entity {
   final String name;
   final String description;
   final String didcommMessage;
-  final String vcard;
+  final String contactCard;
   final String mnemonic;
   final String offerLink;
   final OfferType offerType;

@@ -9,7 +9,7 @@
 | **name** | **String** |  | **`Required`**   |
 | **description** | **String** |  | **`Required`**   |
 | **validUntil** | **String** | validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13 |   |
-| **vcard** | **String** | A vCard containing the details of the offer encoded in base64 format. | **`Required`**   |
+| **contactCard** | **String** | A ContactCard containing the details of the offer encoded in base64 format. | **`Required`**   |
 | **contactAttributes** | **BigDecimal** | A bitfield of contact attributes | **`Required`**   |
 | **offerType** | **BigDecimal** | Offer type information |   |
 | **mediatorDid** | **String** | The mediator DID use to register the offer. | **`Required`**   |
