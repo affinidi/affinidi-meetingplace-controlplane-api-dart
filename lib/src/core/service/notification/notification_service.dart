@@ -361,6 +361,9 @@ class NotificationService {
         notification: offerFinalisedNotification,
       );
     } on DeviceNotificationException {
+      _logger.warn(
+        'Notification failed to send for notificationId: $notificationId',
+      );
       return notificationToken;
     }
 
