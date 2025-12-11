@@ -48,7 +48,7 @@ abstract interface class Storage {
     EntityFromJson<T> fromJson,
   );
 
-  deleteFromlist(
+  Future<void> deleteFromlist(
     String listName,
     String listId,
     String entityName,

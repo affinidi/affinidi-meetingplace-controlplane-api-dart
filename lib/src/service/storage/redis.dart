@@ -161,7 +161,7 @@ class Redis implements Storage {
   }
 
   @override
-  Future<dynamic> deleteFromlist(
+  Future<void> deleteFromlist(
     String listName,
     String listId,
     String entityName,
@@ -169,7 +169,7 @@ class Redis implements Storage {
   ) async {
     _command ??= (await connect())._command;
     await delete(entityName, id);
-    return _command?.send_object(['SREM', '$listName#$listId', id]);
+    await _command?.send_object(['SREM', '$listName#$listId', id]);
   }
 
   Future<bool> _doesKeyExist(String key) async {
