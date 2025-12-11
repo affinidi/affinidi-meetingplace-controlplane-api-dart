@@ -28,7 +28,11 @@ abstract interface class Storage {
     EntityFromJson<T> fromJson,
   );
 
-  Future<List<String>> findAllById(String entityName, String id);
+  Future<List<T>> findAllById<T>(
+    String entityName,
+    String id,
+    EntityFromJson<T> fromJson,
+  );
 
   Future<int> count(String entityName);
 
@@ -38,5 +42,10 @@ abstract interface class Storage {
     EntityFromJson<T> fromJson,
   );
 
-  deleteFromlist(String listName, String listId, String entityName, String id);
+  Future<void> deleteFromlist(
+    String listName,
+    String listId,
+    String entityName,
+    String id,
+  );
 }
