@@ -73,9 +73,7 @@ List of the environment variables required to run the Control Plane API server.
 | ENV                 | Specifies the environment in which the server is running. By default, it is set to `DEV`.                                                                                                                                                                                                                                                                  |
 | SERVER_PORT         | Specifies the port on which the server listens for incoming requests.                                                                                                                                                                                                                                                                                      |
 | API_ENDPOINT        | Defines the API endpoint (e.g., http://localhost) to receive requests from the callers.                                                                                                                                                                                                                                                                    |
-| CONTROL_PLANE_DID   | The DID used for authentication (e.g., did:web:yourdomain.com). The caller will resolve the CONTROL_PLANE_DID to fetch the public key information and encrypt the DIDComm message containing the auth challenge string. For testing or running the server locally, use the `did:local:8080` - replace the `8080` depending on your configured SERVER_PORT. |
-| STORAGE_ENDPOINT    | Specifies the endpoint for the storage instance to access the stored data. Use `localhost` when running the instance locally.                                                                                                                                                                                                                              |
-| STORAGE_PORT        | Specifies the port used by the storage instance to handle requests. For example, if you use the default Redis configuration, the port will be `6379`.                                                                                                                                                                                                      |
+| CONTROL_PLANE_DID   | The DID used for authentication (e.g., did:web:yourdomain.com). The caller will resolve the CONTROL_PLANE_DID to fetch the public key information and encrypt the DIDComm message containing the auth challenge string. For testing or running the server locally, use the `did:local:8080` - replace the `8080` depending on your configured SERVER_PORT. |                                                                                        |
 | DIDCOMM_AUTH_SECRET | Specifies path and filename containing the didcommauth secret (e.g., `secrets/didcommauth.json`)                                                                                                                                                                                                                                                           |
 | HASH_SECRET         | A secret value to enhance the security of hashing operations within the application.                                                                                                                                                                                                                                                                       |
 | DID_DOCUMENT        | Specifies path and filename of the DID document parameter (e.g., `params/did_document.json`.                                                                                                                                                                                                                                                               |
@@ -90,6 +88,34 @@ Configure the following environment variables if AWS is the selected option.
 | AWS_SECRET_KEY    | Specifies the AWS secret key used when accessing AWS services. Only required if `AWS_PROFILE` is not set.                                                                                                                                                                                                                               |
 | AWS_SESSION_TOKEN | Specifies the AWS session token used when accessing AWS services with temporary credentials. Only required if `AWS_PROFILE` is not set.                                                                                                                                                                                                 |
 |                   |
+
+#### Storage Environment Variables
+
+Configure the following environment variables if `ValKey` storage is the selected option.
+                                                                             
+| Variable Name     | Description                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STORAGE_ENDPOINT    | Specifies the endpoint for the storage instance to access the stored data. Use `localhost` when running the instance locally.                                                                                                                                                                                                                              |
+| STORAGE_PORT        | Specifies the port used by the storage instance to handle requests. For example, if you use the default Redis configuration, the port will be `6379`.            
+|                   |
+
+If DynamoDB is chosen as the storage solution, configure the following environment variables in addition to the AWS-specific variables mentioned above.
+                                                                             
+| Variable Name     | Description                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DDB_TABLE_NAME    | Specifies the DynamoDB table name. |
+|                   |
+
+#### Push Notification Provider Environment Variables
+
+If AWS SNS is used for push notification integration, configure the following environment variables along with the AWS-specific variables mentioned above.
+
+                                                                             
+| Variable Name     | Description                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS_PLATFORM_APPLICATION_ARN    | Specifies the ARN of the AWS Platform Application configured to forward requests to push notification services such as Firebase. |
+|                   |
+
 
 ### Local Setup using SSI Persistent Wallet
 
