@@ -14,9 +14,7 @@ class Config {
   dynamic _envConfig;
 
   loadConfig(String env) async {
-    String fileContent = await File(
-      './config.yml',
-    ).readAsString();
+    String fileContent = await File('./config.yml').readAsString();
     _envConfig = loadYaml(fileContent);
     return this;
   }

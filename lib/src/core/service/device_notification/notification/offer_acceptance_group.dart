@@ -8,11 +8,11 @@ class OfferAcceptanceGroupNotification extends DeviceNotification {
     required super.data,
     required this.offerName,
   }) : super(
-          subtitle: 'Invitation accepted!',
-          body: 'Request to join $offerName has been accepted',
-          notificationType: NotificationItemType.invitationGroupAccept,
-          threadId: NotificationStackGroupingTypes.invitationAccept.value,
-        );
+         subtitle: 'Invitation accepted!',
+         body: 'Request to join $offerName has been accepted',
+         notificationType: NotificationItemType.invitationGroupAccept,
+         threadId: NotificationStackGroupingTypes.invitationAccept.value,
+       );
 
   final String offerName;
 }

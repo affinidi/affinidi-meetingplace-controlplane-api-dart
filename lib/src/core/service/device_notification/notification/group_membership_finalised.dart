@@ -7,10 +7,10 @@ class GroupMembershipFinalisedNotification extends DeviceNotification {
     required super.badgeCount,
     required super.data,
   }) : super(
-          subtitle: 'Connection completed!',
-          body: 'Group membership request approved',
-          notificationType: NotificationItemType.groupMembershipFinalised,
-          threadId:
-              NotificationStackGroupingTypes.groupMembershipFinalised.value,
-        );
+         subtitle: 'Connection completed!',
+         body: 'Group membership request approved',
+         notificationType: NotificationItemType.groupMembershipFinalised,
+         threadId:
+             NotificationStackGroupingTypes.groupMembershipFinalised.value,
+       );
 }

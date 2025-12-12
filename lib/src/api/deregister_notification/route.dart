@@ -14,8 +14,8 @@ Future<Response> deregisterNotification(
   try {
     final deregisterNotificationRequest =
         DeregisterNotificationRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
     await facade.deregisterNotification(
       deregisterNotificationRequest,
@@ -29,7 +29,8 @@ Future<Response> deregisterNotification(
     return Response.badRequest(body: e.toString());
   } on NotAuthorizedException {
     facade.logInfo(
-        'Requester is not authorized to deregister notification token');
+      'Requester is not authorized to deregister notification token',
+    );
     return Response.forbidden(
       DeregisterNotificationErrorResponse.permissionDenied().toString(),
     );
@@ -39,8 +40,11 @@ Future<Response> deregisterNotification(
       DeregisterNotificationErrorResponse.notFound().toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Error deregistering notification: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error deregistering notification: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

@@ -7,13 +7,11 @@ part of 'response_model.dart';
 // **************************************************************************
 
 NotifyAcceptanceGroupResponse _$NotifyAcceptanceGroupResponseFromJson(
-        Map<String, dynamic> json) =>
-    NotifyAcceptanceGroupResponse(
-      notificationId: json['notificationId'] as String?,
-    );
+  Map<String, dynamic> json,
+) => NotifyAcceptanceGroupResponse(
+  notificationId: json['notificationId'] as String?,
+);
 
 Map<String, dynamic> _$NotifyAcceptanceGroupResponseToJson(
-        NotifyAcceptanceGroupResponse instance) =>
-    <String, dynamic>{
-      'notificationId': instance.notificationId,
-    };
+  NotifyAcceptanceGroupResponse instance,
+) => <String, dynamic>{'notificationId': instance.notificationId};

@@ -19,8 +19,9 @@ class RegisterNotificationRequest {
   factory RegisterNotificationRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        RegisterNotificationRequestValidator().validate(params);
+    final validationResult = RegisterNotificationRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

@@ -49,13 +49,15 @@ class DeviceTokenMappingService {
       deviceToken: input.deviceToken,
     );
 
-    return _storage.update(DeviceTokenMapping(
-      deviceId: tokenMappingId,
-      deviceToken: input.deviceToken,
-      platformType: input.platformType,
-      platformEndpointArn: input.platformEndpointArn,
-      createdBy: authDid,
-    ));
+    return _storage.update(
+      DeviceTokenMapping(
+        deviceId: tokenMappingId,
+        deviceToken: input.deviceToken,
+        platformType: input.platformType,
+        platformEndpointArn: input.platformEndpointArn,
+        createdBy: authDid,
+      ),
+    );
   }
 
   String generateDeviceHash(String platformEndpointArn) {
@@ -67,6 +69,8 @@ class DeviceTokenMappingService {
     required String deviceToken,
   }) {
     return generateHashedId(
-        '${devicePlatform}_$deviceToken', Config().hashSecret());
+      '${devicePlatform}_$deviceToken',
+      Config().hashSecret(),
+    );
   }
 }

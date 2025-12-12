@@ -9,9 +9,11 @@ class RegisterNotificationResponse {
   RegisterNotificationResponse({required this.notificationToken});
 
   factory RegisterNotificationResponse.fromNotificationChannel(
-      NotificationChannel notificationChannel) {
+    NotificationChannel notificationChannel,
+  ) {
     return RegisterNotificationResponse(
-        notificationToken: notificationChannel.getId());
+      notificationToken: notificationChannel.getId(),
+    );
   }
   final String notificationToken;
 

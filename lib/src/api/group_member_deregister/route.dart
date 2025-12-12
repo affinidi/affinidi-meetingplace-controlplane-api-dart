@@ -17,8 +17,8 @@ Future<Response> groupDeregisterMember(
   try {
     final groupMemberDeregisterRequest =
         GroupMemberDeregisterRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
     await facade.deregisterMemberFromGroup(
       groupMemberDeregisterRequest,
@@ -45,15 +45,16 @@ Future<Response> groupDeregisterMember(
       GroupMemberDeregisterErrorResponse.notFound().toString(),
     );
   } on GroupMemberNotInGroup catch (e) {
-    facade.logInfo(
-      'Group member not in group ${e.groupId}',
-    );
+    facade.logInfo('Group member not in group ${e.groupId}');
     return Response.forbidden(
       GroupMemberDeregisterErrorResponse.notInGroup().toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Error on group member deregister',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on group member deregister',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

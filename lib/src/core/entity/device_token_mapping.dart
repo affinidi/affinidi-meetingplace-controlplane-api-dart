@@ -25,9 +25,9 @@ class DeviceTokenMapping extends Entity {
     required this.platformType,
     required this.platformEndpointArn,
     this.createdBy,
-  })  : createdAt = DateTime.now().toIso8601String(),
-        modifiedAt = DateTime.now().toIso8601String(),
-        modifiedBy = createdBy;
+  }) : createdAt = DateTime.now().toIso8601String(),
+       modifiedAt = DateTime.now().toIso8601String(),
+       modifiedBy = createdBy;
   static String entityName = 'DeviceTokenMapping';
 
   final String deviceId;

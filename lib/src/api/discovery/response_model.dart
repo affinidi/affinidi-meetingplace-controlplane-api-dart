@@ -9,7 +9,5 @@ class DiscoveryResponse {
   final String token;
 
   @override
-  String toString() => JsonEncoder().convert(
-        _$DiscoveryResponseToJson(this),
-      );
+  String toString() => JsonEncoder().convert(_$DiscoveryResponseToJson(this));
 }

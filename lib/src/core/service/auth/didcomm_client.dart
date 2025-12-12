@@ -44,10 +44,7 @@ class AuthClient {
   ) async {
     Base64Codec base64 = const Base64Codec();
     String data = base64.normalize(base64Data);
-    return await unpack(
-      utf8.decode(base64Url.decode(data)),
-      didResolverUrl,
-    );
+    return await unpack(utf8.decode(base64Url.decode(data)), didResolverUrl);
   }
 
   Future<PlainTextMessage> unpack(
@@ -63,9 +60,11 @@ class AuthClient {
       recipientDidManager: authDidManager.didManager,
     );
 
-    return PlainTextMessage.fromJson(jsonDecode(utf8.decode(base64Decode(
-      addBase64Padding(decrypted['payload']),
-    ))));
+    return PlainTextMessage.fromJson(
+      jsonDecode(
+        utf8.decode(base64Decode(addBase64Padding(decrypted['payload']))),
+      ),
+    );
   }
 
   bool _isDidcommMessageExpired(PlainTextMessage message) {

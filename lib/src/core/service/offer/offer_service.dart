@@ -54,9 +54,9 @@ class OfferService {
     required Storage storage,
     required DeviceTokenMappingService deviceTokenMappingService,
     required Logger logger,
-  })  : _storage = storage,
-        _deviceTokenMappingService = deviceTokenMappingService,
-        _logger = logger;
+  }) : _storage = storage,
+       _deviceTokenMappingService = deviceTokenMappingService,
+       _logger = logger;
 
   final Storage _storage;
   final DeviceTokenMappingService _deviceTokenMappingService;
@@ -71,11 +71,11 @@ class OfferService {
     final validUntil = _getValidUntil(input.validUntil);
     _logger.info('Offer valid until: $validUntil');
 
-    final deviceTokenMapping =
-        await _deviceTokenMappingService.getDeviceTokenMapping(
-      devicePlatform: input.platformType,
-      deviceToken: input.deviceToken,
-    );
+    final deviceTokenMapping = await _deviceTokenMappingService
+        .getDeviceTokenMapping(
+          devicePlatform: input.platformType,
+          deviceToken: input.deviceToken,
+        );
 
     final mnemonic = _getMnemonic(input.customPhrase);
     _logger.info('using mnemonic for offer registration: $mnemonic');
@@ -123,8 +123,11 @@ class OfferService {
       _logger.info('Offer already exists');
       throw OfferExists();
     } catch (e, stackTrace) {
-      _logger.error('Error registering offer $e',
-          error: e, stackTrace: stackTrace);
+      _logger.error(
+        'Error registering offer $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw OfferCreationFailed();
     }
   }
@@ -178,8 +181,11 @@ class OfferService {
       _logger.info('Conditional offer update failed.');
       throw OfferQueryLimitExceeded();
     } catch (e, stackTrace) {
-      _logger.error('Offer update failed: $e',
-          error: e, stackTrace: stackTrace);
+      _logger.error(
+        'Offer update failed: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw OfferUpdateFailed(e);
     }
 
@@ -207,13 +213,16 @@ class OfferService {
   }
 
   Future<bool> isMnemonicInUse(String mnemonic) async {
-    final cleanMnemonic = cleanUpCustomPhrase(mnemonic).join(
-      Config().get('offer')['mnemonicWordSeparator'],
-    );
+    final cleanMnemonic = cleanUpCustomPhrase(
+      mnemonic,
+    ).join(Config().get('offer')['mnemonicWordSeparator']);
 
     final offerId = _generateId(cleanMnemonic);
-    final offer =
-        await _storage.findOneById(Offer.entityName, offerId, Offer.fromJson);
+    final offer = await _storage.findOneById(
+      Offer.entityName,
+      offerId,
+      Offer.fromJson,
+    );
 
     return offer != null;
   }
@@ -229,9 +238,7 @@ class OfferService {
         return false;
       }
     } on FormatException {
-      _logger.error(
-        'Invalid date format in stored offer: ${offer.validUntil}',
-      );
+      _logger.error('Invalid date format in stored offer: ${offer.validUntil}');
       return true;
     }
 
@@ -255,10 +262,7 @@ class OfferService {
 
   Map<String, dynamic> _getOfferLimits(int? maximumUsageInput) {
     if (maximumUsageInput == null || maximumUsageInput == 0) {
-      return {
-        'maximumClaims': null,
-        'maximumQueries': null,
-      };
+      return {'maximumClaims': null, 'maximumQueries': null};
     }
 
     return {

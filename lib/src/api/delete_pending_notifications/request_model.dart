@@ -20,8 +20,8 @@ class DeletePendingNotificationsRequest {
   ) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        DeletePendingNotificationsRequestValidator().validate(params);
+    final validationResult = DeletePendingNotificationsRequestValidator()
+        .validate(params);
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

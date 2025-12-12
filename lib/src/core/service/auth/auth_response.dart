@@ -16,12 +16,14 @@ class AuthenticationResponse {
 
   factory AuthenticationResponse.asInvalidChallengeResponse() {
     return AuthenticationResponse(
-        type: AuthenticationResponseType.invalidChallengeResponse);
+      type: AuthenticationResponseType.invalidChallengeResponse,
+    );
   }
 
   factory AuthenticationResponse.asChallengeRequestExpired() {
     return AuthenticationResponse(
-        type: AuthenticationResponseType.challengeRequestExpired);
+      type: AuthenticationResponseType.challengeRequestExpired,
+    );
   }
   AuthenticationResponseType type;
   String did = '';

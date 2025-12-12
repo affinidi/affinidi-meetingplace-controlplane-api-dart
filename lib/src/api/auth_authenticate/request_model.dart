@@ -8,15 +8,14 @@ part 'request_model.g.dart';
 
 @JsonSerializable()
 class AuthAuthenticateRequest {
-  AuthAuthenticateRequest({
-    required this.challengeResponse,
-  });
+  AuthAuthenticateRequest({required this.challengeResponse});
 
   factory AuthAuthenticateRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        AuthAuthenticateRequestValidator().validate(params);
+    final validationResult = AuthAuthenticateRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

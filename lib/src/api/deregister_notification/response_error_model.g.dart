@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 DeregisterNotificationErrorResponse
-    _$DeregisterNotificationErrorResponseFromJson(Map<String, dynamic> json) =>
-        DeregisterNotificationErrorResponse(
-          errorCode: json['errorCode'] as String,
-          errorMessage: json['errorMessage'] as String,
-        );
+_$DeregisterNotificationErrorResponseFromJson(Map<String, dynamic> json) =>
+    DeregisterNotificationErrorResponse(
+      errorCode: json['errorCode'] as String,
+      errorMessage: json['errorMessage'] as String,
+    );
 
 Map<String, dynamic> _$DeregisterNotificationErrorResponseToJson(
-        DeregisterNotificationErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  DeregisterNotificationErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};

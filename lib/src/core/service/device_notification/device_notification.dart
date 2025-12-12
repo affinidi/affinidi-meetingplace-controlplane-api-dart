@@ -5,10 +5,7 @@ part 'device_notification.g.dart';
 
 @JsonSerializable()
 class DeviceNotificationData {
-  DeviceNotificationData({
-    required this.id,
-    required this.pendingCount,
-  }) {
+  DeviceNotificationData({required this.id, required this.pendingCount}) {
     notificationDate = DateTime.now().toIso8601String();
   }
   final String id;

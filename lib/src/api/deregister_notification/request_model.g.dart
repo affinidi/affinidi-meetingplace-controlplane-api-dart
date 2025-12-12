@@ -7,13 +7,11 @@ part of 'request_model.dart';
 // **************************************************************************
 
 DeregisterNotificationRequest _$DeregisterNotificationRequestFromJson(
-        Map<String, dynamic> json) =>
-    DeregisterNotificationRequest(
-      notificationToken: json['notificationToken'] as String,
-    );
+  Map<String, dynamic> json,
+) => DeregisterNotificationRequest(
+  notificationToken: json['notificationToken'] as String,
+);
 
 Map<String, dynamic> _$DeregisterNotificationRequestToJson(
-        DeregisterNotificationRequest instance) =>
-    <String, dynamic>{
-      'notificationToken': instance.notificationToken,
-    };
+  DeregisterNotificationRequest instance,
+) => <String, dynamic>{'notificationToken': instance.notificationToken};

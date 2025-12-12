@@ -6,7 +6,8 @@ import 'package:dotenv/dotenv.dart';
 import 'lib/client_helper.dart';
 
 String generateVCard(String fullName) {
-  final vcard = '''BEGIN:VCARD
+  final vcard =
+      '''BEGIN:VCARD
 VERSION:4.0
 FN:$fullName
 END:VCARD''';
@@ -21,11 +22,11 @@ String generateDidcommInvitation(String did, String endpoint) {
     'body': {
       'goal_code': 'connect',
       'goal': 'Establish connection',
-      'accept': ['didcomm/v2']
+      'accept': ['didcomm/v2'],
     },
     'services': [
-      {'serviceEndpoint': endpoint}
-    ]
+      {'serviceEndpoint': endpoint},
+    ],
   };
   return base64Encode(utf8.encode(jsonEncode(invitation)));
 }
@@ -44,8 +45,8 @@ Future<void> main() async {
   );
 
   print('1. Creating Alice\'s DID and authenticating...');
-  final (aliceDidManager, aliceKeyPair) =
-      await helper.createDidManagerWithKeyPair();
+  final (aliceDidManager, aliceKeyPair) = await helper
+      .createDidManagerWithKeyPair();
   final aliceDidDoc = await aliceDidManager.getDidDocument();
   final aliceToken = await helper.authenticate(aliceDidManager, aliceKeyPair);
   print('   Alice DID: ${aliceDidDoc.id}');
@@ -87,8 +88,8 @@ Future<void> main() async {
   print('   Offer Link: ${registerResponse.data['offerLink']}\n');
 
   print('4. Creating Bob\'s DID and authenticating...');
-  final (bobDidManager, bobKeyPair) =
-      await helper.createDidManagerWithKeyPair();
+  final (bobDidManager, bobKeyPair) = await helper
+      .createDidManagerWithKeyPair();
   final bobDidDoc = await bobDidManager.getDidDocument();
   final bobToken = await helper.authenticate(bobDidManager, bobKeyPair);
   print('   Bob DID: ${bobDidDoc.id}');
@@ -140,7 +141,8 @@ Future<void> main() async {
   );
   print('   Connection finalized');
   print(
-      '   Notification Token: ${finalizeResponse.data['notificationToken']}\n');
+    '   Notification Token: ${finalizeResponse.data['notificationToken']}\n',
+  );
 
   print('Complete. Alice and Bob are now connected.\n');
 

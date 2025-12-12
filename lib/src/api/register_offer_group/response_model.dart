@@ -49,7 +49,6 @@ class RegisterOfferGroupResponse {
   final String groupDid;
 
   @override
-  String toString() => JsonEncoder().convert(
-        _$RegisterOfferGroupResponseToJson(this),
-      );
+  String toString() =>
+      JsonEncoder().convert(_$RegisterOfferGroupResponseToJson(this));
 }

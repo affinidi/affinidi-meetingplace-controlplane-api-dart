@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 QueryOfferErrorResponse _$QueryOfferErrorResponseFromJson(
-        Map<String, dynamic> json) =>
-    QueryOfferErrorResponse(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-    );
+  Map<String, dynamic> json,
+) => QueryOfferErrorResponse(
+  errorCode: json['errorCode'] as String,
+  errorMessage: json['errorMessage'] as String,
+);
 
 Map<String, dynamic> _$QueryOfferErrorResponseToJson(
-        QueryOfferErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  QueryOfferErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};

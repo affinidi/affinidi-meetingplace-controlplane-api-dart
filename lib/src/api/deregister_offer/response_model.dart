@@ -17,10 +17,7 @@ enum ResponseStatus {
 
 @JsonSerializable()
 class DeregisterOfferResponse {
-  DeregisterOfferResponse({
-    required this.status,
-    required this.message,
-  });
+  DeregisterOfferResponse({required this.status, required this.message});
 
   factory DeregisterOfferResponse.success() {
     return DeregisterOfferResponse(
@@ -40,7 +37,6 @@ class DeregisterOfferResponse {
   final String message;
 
   @override
-  String toString() => JsonEncoder().convert(
-        _$DeregisterOfferResponseToJson(this),
-      );
+  String toString() =>
+      JsonEncoder().convert(_$DeregisterOfferResponseToJson(this));
 }

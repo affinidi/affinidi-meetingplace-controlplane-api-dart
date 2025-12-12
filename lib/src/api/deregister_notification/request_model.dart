@@ -8,17 +8,16 @@ part 'request_model.g.dart';
 
 @JsonSerializable()
 class DeregisterNotificationRequest {
-  DeregisterNotificationRequest({
-    required this.notificationToken,
-  });
+  DeregisterNotificationRequest({required this.notificationToken});
 
   factory DeregisterNotificationRequest.fromRequestParams(
     String requestParams,
   ) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        DeregisterNotificationRequestValidator().validate(params);
+    final validationResult = DeregisterNotificationRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

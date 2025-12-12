@@ -26,9 +26,7 @@ class NotificationResponse {
 
 @JsonSerializable(explicitToJson: true)
 class GetPendingNotificationsResponse {
-  GetPendingNotificationsResponse({
-    required this.notifications,
-  });
+  GetPendingNotificationsResponse({required this.notifications});
 
   factory GetPendingNotificationsResponse.fromPendingNotifications(
     List<NotificationItem> notificationItems,
@@ -49,7 +47,6 @@ class GetPendingNotificationsResponse {
   final List<NotificationResponse> notifications;
 
   @override
-  String toString() => JsonEncoder().convert(
-        _$GetPendingNotificationsResponseToJson(this),
-      );
+  String toString() =>
+      JsonEncoder().convert(_$GetPendingNotificationsResponseToJson(this));
 }

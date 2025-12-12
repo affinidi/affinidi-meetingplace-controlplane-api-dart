@@ -54,12 +54,16 @@ void main() {
     final recryptKeyPair = recrypt.generateKeyPair();
     final result = recrypt.encapsulate(recryptKeyPair.publicKey);
 
-    return base64.encode(utf8.encode(jsonEncode({
-      'ciphertext': 'cipher-sample',
-      'capsule': (result['capsule'] as Capsule).toBase64(),
-      'iv': 'iv-sample',
-      'authenticationTag': 'auth-tag-sample',
-    })));
+    return base64.encode(
+      utf8.encode(
+        jsonEncode({
+          'ciphertext': 'cipher-sample',
+          'capsule': (result['capsule'] as Capsule).toBase64(),
+          'iv': 'iv-sample',
+          'authenticationTag': 'auth-tag-sample',
+        }),
+      ),
+    );
   }
 
   late String aliceAccessToken;
@@ -74,15 +78,19 @@ void main() {
     aliceWallet = PersistentWallet(InMemoryKeyStore());
     final aliceKeyPair = await aliceWallet.generateKey(keyId: "m/44'/60'/0'/0");
 
-    final aliceDidManager =
-        DidKeyManager(wallet: aliceWallet, store: InMemoryDidStore());
+    final aliceDidManager = DidKeyManager(
+      wallet: aliceWallet,
+      store: InMemoryDidStore(),
+    );
     await aliceDidManager.addVerificationMethod(aliceKeyPair.id);
 
     bobWallet = PersistentWallet(InMemoryKeyStore());
     final bobKeyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/0");
 
-    final bobDidManager =
-        DidKeyManager(wallet: bobWallet, store: InMemoryDidStore());
+    final bobDidManager = DidKeyManager(
+      wallet: bobWallet,
+      store: InMemoryDidStore(),
+    );
     await bobDidManager.addVerificationMethod(bobKeyPair.id);
 
     aliceAccessToken = await handleAuthorization(aliceDidManager, aliceKeyPair);
@@ -94,10 +102,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -106,10 +116,12 @@ void main() {
         deviceToken: BobDevice.deviceToken,
         platformType: BobDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
   });
 
@@ -128,10 +140,12 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final findOfferResponse = await dio.post(
@@ -140,10 +154,12 @@ void main() {
         'did': await DidGenerator.generateDidKey(aliceWallet),
         'mnemonic': response.data['mnemonic'],
       },
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.data['groupId'], isNotNull);
@@ -163,10 +179,7 @@ void main() {
       equals(registerOfferRequest.offerDescription),
     );
 
-    expect(
-      findOfferResponse.data['vcard'],
-      equals(registerOfferRequest.vcard),
-    );
+    expect(findOfferResponse.data['vcard'], equals(registerOfferRequest.vcard));
 
     expect(
       findOfferResponse.data['validUntil'],
@@ -198,10 +211,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final acceptOfferResponse = await dio.post(
@@ -212,10 +227,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     expect(
@@ -228,20 +245,14 @@ void main() {
       registerOfferResponse.data['offerLink'],
     );
 
-    expect(
-      acceptOfferResponse.data['name'],
-      registerOfferRequest.offerName,
-    );
+    expect(acceptOfferResponse.data['name'], registerOfferRequest.offerName);
 
     expect(
       acceptOfferResponse.data['description'],
       registerOfferRequest.offerDescription,
     );
 
-    expect(
-      acceptOfferResponse.data['vcard'],
-      registerOfferRequest.vcard,
-    );
+    expect(acceptOfferResponse.data['vcard'], registerOfferRequest.vcard);
 
     expect(
       acceptOfferResponse.data['validUntil'],
@@ -263,68 +274,78 @@ void main() {
     final registerOfferRequest = getRegisterOfferRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
-      validUntil:
-          DateTime.now().toUtc().add(Duration(seconds: 1)).toIso8601String(),
+      validUntil: DateTime.now()
+          .toUtc()
+          .add(Duration(seconds: 1))
+          .toIso8601String(),
     );
 
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await Future.delayed(Duration(seconds: 2));
 
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/accept-offer',
-              data: getAcceptOfferRequest(
-                did: BobDevice.offerAcceptanceDid,
-                deviceToken: BobDevice.deviceToken,
-                platformType: BobDevice.platformType,
-                mnemonic: registerOfferResponse.data['mnemonic'],
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': aliceAccessToken,
-              }),
-            ), throwsA(
-      predicate((e) {
-        return e is DioException &&
-            e.response?.statusCode == HttpStatus.badRequest &&
-            e.response?.data['errorCode'] ==
-                AcceptOfferErrorCodes.invalid.value &&
-            e.response?.data['errorMessage'] == 'Offer is no longer valid';
-      }),
-    ));
-  });
-
-  test('#accept-offer: returns unauthorized if user is not authenticated',
-      () async {
-    try {
-      await dio.post(
+      () => dio.post(
         '$apiEndpoint/v1/accept-offer',
         data: getAcceptOfferRequest(
           did: BobDevice.offerAcceptanceDid,
           deviceToken: BobDevice.deviceToken,
           platformType: BobDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.badRequest &&
+              e.response?.data['errorCode'] ==
+                  AcceptOfferErrorCodes.invalid.value &&
+              e.response?.data['errorMessage'] == 'Offer is no longer valid';
         }),
-      );
-      fail('Expected dio exception');
-    } on DioException catch (e) {
-      expect(e.response?.statusCode, HttpStatus.forbidden);
-      expect(e.response?.data, {
-        'errorCode': 'AUTHORIZATION_TOKEN_NOT_PROVIDED',
-        'errorMessage': 'No authorization token provided',
-      });
-    }
+      ),
+    );
   });
+
+  test(
+    '#accept-offer: returns unauthorized if user is not authenticated',
+    () async {
+      try {
+        await dio.post(
+          '$apiEndpoint/v1/accept-offer',
+          data: getAcceptOfferRequest(
+            did: BobDevice.offerAcceptanceDid,
+            deviceToken: BobDevice.deviceToken,
+            platformType: BobDevice.platformType,
+          ).toJson(),
+          options: Options(
+            headers: {Headers.contentTypeHeader: 'application/json'},
+          ),
+        );
+        fail('Expected dio exception');
+      } on DioException catch (e) {
+        expect(e.response?.statusCode, HttpStatus.forbidden);
+        expect(e.response?.data, {
+          'errorCode': 'AUTHORIZATION_TOKEN_NOT_PROVIDED',
+          'errorMessage': 'No authorization token provided',
+        });
+      }
+    },
+  );
 
   test('#accept-offer: return 404 if offer not found', () async {
     try {
@@ -336,10 +357,12 @@ void main() {
           platformType: BobDevice.platformType,
           mnemonic: 'does not exist',
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
-        }),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.notFound);
@@ -360,10 +383,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final acceptOfferResponse = await dio.post(
@@ -374,10 +399,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(
@@ -390,20 +417,14 @@ void main() {
       registerOfferResponse.data['offerLink'],
     );
 
-    expect(
-      acceptOfferResponse.data['name'],
-      registerOfferRequest.offerName,
-    );
+    expect(acceptOfferResponse.data['name'], registerOfferRequest.offerName);
 
     expect(
       acceptOfferResponse.data['description'],
       registerOfferRequest.offerDescription,
     );
 
-    expect(
-      acceptOfferResponse.data['vcard'],
-      registerOfferRequest.vcard,
-    );
+    expect(acceptOfferResponse.data['vcard'], registerOfferRequest.vcard);
 
     expect(
       acceptOfferResponse.data['validUntil'],
@@ -425,10 +446,12 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/check-offer-phrase',
       data: CheckOfferPhraseRequest(offerPhrase: 'does not exist').toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -442,10 +465,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -453,35 +478,39 @@ void main() {
       data: CheckOfferPhraseRequest(
         offerPhrase: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data['isInUse'], true);
   });
 
-  test('#check-offer-phrase: returns unauthorized if user is not authenticated',
-      () async {
-    try {
-      await dio.post(
-        '$apiEndpoint/v1/check-offer-phrase',
-        data: CheckOfferPhraseRequest(offerPhrase: 'world').toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
-      );
-      fail('Expected dio exception');
-    } on DioException catch (e) {
-      expect(e.response?.statusCode, HttpStatus.forbidden);
-      expect(e.response?.data, {
-        'errorCode': 'AUTHORIZATION_TOKEN_NOT_PROVIDED',
-        'errorMessage': 'No authorization token provided',
-      });
-    }
-  });
+  test(
+    '#check-offer-phrase: returns unauthorized if user is not authenticated',
+    () async {
+      try {
+        await dio.post(
+          '$apiEndpoint/v1/check-offer-phrase',
+          data: CheckOfferPhraseRequest(offerPhrase: 'world').toJson(),
+          options: Options(
+            headers: {Headers.contentTypeHeader: 'application/json'},
+          ),
+        );
+        fail('Expected dio exception');
+      } on DioException catch (e) {
+        expect(e.response?.statusCode, HttpStatus.forbidden);
+        expect(e.response?.data, {
+          'errorCode': 'AUTHORIZATION_TOKEN_NOT_PROVIDED',
+          'errorMessage': 'No authorization token provided',
+        });
+      }
+    },
+  );
 
   test('#create-oob: success', () async {
     final createOobResponse = await dio.post(
@@ -492,9 +521,9 @@ void main() {
         mediatorWSSEndpoint: 'ws://mediator.yourdomain.com',
         didcommMessage: 'ZGlkY29tbW1lc3NhZ2UK',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-      }),
+      options: Options(
+        headers: {Headers.contentTypeHeader: 'application/json'},
+      ),
     );
 
     expect(createOobResponse.statusCode, HttpStatus.ok);
@@ -508,10 +537,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -522,10 +553,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -536,10 +569,12 @@ void main() {
         mnemonic: registerOfferResponse.data['mnemonic'],
         senderInfo: 'Anonymous',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final getPendingNotificationsResponse = await dio.post(
@@ -548,10 +583,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final notificationIds = getPendingNotificationsResponse
@@ -567,10 +604,12 @@ void main() {
         platformType: AliceDevice.platformType,
         notificationIds: notificationIds,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -587,10 +626,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -599,10 +640,12 @@ void main() {
         notificationToken:
             registerNotificationResponse.data['notificationToken'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -610,59 +653,75 @@ void main() {
   });
 
   test(
-      '''#deregister-notification: fails with permission denied if requester is not the owner''',
-      () async {
-    final registerNotificationResponse = await dio.post(
-      '$apiEndpoint/v1/register-notification',
-      data: RegisterNotificationRequest(
-        myDid: await DidGenerator.generateDidKey(aliceWallet),
-        theirDid: await DidGenerator.generateDidKey(bobWallet),
-        deviceToken: AliceDevice.deviceToken,
-        platformType: AliceDevice.platformType,
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
+    '''#deregister-notification: fails with permission denied if requester is not the owner''',
+    () async {
+      final registerNotificationResponse = await dio.post(
+        '$apiEndpoint/v1/register-notification',
+        data: RegisterNotificationRequest(
+          myDid: await DidGenerator.generateDidKey(aliceWallet),
+          theirDid: await DidGenerator.generateDidKey(bobWallet),
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
 
-    expect(
+      expect(
         () => dio.post(
-              '$apiEndpoint/v1/deregister-notification',
-              data: DeregisterNotificationRequest(
-                notificationToken:
-                    registerNotificationResponse.data['notificationToken'],
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': bobAccessToken,
-              }),
-            ), throwsA(predicate((e) {
-      return e is DioException &&
-          e.response?.statusCode == HttpStatus.forbidden &&
-          e.response?.data['errorCode'] == 'permission_denied' &&
-          e.response?.data['errorMessage'] ==
-              'Requester is not allowed to deregister given notification token';
-    })));
-  });
+          '$apiEndpoint/v1/deregister-notification',
+          data: DeregisterNotificationRequest(
+            notificationToken:
+                registerNotificationResponse.data['notificationToken'],
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate((e) {
+            return e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] == 'permission_denied' &&
+                e.response?.data['errorMessage'] ==
+                    'Requester is not allowed to deregister given notification token';
+          }),
+        ),
+      );
+    },
+  );
 
   test('#deregister-notification: fails with not found error', () async {
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/deregister-notification',
-              data: DeregisterNotificationRequest(
-                notificationToken: 'some-random-token',
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': aliceAccessToken,
-              }),
-            ), throwsA(predicate((e) {
-      return e is DioException &&
-          e.response?.statusCode == HttpStatus.notFound &&
-          e.response?.data['errorCode'] == 'not_found' &&
-          e.response?.data['errorMessage'] == 'Notification channel not found';
-    })));
+      () => dio.post(
+        '$apiEndpoint/v1/deregister-notification',
+        data: DeregisterNotificationRequest(
+          notificationToken: 'some-random-token',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.notFound &&
+              e.response?.data['errorCode'] == 'not_found' &&
+              e.response?.data['errorMessage'] ==
+                  'Notification channel not found';
+        }),
+      ),
+    );
   });
 
   test('#register-notification: success', () async {
@@ -674,10 +733,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -691,10 +752,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -703,10 +766,12 @@ void main() {
         offerLink: registerOfferResponse.data['offerLink'],
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -718,25 +783,29 @@ void main() {
 
   test('#deregister-offer: fails if offer does not exist', () async {
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/deregister-offer',
-              data: DeregisterOfferRequest(
-                offerLink: 'offer-link',
-                mnemonic: 'does not exist',
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': aliceAccessToken,
-              }),
-            ), throwsA(
-      predicate((e) {
-        return e is DioException &&
-            e.response?.statusCode == HttpStatus.conflict &&
-            e.response?.data['errorCode'] == 'not_found' &&
-            e.response?.data['errorMessage'] ==
-                'Deregister offer exception: offer not found or it was already deleted';
-      }),
-    ));
+      () => dio.post(
+        '$apiEndpoint/v1/deregister-offer',
+        data: DeregisterOfferRequest(
+          offerLink: 'offer-link',
+          mnemonic: 'does not exist',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.conflict &&
+              e.response?.data['errorCode'] == 'not_found' &&
+              e.response?.data['errorMessage'] ==
+                  'Deregister offer exception: offer not found or it was already deleted';
+        }),
+      ),
+    );
   });
 
   test('#deregister-offer: fails if offer link does not match', () async {
@@ -746,32 +815,38 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/deregister-offer',
-              data: DeregisterOfferRequest(
-                offerLink: 'does-not-match',
-                mnemonic: registerOfferResponse.data['mnemonic'],
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': aliceAccessToken,
-              }),
-            ), throwsA(
-      predicate((e) {
-        return e is DioException &&
-            e.response?.statusCode == HttpStatus.badRequest &&
-            e.response?.data['errorCode'] == 'offer_link_mismatch' &&
-            e.response?.data['errorMessage'] ==
-                'Deregister offer exception: offer link does not match';
-      }),
-    ));
+      () => dio.post(
+        '$apiEndpoint/v1/deregister-offer',
+        data: DeregisterOfferRequest(
+          offerLink: 'does-not-match',
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.badRequest &&
+              e.response?.data['errorCode'] == 'offer_link_mismatch' &&
+              e.response?.data['errorMessage'] ==
+                  'Deregister offer exception: offer link does not match';
+        }),
+      ),
+    );
   });
 
   test('#deregister-offer: fails if user is not authorized', () async {
@@ -781,32 +856,38 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/deregister-offer',
-              data: DeregisterOfferRequest(
-                offerLink: registerOfferResponse.data['offerLink'],
-                mnemonic: registerOfferResponse.data['mnemonic'],
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': bobAccessToken,
-              }),
-            ), throwsA(
-      predicate((e) {
-        return e is DioException &&
-            e.response?.statusCode == HttpStatus.forbidden &&
-            e.response?.data['errorCode'] == 'permission_denied' &&
-            e.response?.data['errorMessage'] ==
-                '''Deregister offer exception: only offer owners are allowed to deregister offers''';
-      }),
-    ));
+      () => dio.post(
+        '$apiEndpoint/v1/deregister-offer',
+        data: DeregisterOfferRequest(
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.forbidden &&
+              e.response?.data['errorCode'] == 'permission_denied' &&
+              e.response?.data['errorMessage'] ==
+                  '''Deregister offer exception: only offer owners are allowed to deregister offers''';
+        }),
+      ),
+    );
   });
 
   test('#finalise-acceptance: success', () async {
@@ -816,10 +897,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -830,10 +913,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -846,10 +931,12 @@ void main() {
         deviceToken: BobDevice.deviceToken,
         platformType: BobDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -868,9 +955,9 @@ void main() {
           deviceToken: BobDevice.deviceToken,
           platformType: BobDevice.platformType,
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -890,9 +977,9 @@ void main() {
         mediatorWSSEndpoint: 'ws://mediator.yourdomain.com',
         didcommMessage: 'ZGlkY29tbW1lc3NhZ2UK',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-      }),
+      options: Options(
+        headers: {Headers.contentTypeHeader: 'application/json'},
+      ),
     );
 
     Uri uri = Uri.parse(createOobResponse.data['oobUrl']);
@@ -900,21 +987,22 @@ void main() {
 
     final response = await dio.get(
       '$apiEndpoint/v1/oob/$oobId',
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-      }),
+      options: Options(
+        headers: {Headers.contentTypeHeader: 'application/json'},
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
     expect(
-        response.data,
-        equals({
-          'oobId': oobId,
-          'didcommMessage': 'ZGlkY29tbW1lc3NhZ2UK',
-          'mediatorDid': 'did:web:mediator',
-          'mediatorEndpoint': 'https://mediator.yourdomain.com',
-          'mediatorWSSEndpoint': 'ws://mediator.yourdomain.com',
-        }));
+      response.data,
+      equals({
+        'oobId': oobId,
+        'didcommMessage': 'ZGlkY29tbW1lc3NhZ2UK',
+        'mediatorDid': 'did:web:mediator',
+        'mediatorEndpoint': 'https://mediator.yourdomain.com',
+        'mediatorWSSEndpoint': 'ws://mediator.yourdomain.com',
+      }),
+    );
   });
 
   test('get-pending-notifications: sucess', () async {
@@ -924,10 +1012,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -938,10 +1028,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -952,10 +1044,12 @@ void main() {
         mnemonic: registerOfferResponse.data['mnemonic'],
         senderInfo: 'Anonymous',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -964,10 +1058,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -981,10 +1077,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -995,10 +1093,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -1009,10 +1109,12 @@ void main() {
         mnemonic: registerOfferResponse.data['mnemonic'],
         senderInfo: 'Anonymous',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -1029,10 +1131,12 @@ void main() {
           mnemonic: 'mnemonic',
           senderInfo: 'Anonymous',
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': bobAccessToken,
-        }),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.badRequest);
@@ -1050,10 +1154,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     try {
@@ -1065,10 +1171,12 @@ void main() {
           mnemonic: registerOfferResponse.data['mnemonic'],
           senderInfo: 'Anonymous',
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': bobAccessToken,
-        }),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.badRequest);
@@ -1089,9 +1197,9 @@ void main() {
           mnemonic: 'mnemonic',
           senderInfo: 'Anonymous',
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -1111,10 +1219,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -1125,10 +1235,12 @@ void main() {
         did: await DidGenerator.generateDidKey(bobWallet),
         type: 'chat-activity',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -1144,9 +1256,9 @@ void main() {
           did: BobDevice.offerAcceptanceDid,
           type: 'chat-activity',
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -1167,10 +1279,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -1181,10 +1295,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final mediatorDid = registerOfferRequest.mediatorDid;
@@ -1205,9 +1321,10 @@ void main() {
 
     await sdk.updateAcl(
       ownerDidManager: didManager,
-      acl: AccessListAdd(ownerDid: bobDidDoc.id, granteeDids: [
-        registerOfferResponse.data['groupDid'],
-      ]),
+      acl: AccessListAdd(
+        ownerDid: bobDidDoc.id,
+        granteeDids: [registerOfferResponse.data['groupDid']],
+      ),
       mediatorDid: mediatorDid,
     );
 
@@ -1238,10 +1355,12 @@ void main() {
         publicKey: reencryptKeyPair.publicKeyToBase64(),
         vcard: '',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.data['status'], equals('success'));
@@ -1257,10 +1376,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: registerOfferRequestMock.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -1268,10 +1389,12 @@ void main() {
       data: QueryOfferRequest(
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -1303,10 +1426,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequestMock.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -1314,10 +1439,12 @@ void main() {
       data: QueryOfferRequest(
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -1329,13 +1456,13 @@ void main() {
     try {
       await dio.post(
         '$apiEndpoint/v1/query-offer',
-        data: QueryOfferRequest(
-          mnemonic: 'does not exist',
-        ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
-        }),
+        data: QueryOfferRequest(mnemonic: 'does not exist').toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.notFound);
@@ -1406,10 +1533,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: registerOfferRequestMock.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -1417,10 +1546,12 @@ void main() {
       data: QueryOfferRequest(
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     try {
@@ -1429,10 +1560,12 @@ void main() {
         data: QueryOfferRequest(
           mnemonic: registerOfferResponse.data['mnemonic'],
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': bobAccessToken,
-        }),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.unprocessableEntity);
@@ -1447,12 +1580,10 @@ void main() {
     try {
       await dio.post(
         '$apiEndpoint/v1/query-offer',
-        data: QueryOfferRequest(
-          mnemonic: 'does not exist',
-        ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
+        data: QueryOfferRequest(mnemonic: 'does not exist').toJson(),
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -1470,10 +1601,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data, {
@@ -1491,10 +1624,12 @@ void main() {
         deviceToken: 'did:web:mediator.com::did:key:123456',
         platformType: PlatformType.DIDCOMM,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data, {
@@ -1513,9 +1648,9 @@ void main() {
           deviceToken: AliceDevice.deviceToken,
           platformType: AliceDevice.platformType,
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -1530,8 +1665,10 @@ void main() {
     final offerPhrase =
         'random ${Random().nextInt(26)}${Random().nextInt(26)}${Random().nextInt(26)} phrase';
 
-    final validUntil =
-        DateTime.now().toUtc().add(Duration(seconds: 300)).toIso8601String();
+    final validUntil = DateTime.now()
+        .toUtc()
+        .add(Duration(seconds: 300))
+        .toIso8601String();
     final response = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: getRegisterOfferRequestMock(
@@ -1541,10 +1678,12 @@ void main() {
         customPhrase: offerPhrase,
         validUntil: validUntil,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -1569,10 +1708,12 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: request.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -1585,10 +1726,12 @@ void main() {
         'did': await DidGenerator.generateDidKey(aliceWallet),
         'mnemonic': response.data['mnemonic'],
       },
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(findOfferResponse.data['validUntil'], isNull);
@@ -1602,10 +1745,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     try {
@@ -1616,10 +1761,12 @@ void main() {
           platformType: AliceDevice.platformType,
           customPhrase: registerOfferResponse.data['mnemonic'],
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
-        }),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.conflict);
@@ -1640,9 +1787,9 @@ void main() {
           deviceToken: AliceDevice.deviceToken,
           platformType: AliceDevice.platformType,
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-        }),
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -1665,10 +1812,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -1679,10 +1828,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final mediatorDid = registerOfferRequest.mediatorDid;
@@ -1703,9 +1854,10 @@ void main() {
 
     await sdk.updateAcl(
       ownerDidManager: didManager,
-      acl: AccessListAdd(ownerDid: bobDidDoc.id, granteeDids: [
-        registerOfferResponse.data['groupDid'],
-      ]),
+      acl: AccessListAdd(
+        ownerDid: bobDidDoc.id,
+        granteeDids: [registerOfferResponse.data['groupDid']],
+      ),
       mediatorDid: mediatorDid,
     );
 
@@ -1737,10 +1889,12 @@ void main() {
         publicKey: reencryptKeyPair.publicKeyToBase64(),
         vcard: '',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final recryptKeyPair = recrypt.generateKeyPair();
@@ -1756,14 +1910,16 @@ void main() {
       data: GroupSendMessage(
         offerLink: registerOfferResponse.data['offerLink'],
         groupDid: registerOfferResponse.data['groupDid'],
-        payload: base64Encode(utf8.encode(jsonEncode(
-          {
-            'ciphertext': expCiphertext,
-            'capsule': expCapsule,
-            'iv': expIV,
-            'authenticationTag': expAuthenticationTag,
-          },
-        ))),
+        payload: base64Encode(
+          utf8.encode(
+            jsonEncode({
+              'ciphertext': expCiphertext,
+              'capsule': expCapsule,
+              'iv': expIV,
+              'authenticationTag': expAuthenticationTag,
+            }),
+          ),
+        ),
         ephemeral: false,
         expiresTime: DateTime.now()
             .toUtc()
@@ -1772,19 +1928,25 @@ void main() {
         notify: false,
         incSeqNo: true,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final receivedMessage = await receivedMessageCompleter.future;
-    expect(receivedMessage.type.toString(),
-        equals(MeetingPlaceProtocol.groupMessage.value));
+    expect(
+      receivedMessage.type.toString(),
+      equals(MeetingPlaceProtocol.groupMessage.value),
+    );
     expect(receivedMessage.body!['ciphertext'], equals(expCiphertext));
     expect(receivedMessage.body!['iv'], equals(expIV));
-    expect(receivedMessage.body!['authenticationTag'],
-        equals(expAuthenticationTag));
+    expect(
+      receivedMessage.body!['authenticationTag'],
+      equals(expAuthenticationTag),
+    );
     expect(receivedMessage.body!['preCapsule'], isNotNull);
     expect(receivedMessage.body!['fromDid'], registerOfferRequest.adminDid);
     expect(receivedMessage.body!['seqNo'], equals(1));
@@ -1800,10 +1962,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -1814,10 +1978,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
@@ -1834,30 +2000,37 @@ void main() {
     final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
 
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/group-add-member',
-              data: GroupAddMemberRequest(
-                offerLink: registerOfferResponse.data['offerLink'],
-                mnemonic: registerOfferResponse.data['mnemonic'],
-                groupId: registerOfferResponse.data['groupId'],
-                memberDid: bobDidDoc.id,
-                acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-                reencryptionKey: reencryptionKey.toBase64(),
-                publicKey: reencryptKeyPair.publicKeyToBase64(),
-                vcard: '',
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': bobAccessToken,
-              }),
-            ),
-        throwsA(predicate((e) =>
-            e is DioException &&
-            e.response?.statusCode == HttpStatus.forbidden &&
-            e.response?.data['errorCode'] ==
-                GroupAddMemberErrorCodes.permissionDenied.value &&
-            e.response?.data['errorMessage'] ==
-                '''Group add member exception: The requester does not have permission to add a member to the group.''')));
+      () => dio.post(
+        '$apiEndpoint/v1/group-add-member',
+        data: GroupAddMemberRequest(
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          groupId: registerOfferResponse.data['groupId'],
+          memberDid: bobDidDoc.id,
+          acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+          reencryptionKey: reencryptionKey.toBase64(),
+          publicKey: reencryptKeyPair.publicKeyToBase64(),
+          vcard: '',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate(
+          (e) =>
+              e is DioException &&
+              e.response?.statusCode == HttpStatus.forbidden &&
+              e.response?.data['errorCode'] ==
+                  GroupAddMemberErrorCodes.permissionDenied.value &&
+              e.response?.data['errorMessage'] ==
+                  '''Group add member exception: The requester does not have permission to add a member to the group.''',
+        ),
+      ),
+    );
   });
 
   test('group-deregister-member: success', () async {
@@ -1870,10 +2043,12 @@ void main() {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     await dio.post(
@@ -1884,10 +2059,12 @@ void main() {
         platformType: BobDevice.platformType,
         mnemonic: registerOfferResponse.data['mnemonic'],
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
@@ -1915,10 +2092,12 @@ void main() {
         publicKey: reencryptKeyPair.publicKeyToBase64(),
         vcard: '',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final response = await dio.post(
@@ -1928,114 +2107,132 @@ void main() {
         memberDid: bobDidDoc.id,
         messageToRelay: getEncryptedMessageExample(),
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(response.data['status'], equals('success'));
-    expect(response.data['message'],
-        equals('Group member deregistered successfully'));
-  });
-
-  test('group-deregister-member: fails because group was deleted already',
-      () async {
-    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
-      deviceToken: AliceDevice.deviceToken,
-      platformType: AliceDevice.platformType,
-      wallet: aliceWallet,
-    );
-
-    final registerOfferResponse = await dio.post(
-      '$apiEndpoint/v1/register-offer-group',
-      data: registerOfferRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
-
-    await dio.post(
-      '$apiEndpoint/v1/accept-offer-group',
-      data: getAcceptOfferGroupRequest(
-        did: BobDevice.offerAcceptanceDid,
-        deviceToken: BobDevice.deviceToken,
-        platformType: BobDevice.platformType,
-        mnemonic: registerOfferResponse.data['mnemonic'],
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
-
-    final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
-
-    final didManager = DidKeyManager(
-      store: InMemoryDidStore(),
-      wallet: bobWallet,
-    );
-
-    await didManager.addVerificationMethod(keyPair.id);
-    final bobDidDoc = await didManager.getDidDocument();
-
-    final reencryptKeyPair = generateMemberRecryptKeyPair();
-    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
-    await dio.post(
-      '$apiEndpoint/v1/group-add-member',
-      data: GroupAddMemberRequest(
-        offerLink: registerOfferResponse.data['offerLink'],
-        mnemonic: registerOfferResponse.data['mnemonic'],
-        groupId: registerOfferResponse.data['groupId'],
-        memberDid: bobDidDoc.id,
-        acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-        reencryptionKey: reencryptionKey.toBase64(),
-        publicKey: reencryptKeyPair.toBase64(),
-        vcard: '',
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
-
-    await dio.post(
-      '$apiEndpoint/v1/group-delete',
-      data: GroupDeleteRequest(
-        groupId: registerOfferResponse.data['groupId'],
-        messageToRelay: getEncryptedMessageExample(),
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
-
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/group-member-deregister',
-              data: GroupMemberDeregisterRequest(
-                groupId: registerOfferResponse.data['groupId'],
-                memberDid: bobDidDoc.id,
-                messageToRelay: getEncryptedMessageExample(),
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': aliceAccessToken,
-              }),
-            ), throwsA(
-      predicate((e) {
-        return e is DioException &&
-            e.response?.statusCode == HttpStatus.gone &&
-            e.response?.data['errorCode'] ==
-                GroupMemberDeregisterErrorCodes.deleted.value &&
-            e.response?.data['errorMessage'] ==
-                'Deregister member failed: group has been deleted.';
-      }),
-    ));
+      response.data['message'],
+      equals('Group member deregistered successfully'),
+    );
   });
+
+  test(
+    'group-deregister-member: fails because group was deleted already',
+    () async {
+      final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+        wallet: aliceWallet,
+      );
+
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer-group',
+        data: registerOfferRequest.toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/accept-offer-group',
+        data: getAcceptOfferGroupRequest(
+          did: BobDevice.offerAcceptanceDid,
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
+
+      final didManager = DidKeyManager(
+        store: InMemoryDidStore(),
+        wallet: bobWallet,
+      );
+
+      await didManager.addVerificationMethod(keyPair.id);
+      final bobDidDoc = await didManager.getDidDocument();
+
+      final reencryptKeyPair = generateMemberRecryptKeyPair();
+      final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
+
+      await dio.post(
+        '$apiEndpoint/v1/group-add-member',
+        data: GroupAddMemberRequest(
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          groupId: registerOfferResponse.data['groupId'],
+          memberDid: bobDidDoc.id,
+          acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+          reencryptionKey: reencryptionKey.toBase64(),
+          publicKey: reencryptKeyPair.toBase64(),
+          vcard: '',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/group-delete',
+        data: GroupDeleteRequest(
+          groupId: registerOfferResponse.data['groupId'],
+          messageToRelay: getEncryptedMessageExample(),
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/group-member-deregister',
+          data: GroupMemberDeregisterRequest(
+            groupId: registerOfferResponse.data['groupId'],
+            memberDid: bobDidDoc.id,
+            messageToRelay: getEncryptedMessageExample(),
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': aliceAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate((e) {
+            return e is DioException &&
+                e.response?.statusCode == HttpStatus.gone &&
+                e.response?.data['errorCode'] ==
+                    GroupMemberDeregisterErrorCodes.deleted.value &&
+                e.response?.data['errorMessage'] ==
+                    'Deregister member failed: group has been deleted.';
+          }),
+        ),
+      );
+    },
+  );
 
   test('group-delete: success', () async {
     final registerOfferGroupRequest = await getRegisterOfferGroupRequestMock(
@@ -2047,10 +2244,12 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferGroupRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final actual = await dio.post(
@@ -2059,36 +2258,42 @@ void main() {
         groupId: response.data!['groupId'],
         messageToRelay: getEncryptedMessageExample(),
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     expect(actual.data['status'], 'success');
     expect(actual.data['message'], 'Group deleted successfully');
 
     expect(
-        () => dio.post(
-              '$apiEndpoint/v1/group-delete',
-              data: GroupDeleteRequest(
-                groupId: response.data!['groupId'],
-                messageToRelay: getEncryptedMessageExample(),
-              ).toJson(),
-              options: Options(headers: {
-                Headers.contentTypeHeader: 'application/json',
-                'authorization': aliceAccessToken,
-              }),
-            ), throwsA(
-      predicate((e) {
-        return e is DioException &&
-            e.response?.statusCode == HttpStatus.gone &&
-            e.response?.data['errorCode'] ==
-                GroupDeleteErrorCodes.groupDeleted.value &&
-            e.response?.data['errorMessage'] ==
-                'Group delete exception: Group has been deleted';
-      }),
-    ));
+      () => dio.post(
+        '$apiEndpoint/v1/group-delete',
+        data: GroupDeleteRequest(
+          groupId: response.data!['groupId'],
+          messageToRelay: getEncryptedMessageExample(),
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.gone &&
+              e.response?.data['errorCode'] ==
+                  GroupDeleteErrorCodes.groupDeleted.value &&
+              e.response?.data['errorMessage'] ==
+                  'Group delete exception: Group has been deleted';
+        }),
+      ),
+    );
   });
 
   test('group-delete: failure not owning the group', () async {
@@ -2101,10 +2306,12 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/register-offer-group',
       data: registerOfferGroupRequest.toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     try {
@@ -2114,10 +2321,12 @@ void main() {
           groupId: response.data!['groupId'],
           messageToRelay: getEncryptedMessageExample(),
         ).toJson(),
-        options: Options(headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': bobAccessToken,
-        }),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
       );
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
@@ -2139,10 +2348,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     final notifyOutreachResponse = await dio.post(
@@ -2151,10 +2362,12 @@ void main() {
         mnemonic: registerOfferResponse.data['mnemonic'],
         senderInfo: 'Bob',
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
     );
 
     final notificationResponse = await dio.post(
@@ -2163,10 +2376,12 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
     );
 
     // Check endpoint response
@@ -2182,103 +2397,116 @@ void main() {
     expect(notificationResponse.data['notifications'].length > 0, isTrue);
   });
 
-  test('didcomm notification', () async {
-    final keyPair = await aliceWallet.generateKey(keyId: "m/44'/60'/0'/5");
+  test(
+    'didcomm notification',
+    () async {
+      final keyPair = await aliceWallet.generateKey(keyId: "m/44'/60'/0'/5");
 
-    final didManager = DidKeyManager(
-      store: InMemoryDidStore(),
-      wallet: aliceWallet,
-    );
+      final didManager = DidKeyManager(
+        store: InMemoryDidStore(),
+        wallet: aliceWallet,
+      );
 
-    await didManager.addVerificationMethod(keyPair.id);
+      await didManager.addVerificationMethod(keyPair.id);
 
-    final didDoc = await didManager.getDidDocument();
-    final mediatorDid = getEnv('MEDIATOR_DID');
+      final didDoc = await didManager.getDidDocument();
+      final mediatorDid = getEnv('MEDIATOR_DID');
 
-    final sdk = MeetingPlaceMediatorSDK(
-      mediatorDid: mediatorDid,
-      didResolver: CachedDidResolver(),
-    );
+      final sdk = MeetingPlaceMediatorSDK(
+        mediatorDid: mediatorDid,
+        didResolver: CachedDidResolver(),
+      );
 
-    await sdk.updateAcl(
-      ownerDidManager: didManager,
-      acl: AccessListAdd(
-          ownerDid: didDoc.id, granteeDids: [getEnv('CONTROL_PLANE_DID')]),
-      mediatorDid: mediatorDid,
-    );
+      await sdk.updateAcl(
+        ownerDidManager: didManager,
+        acl: AccessListAdd(
+          ownerDid: didDoc.id,
+          granteeDids: [getEnv('CONTROL_PLANE_DID')],
+        ),
+        mediatorDid: mediatorDid,
+      );
 
-    final completer = Completer<void>();
-    final channel = await sdk.subscribeToMessages(
-      didManager,
-      mediatorDid: mediatorDid,
-    );
+      final completer = Completer<void>();
+      final channel = await sdk.subscribeToMessages(
+        didManager,
+        mediatorDid: mediatorDid,
+      );
 
-    final expectedMessageType =
-        '${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/invitation-accept';
+      final expectedMessageType =
+          '${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/invitation-accept';
 
-    channel.listen((message) {
-      if (message.type.toString() == expectedMessageType) {
-        completer.complete();
-      }
-    });
+      channel.listen((message) {
+        if (message.type.toString() == expectedMessageType) {
+          completer.complete();
+        }
+      });
 
-    final deviceToken = '$mediatorDid::${didDoc.id}';
-    final platformType = PlatformType.DIDCOMM;
+      final deviceToken = '$mediatorDid::${didDoc.id}';
+      final platformType = PlatformType.DIDCOMM;
 
-    await dio.post(
-      '$apiEndpoint/v1/register-device',
-      data: RegisterDeviceRequest(
-        deviceToken: deviceToken,
-        platformType: platformType,
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
+      await dio.post(
+        '$apiEndpoint/v1/register-device',
+        data: RegisterDeviceRequest(
+          deviceToken: deviceToken,
+          platformType: platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
 
-    final registerOfferResponse = await dio.post(
-      '$apiEndpoint/v1/register-offer',
-      data: getRegisterOfferRequestMock(
-        deviceToken: deviceToken,
-        platformType: platformType,
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': aliceAccessToken,
-      }),
-    );
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: deviceToken,
+          platformType: platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
 
-    await dio.post(
-      '$apiEndpoint/v1/accept-offer',
-      data: getAcceptOfferRequest(
-        did: BobDevice.offerAcceptanceDid,
-        deviceToken: BobDevice.deviceToken,
-        platformType: BobDevice.platformType,
-        mnemonic: registerOfferResponse.data['mnemonic'],
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
-    );
+      await dio.post(
+        '$apiEndpoint/v1/accept-offer',
+        data: getAcceptOfferRequest(
+          did: BobDevice.offerAcceptanceDid,
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      );
 
-    await dio.post(
-      '$apiEndpoint/v1/notify-acceptance',
-      data: NotifyAcceptanceRequest(
-        did: BobDevice.offerAcceptanceDid,
-        offerLink: registerOfferResponse.data['offerLink'],
-        mnemonic: registerOfferResponse.data['mnemonic'],
-        senderInfo: 'Anonymous',
-      ).toJson(),
-      options: Options(headers: {
-        Headers.contentTypeHeader: 'application/json',
-        'authorization': bobAccessToken,
-      }),
-    );
+      await dio.post(
+        '$apiEndpoint/v1/notify-acceptance',
+        data: NotifyAcceptanceRequest(
+          did: BobDevice.offerAcceptanceDid,
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          senderInfo: 'Anonymous',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      );
 
-    await completer.future;
-  },
-      skip:
-          '''Doesnt work on local server instance because mediator cant resolve did:web document of the server''');
+      await completer.future;
+    },
+    skip:
+        '''Doesnt work on local server instance because mediator cant resolve did:web document of the server''',
+  );
 }

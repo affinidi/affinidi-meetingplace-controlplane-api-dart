@@ -7,13 +7,9 @@ part of 'response_model.dart';
 // **************************************************************************
 
 AuthChallengeResponse _$AuthChallengeResponseFromJson(
-        Map<String, dynamic> json) =>
-    AuthChallengeResponse(
-      challenge: json['challenge'] as String,
-    );
+  Map<String, dynamic> json,
+) => AuthChallengeResponse(challenge: json['challenge'] as String);
 
 Map<String, dynamic> _$AuthChallengeResponseToJson(
-        AuthChallengeResponse instance) =>
-    <String, dynamic>{
-      'challenge': instance.challenge,
-    };
+  AuthChallengeResponse instance,
+) => <String, dynamic>{'challenge': instance.challenge};

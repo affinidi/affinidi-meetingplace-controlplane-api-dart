@@ -61,9 +61,9 @@ void main() async {
 
   didDocumentFile.writeAsStringSync(jsonEncode(didWebDocument));
   didcommAuthFile.writeAsStringSync(jsonEncode([...privateJwks]));
-  hashSecretFile.writeAsStringSync(jsonEncode({
-    'secret': hex.encode(randomBytes(32)),
-  }));
+  hashSecretFile.writeAsStringSync(
+    jsonEncode({'secret': hex.encode(randomBytes(32))}),
+  );
 }
 
 Map<String, dynamic> generateDidDocument({
@@ -77,9 +77,9 @@ Map<String, dynamic> generateDidDocument({
       {
         "publicKeyJwk": {
           "@id": "https://w3id.org/security#publicKeyJwk",
-          "@type": "@json"
-        }
-      }
+          "@type": "@json",
+        },
+      },
     ],
     "id": didWeb,
     "verificationMethod": jwks,
@@ -90,14 +90,14 @@ Map<String, dynamic> generateDidDocument({
       {
         "id": "$didWeb#auth",
         "type": "Authentication",
-        "serviceEndpoint": "$serviceEndpoint/authenticate"
+        "serviceEndpoint": "$serviceEndpoint/authenticate",
       },
       {
         "id": "$didWeb#api",
         "type": "RestAPI",
-        "serviceEndpoint": serviceEndpoint
-      }
-    ]
+        "serviceEndpoint": serviceEndpoint,
+      },
+    ],
   };
 }
 
@@ -118,7 +118,7 @@ List<Map<String, dynamic>> createPrivateJwks(
         'x': jwk.value['x'],
         if (jwk.value['y'] != null) 'y': jwk.value['y'],
         'd': jwk.value['d'],
-      }
+      },
     });
   }
 
@@ -203,8 +203,9 @@ List<int> _encodeBigIntPadded(BigInt number, int length) {
 String base64url(BigInt val) =>
     base64UrlEncode(_stripLeadingZero(_encodeBigIntUnsigned(val)));
 
-Future<Map<String, dynamic>> generateEd25519Jwk(
-    {bool includePrivate = true}) async {
+Future<Map<String, dynamic>> generateEd25519Jwk({
+  bool includePrivate = true,
+}) async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPair();
   final publicKey = await keyPair.extractPublicKey();

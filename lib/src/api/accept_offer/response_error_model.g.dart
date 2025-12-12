@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 AcceptOfferErrorResponse _$AcceptOfferErrorResponseFromJson(
-        Map<String, dynamic> json) =>
-    AcceptOfferErrorResponse(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-    );
+  Map<String, dynamic> json,
+) => AcceptOfferErrorResponse(
+  errorCode: json['errorCode'] as String,
+  errorMessage: json['errorMessage'] as String,
+);
 
 Map<String, dynamic> _$AcceptOfferErrorResponseToJson(
-        AcceptOfferErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  AcceptOfferErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};

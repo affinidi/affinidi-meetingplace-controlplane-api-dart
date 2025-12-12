@@ -7,18 +7,18 @@ part of 'request_model.dart';
 // **************************************************************************
 
 RegisterDeviceRequest _$RegisterDeviceRequestFromJson(
-        Map<String, dynamic> json) =>
-    RegisterDeviceRequest(
-      deviceToken: json['deviceToken'] as String,
-      platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
-    );
+  Map<String, dynamic> json,
+) => RegisterDeviceRequest(
+  deviceToken: json['deviceToken'] as String,
+  platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
+);
 
 Map<String, dynamic> _$RegisterDeviceRequestToJson(
-        RegisterDeviceRequest instance) =>
-    <String, dynamic>{
-      'deviceToken': instance.deviceToken,
-      'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
-    };
+  RegisterDeviceRequest instance,
+) => <String, dynamic>{
+  'deviceToken': instance.deviceToken,
+  'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
+};
 
 const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',

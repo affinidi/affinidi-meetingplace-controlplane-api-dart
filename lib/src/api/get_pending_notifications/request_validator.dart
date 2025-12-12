@@ -4,16 +4,18 @@ import '../../utils/platform_type.dart';
 
 class GetPendingNotificationsRequestValidator extends LucidValidator {
   GetPendingNotificationsRequestValidator() {
-    ruleFor((request) => request['platformType'] as String?,
-            key: 'platformType')
-        .notEmptyOrNull()
-        .must(
-            (value) => PlatformType.values.any((e) => e.name == value),
-            'Platform type must be one of ${PlatformType.values.join(',')}',
-            'invalidPlatformType');
+    ruleFor(
+      (request) => request['platformType'] as String?,
+      key: 'platformType',
+    ).notEmptyOrNull().must(
+      (value) => PlatformType.values.any((e) => e.name == value),
+      'Platform type must be one of ${PlatformType.values.join(',')}',
+      'invalidPlatformType',
+    );
 
-    ruleFor((request) => request['deviceToken'] as String?, key: 'deviceToken')
-        .notEmptyOrNull()
-        .maxLength(2048);
+    ruleFor(
+      (request) => request['deviceToken'] as String?,
+      key: 'deviceToken',
+    ).notEmptyOrNull().maxLength(2048);
   }
 }

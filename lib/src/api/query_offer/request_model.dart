@@ -8,9 +8,7 @@ part 'request_model.g.dart';
 
 @JsonSerializable()
 class QueryOfferRequest {
-  QueryOfferRequest({
-    required this.mnemonic,
-  });
+  QueryOfferRequest({required this.mnemonic});
 
   factory QueryOfferRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);

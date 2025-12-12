@@ -10,7 +10,8 @@ enum KmsWalletExceptionCodes {
   unsupportedSignatureScheme('unsupported_signature_scheme'),
   kmsCustomerKeySpecMissing('kms_customer_key_spec_missing'),
   derCodingForKmsCustomerKeySpecUnImplemented(
-      'der_decoding_for_kms_customer_key_spec_un_implemented'),
+    'der_decoding_for_kms_customer_key_spec_un_implemented',
+  ),
   keyNotFound('key_not_found'),
   keyReferenceNotFound('key_reference_not_found'),
   keyUsageNotSupported('key_usage_not_supported'),
@@ -22,9 +23,7 @@ enum KmsWalletExceptionCodes {
 }
 
 class KmsWalletException implements Exception {
-  factory KmsWalletException.generic({
-    Object? originalException,
-  }) {
+  factory KmsWalletException.generic({Object? originalException}) {
     return KmsWalletException(
       message: 'KMS wallet exception: ${originalException.toString()}.',
       code: KmsWalletExceptionCodes.generic,
@@ -123,9 +122,7 @@ class KmsWalletException implements Exception {
     );
   }
 
-  factory KmsWalletException.awsAccountIdMissing({
-    Object? originalException,
-  }) {
+  factory KmsWalletException.awsAccountIdMissing({Object? originalException}) {
     return KmsWalletException(
       message: 'KMS wallet exception: missing AWS account id',
       code: KmsWalletExceptionCodes.awsAccountIdMissing,

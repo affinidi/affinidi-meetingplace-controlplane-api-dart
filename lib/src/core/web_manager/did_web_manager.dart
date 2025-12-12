@@ -18,8 +18,10 @@ class DidWebManager extends DidManager {
     String walletKeyId, {
     Set<VerificationRelationship>? relationships,
   }) async {
-    final result = await super
-        .addVerificationMethod(walletKeyId, relationships: relationships);
+    final result = await super.addVerificationMethod(
+      walletKeyId,
+      relationships: relationships,
+    );
 
     // For Ed25519 keys, we need to store the mapping for the derived X25519 key agreement method
     // that is created by DidKey.generateDocument()

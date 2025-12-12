@@ -7,22 +7,22 @@ part of 'request_model.dart';
 // **************************************************************************
 
 DeletePendingNotificationsRequest _$DeletePendingNotificationsRequestFromJson(
-        Map<String, dynamic> json) =>
-    DeletePendingNotificationsRequest(
-      deviceToken: json['deviceToken'] as String,
-      platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
-      notificationIds: (json['notificationIds'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-    );
+  Map<String, dynamic> json,
+) => DeletePendingNotificationsRequest(
+  deviceToken: json['deviceToken'] as String,
+  platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
+  notificationIds: (json['notificationIds'] as List<dynamic>)
+      .map((e) => e as String)
+      .toList(),
+);
 
 Map<String, dynamic> _$DeletePendingNotificationsRequestToJson(
-        DeletePendingNotificationsRequest instance) =>
-    <String, dynamic>{
-      'deviceToken': instance.deviceToken,
-      'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
-      'notificationIds': instance.notificationIds,
-    };
+  DeletePendingNotificationsRequest instance,
+) => <String, dynamic>{
+  'deviceToken': instance.deviceToken,
+  'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
+  'notificationIds': instance.notificationIds,
+};
 
 const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',

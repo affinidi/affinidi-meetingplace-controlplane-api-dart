@@ -12,8 +12,9 @@ void main(List<String> args) async {
   final ip = InternetAddress.anyIPv4;
   Config config = await Config().loadConfig(getEnv('ENV'));
 
-  final secretManager =
-      SecretManager.withProvider(await AWSSecretManager.init());
+  final secretManager = SecretManager.withProvider(
+    await AWSSecretManager.init(),
+  );
 
   _registerSecrets(secretManager: secretManager, config: config);
 

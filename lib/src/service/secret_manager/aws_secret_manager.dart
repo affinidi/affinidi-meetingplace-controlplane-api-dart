@@ -32,8 +32,8 @@ class AWSSecretManager implements SecretProvider {
   @override
   Future<String> getSecret(String secretId) async {
     final client = await _getClient();
-    final aws.GetSecretValueResponse(:secretString) =
-        await client.getSecretValue(secretId: secretId);
+    final aws.GetSecretValueResponse(:secretString) = await client
+        .getSecretValue(secretId: secretId);
 
     if (secretString == null) {
       throw Exception('Secret for id $secretId not found');

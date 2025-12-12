@@ -18,8 +18,9 @@ class NotifyAcceptanceGroupRequest {
   factory NotifyAcceptanceGroupRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        NotifyAcceptanceGroupRequestValidator().validate(params);
+    final validationResult = NotifyAcceptanceGroupRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

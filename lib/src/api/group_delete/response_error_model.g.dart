@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 GroupDeleteErrorResponse _$GroupDeleteErrorResponseFromJson(
-        Map<String, dynamic> json) =>
-    GroupDeleteErrorResponse(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-    );
+  Map<String, dynamic> json,
+) => GroupDeleteErrorResponse(
+  errorCode: json['errorCode'] as String,
+  errorMessage: json['errorMessage'] as String,
+);
 
 Map<String, dynamic> _$GroupDeleteErrorResponseToJson(
-        GroupDeleteErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  GroupDeleteErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};

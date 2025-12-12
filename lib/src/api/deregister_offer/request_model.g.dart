@@ -7,15 +7,15 @@ part of 'request_model.dart';
 // **************************************************************************
 
 DeregisterOfferRequest _$DeregisterOfferRequestFromJson(
-        Map<String, dynamic> json) =>
-    DeregisterOfferRequest(
-      offerLink: json['offerLink'] as String,
-      mnemonic: json['mnemonic'] as String,
-    );
+  Map<String, dynamic> json,
+) => DeregisterOfferRequest(
+  offerLink: json['offerLink'] as String,
+  mnemonic: json['mnemonic'] as String,
+);
 
 Map<String, dynamic> _$DeregisterOfferRequestToJson(
-        DeregisterOfferRequest instance) =>
-    <String, dynamic>{
-      'offerLink': instance.offerLink,
-      'mnemonic': instance.mnemonic,
-    };
+  DeregisterOfferRequest instance,
+) => <String, dynamic>{
+  'offerLink': instance.offerLink,
+  'mnemonic': instance.mnemonic,
+};

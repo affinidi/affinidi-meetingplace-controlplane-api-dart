@@ -7,15 +7,15 @@ part of 'request_model.dart';
 // **************************************************************************
 
 NotifyOutreachRequest _$NotifyOutreachRequestFromJson(
-        Map<String, dynamic> json) =>
-    NotifyOutreachRequest(
-      mnemonic: json['mnemonic'] as String,
-      senderInfo: json['senderInfo'] as String,
-    );
+  Map<String, dynamic> json,
+) => NotifyOutreachRequest(
+  mnemonic: json['mnemonic'] as String,
+  senderInfo: json['senderInfo'] as String,
+);
 
 Map<String, dynamic> _$NotifyOutreachRequestToJson(
-        NotifyOutreachRequest instance) =>
-    <String, dynamic>{
-      'mnemonic': instance.mnemonic,
-      'senderInfo': instance.senderInfo,
-    };
+  NotifyOutreachRequest instance,
+) => <String, dynamic>{
+  'mnemonic': instance.mnemonic,
+  'senderInfo': instance.senderInfo,
+};

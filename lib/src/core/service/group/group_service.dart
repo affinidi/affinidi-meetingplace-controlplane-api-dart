@@ -51,11 +51,11 @@ class GroupService {
     required GroupDidManager groupDidManager,
     required DidResolver didResolver,
     required Logger logger,
-  })  : _storage = storage,
-        _notificationService = notificationService,
-        _groupDidManager = groupDidManager,
-        _didResolver = didResolver,
-        _logger = logger;
+  }) : _storage = storage,
+       _notificationService = notificationService,
+       _groupDidManager = groupDidManager,
+       _didResolver = didResolver,
+       _logger = logger;
 
   final Storage _storage;
   final NotificationService _notificationService;
@@ -88,15 +88,21 @@ class GroupService {
     try {
       return _storage.create(group);
     } catch (e, stackTrace) {
-      _logger.error('Error creating group $e',
-          error: e, stackTrace: stackTrace);
+      _logger.error(
+        'Error creating group $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw GroupCreationFailed();
     }
   }
 
   Future<Group> getGroup(String id) async {
-    final group =
-        await _storage.findOneById(Group.entityName, id, Group.fromJson);
+    final group = await _storage.findOneById(
+      Group.entityName,
+      id,
+      Group.fromJson,
+    );
 
     if (group == null) throw GroupNotFound(groupId: id);
     if (group.status == GroupStatus.deleted) throw GroupDeleted(groupId: id);
@@ -141,8 +147,11 @@ class GroupService {
     } on GroupPermissionDenied {
       rethrow;
     } catch (e, stackTrace) {
-      _logger.error('Error adding member to group $e',
-          error: e, stackTrace: stackTrace);
+      _logger.error(
+        'Error adding member to group $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw GroupAddMemberFailed();
     }
   }
@@ -172,14 +181,16 @@ class GroupService {
       groupId: group.id,
     );
 
-    await sendMessage(SendMessageInput(
-      offerLink: group.offerLink,
-      groupDid: group.groupDid,
-      controllingDid: input.controllingDid,
-      messagePayload: input.messageToRelay,
-      incSeqNo: false,
-      notify: false,
-    ));
+    await sendMessage(
+      SendMessageInput(
+        offerLink: group.offerLink,
+        groupDid: group.groupDid,
+        controllingDid: input.controllingDid,
+        messagePayload: input.messageToRelay,
+        incSeqNo: false,
+        notify: false,
+      ),
+    );
 
     await _storage.deleteFromlist(
       GroupMember.entityName,
@@ -240,9 +251,9 @@ class GroupService {
           groupMember.memberDid,
         );
 
-        final payload = jsonDecode(utf8.decode(base64.decode(
-          input.messagePayload,
-        )));
+        final payload = jsonDecode(
+          utf8.decode(base64.decode(input.messagePayload)),
+        );
 
         final messageToSend = GroupMessage.create(
           from: group.groupDid,
@@ -280,8 +291,11 @@ class GroupService {
         } on MeetingPlaceMediatorSDKException catch (e, stackTrace) {
           final clientException = e.innerException;
           if (clientException is MediatorClientException) {
-            _logger.error(clientException.innerMessage,
-                error: clientException, stackTrace: stackTrace);
+            _logger.error(
+              clientException.innerMessage,
+              error: clientException,
+              stackTrace: stackTrace,
+            );
           }
           _logger.error(
             'Message could not be send from group to member: ${e.message}',
@@ -290,9 +304,10 @@ class GroupService {
           );
         } catch (e, stackTrace) {
           _logger.error(
-              'Message could not be send from group to member: ${e.toString()}',
-              error: e,
-              stackTrace: stackTrace);
+            'Message could not be send from group to member: ${e.toString()}',
+            error: e,
+            stackTrace: stackTrace,
+          );
         }
       }).toList(),
     );
@@ -313,14 +328,16 @@ class GroupService {
       throw GroupPermissionDenied();
     }
 
-    await sendMessage(SendMessageInput(
-      offerLink: group.offerLink,
-      groupDid: group.groupDid,
-      controllingDid: input.controllingDid,
-      messagePayload: input.messageToRelay,
-      incSeqNo: false,
-      notify: false,
-    ));
+    await sendMessage(
+      SendMessageInput(
+        offerLink: group.offerLink,
+        groupDid: group.groupDid,
+        controllingDid: input.controllingDid,
+        messagePayload: input.messageToRelay,
+        incSeqNo: false,
+        notify: false,
+      ),
+    );
 
     group.status = GroupStatus.deleted;
     await _storage.update(group);

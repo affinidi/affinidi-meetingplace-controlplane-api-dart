@@ -12,26 +12,34 @@ class KMSKeyStoreImpl implements KMSKeyStore {
 
   @override
   Future<bool> contains(String key) async {
-    final result =
-        await _storage.findOneById(KmsKey.entityName, key, KmsKey.fromJson);
+    final result = await _storage.findOneById(
+      KmsKey.entityName,
+      key,
+      KmsKey.fromJson,
+    );
     return result != null;
   }
 
   @override
   Future<StoredKmsKey?> get(String key) async {
-    final result =
-        await _storage.findOneById(KmsKey.entityName, key, KmsKey.fromJson);
+    final result = await _storage.findOneById(
+      KmsKey.entityName,
+      key,
+      KmsKey.fromJson,
+    );
 
     return result != null
         ? StoredKmsKey(
             id: result.keyId,
-            publicKeyBytes: Uint8List.fromList(hex.decode(result.publicKey)))
+            publicKeyBytes: Uint8List.fromList(hex.decode(result.publicKey)),
+          )
         : null;
   }
 
   @override
   Future<void> set(String id, StoredKmsKey value) async {
     await _storage.create(
-        KmsKey(keyId: value.id, publicKey: hex.encode((value.publicKeyBytes))));
+      KmsKey(keyId: value.id, publicKey: hex.encode((value.publicKeyBytes))),
+    );
   }
 }

@@ -9,11 +9,11 @@ class OfferAcceptanceNotification extends DeviceNotification {
     required this.sender,
     required this.offerName,
   }) : super(
-          subtitle: 'Invitation accepted!',
-          body: '',
-          notificationType: NotificationItemType.invitationAccept,
-          threadId: NotificationStackGroupingTypes.invitationAccept.value,
-        );
+         subtitle: 'Invitation accepted!',
+         body: '',
+         notificationType: NotificationItemType.invitationAccept,
+         threadId: NotificationStackGroupingTypes.invitationAccept.value,
+       );
 
   final String offerName;
   final String sender;

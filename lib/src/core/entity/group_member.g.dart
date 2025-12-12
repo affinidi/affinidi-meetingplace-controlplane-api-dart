@@ -7,18 +7,18 @@ part of 'group_member.dart';
 // **************************************************************************
 
 GroupMember _$GroupMemberFromJson(Map<String, dynamic> json) => GroupMember(
-      groupId: json['groupId'] as String,
-      offerLink: json['offerLink'] as String,
-      memberDid: json['memberDid'] as String,
-      memberPublicKey: json['memberPublicKey'] as String,
-      memberReencryptionKey: json['memberReencryptionKey'] as String,
-      memberVCard: json['memberVCard'] as String,
-      platformEndpointArn: json['platformEndpointArn'] as String,
-      platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
-      controllingDid: json['controllingDid'] as String,
-      startSeqNo: (json['startSeqNo'] as num).toInt(),
-      ttl: json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String),
-    );
+  groupId: json['groupId'] as String,
+  offerLink: json['offerLink'] as String,
+  memberDid: json['memberDid'] as String,
+  memberPublicKey: json['memberPublicKey'] as String,
+  memberReencryptionKey: json['memberReencryptionKey'] as String,
+  memberVCard: json['memberVCard'] as String,
+  platformEndpointArn: json['platformEndpointArn'] as String,
+  platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
+  controllingDid: json['controllingDid'] as String,
+  startSeqNo: (json['startSeqNo'] as num).toInt(),
+  ttl: json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String),
+);
 
 Map<String, dynamic> _$GroupMemberToJson(GroupMember instance) =>
     <String, dynamic>{

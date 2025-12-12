@@ -5,10 +5,7 @@ part 'response_model.g.dart';
 
 @JsonSerializable()
 class CreateOobResponse {
-  CreateOobResponse({
-    required this.oobId,
-    required this.oobUrl,
-  });
+  CreateOobResponse({required this.oobId, required this.oobUrl});
   final String oobId;
   final String oobUrl;
 

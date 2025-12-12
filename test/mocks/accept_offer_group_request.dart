@@ -6,11 +6,10 @@ AcceptOfferGroupRequest getAcceptOfferGroupRequest({
   required String deviceToken,
   required PlatformType platformType,
   String? mnemonic,
-}) =>
-    AcceptOfferGroupRequest(
-      did: did,
-      mnemonic: mnemonic ?? 'offer-mnemonic',
-      deviceToken: deviceToken,
-      platformType: platformType,
-      vcard: 'dmNhcmQtdmFsdWUK',
-    );
+}) => AcceptOfferGroupRequest(
+  did: did,
+  mnemonic: mnemonic ?? 'offer-mnemonic',
+  deviceToken: deviceToken,
+  platformType: platformType,
+  vcard: 'dmNhcmQtdmFsdWUK',
+);

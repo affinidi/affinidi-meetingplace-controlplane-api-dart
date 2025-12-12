@@ -40,8 +40,9 @@ class DeletePendingNotificationsResponse {
   @override
   String toString() {
     Map json = _$DeletePendingNotificationsResponseToJson(this);
-    json['notifications'] =
-        json['notifications'].map((n) => n.toJson()).toList();
+    json['notifications'] = json['notifications']
+        .map((n) => n.toJson())
+        .toList();
     return JsonEncoder().convert(json);
   }
 }

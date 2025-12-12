@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 NotifyAcceptanceGroupErrorResponse _$NotifyAcceptanceGroupErrorResponseFromJson(
-        Map<String, dynamic> json) =>
-    NotifyAcceptanceGroupErrorResponse(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-    );
+  Map<String, dynamic> json,
+) => NotifyAcceptanceGroupErrorResponse(
+  errorCode: json['errorCode'] as String,
+  errorMessage: json['errorMessage'] as String,
+);
 
 Map<String, dynamic> _$NotifyAcceptanceGroupErrorResponseToJson(
-        NotifyAcceptanceGroupErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  NotifyAcceptanceGroupErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};

@@ -6,13 +6,9 @@ typedef EntityFromJson<T> = T Function(Map<String, dynamic> json);
 abstract interface class Storage {
   Future<Storage> connect();
 
-  Future<T> create<T extends Entity>(
-    T object,
-  );
+  Future<T> create<T extends Entity>(T object);
 
-  Future<T> update<T extends Entity>(
-    T object,
-  );
+  Future<T> update<T extends Entity>(T object);
 
   Future<T?> updateWithCondition<T extends Entity>(
     String entityName,
@@ -22,15 +18,9 @@ abstract interface class Storage {
     required bool Function(T entity) conditionFn,
   });
 
-  Future<T> add<T extends Entity>(
-    String listName,
-    T object,
-  );
+  Future<T> add<T extends Entity>(String listName, T object);
 
-  Future<void> delete(
-    String entityName,
-    String id,
-  );
+  Future<void> delete(String entityName, String id);
 
   Future<T?> findOneById<T extends Entity>(
     String entityName,
@@ -48,10 +38,5 @@ abstract interface class Storage {
     EntityFromJson<T> fromJson,
   );
 
-  deleteFromlist(
-    String listName,
-    String listId,
-    String entityName,
-    String id,
-  );
+  deleteFromlist(String listName, String listId, String entityName, String id);
 }

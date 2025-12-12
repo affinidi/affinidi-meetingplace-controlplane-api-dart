@@ -7,13 +7,11 @@ part of 'response_model.dart';
 // **************************************************************************
 
 RegisterNotificationResponse _$RegisterNotificationResponseFromJson(
-        Map<String, dynamic> json) =>
-    RegisterNotificationResponse(
-      notificationToken: json['notificationToken'] as String,
-    );
+  Map<String, dynamic> json,
+) => RegisterNotificationResponse(
+  notificationToken: json['notificationToken'] as String,
+);
 
 Map<String, dynamic> _$RegisterNotificationResponseToJson(
-        RegisterNotificationResponse instance) =>
-    <String, dynamic>{
-      'notificationToken': instance.notificationToken,
-    };
+  RegisterNotificationResponse instance,
+) => <String, dynamic>{'notificationToken': instance.notificationToken};

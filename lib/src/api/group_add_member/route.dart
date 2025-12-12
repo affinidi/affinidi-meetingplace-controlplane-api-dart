@@ -30,7 +30,8 @@ Future<Response> groupAddMember(
     return Response.badRequest(body: e.toString());
   } on GroupPermissionDenied {
     facade.logInfo(
-        '''Access to group denied. Only group owner is allowed to call this action''');
+      '''Access to group denied. Only group owner is allowed to call this action''',
+    );
     return Response.forbidden(
       GroupAddMemberErrorResponse.permissionDenied().toString(),
     );
@@ -46,8 +47,11 @@ Future<Response> groupAddMember(
       GroupAddMemberErrorResponse.groupDoesNotExist().toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Error on group add member',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on group add member',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

@@ -18,8 +18,9 @@ class NotifyAcceptanceRequest {
   factory NotifyAcceptanceRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        NotifyAcceptanceRequestValidator().validate(params);
+    final validationResult = NotifyAcceptanceRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

@@ -10,26 +10,30 @@ import '../../core/service/auth/auth_response.dart';
 import '../../core/service/auth/didcomm_auth.dart';
 
 Future<Response> authAuthenticate(
-    Request request, ApplicationFacade facade) async {
+  Request request,
+  ApplicationFacade facade,
+) async {
   try {
     final requestParams = AuthAuthenticateRequest.fromRequestParams(
       await request.readAsString(),
     );
 
-    final authorizer =
-        await DIDCommAuthBuilder(logger: facade.config.logger).build();
+    final authorizer = await DIDCommAuthBuilder(
+      logger: facade.config.logger,
+    ).build();
 
-    final AuthenticationResponse authResponse =
-        await authorizer.unpackChallengeResponse(
-      requestParams.challengeResponse,
-      Config().get('auth')['didResolverUrl'],
-    );
+    final AuthenticationResponse authResponse = await authorizer
+        .unpackChallengeResponse(
+          requestParams.challengeResponse,
+          Config().get('auth')['didResolverUrl'],
+        );
 
     if (authResponse.type != AuthenticationResponseType.didcommChallengeOk) {
       return Response.badRequest(
-          body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
-        authResponse.type.name,
-      ).toString());
+        body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
+          authResponse.type.name,
+        ).toString(),
+      );
     }
 
     final JWTStatus jwtStatus = authorizer.verifyAuthChallengeToken(
@@ -39,9 +43,10 @@ Future<Response> authAuthenticate(
 
     if (jwtStatus != JWTStatus.valid) {
       return Response.badRequest(
-          body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
-        jwtStatus.name,
-      ).toString());
+        body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
+          jwtStatus.name,
+        ).toString(),
+      );
     }
 
     final authConfig = Config().get('auth');
@@ -74,8 +79,11 @@ Future<Response> authAuthenticate(
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Authentication failed: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Authentication failed: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

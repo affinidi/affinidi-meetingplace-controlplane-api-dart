@@ -12,8 +12,9 @@ class RegisterOfferGroupRequest {
   factory RegisterOfferGroupRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        RegisterOfferGroupRequestValidator().validate(params);
+    final validationResult = RegisterOfferGroupRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

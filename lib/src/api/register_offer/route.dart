@@ -23,9 +23,7 @@ Future<Response> registerOffer(
       getAuthDid(request),
     );
 
-    return Response.ok(
-      RegisterOfferResponse.fromOffer(offer).toString(),
-    );
+    return Response.ok(RegisterOfferResponse.fromOffer(offer).toString());
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } on InvalidOfferInput catch (e) {
@@ -38,8 +36,11 @@ Future<Response> registerOffer(
       body: RegisterOfferResponse.offerExists().toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Internal server error: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Internal server error: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

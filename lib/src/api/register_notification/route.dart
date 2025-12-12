@@ -12,8 +12,8 @@ Future<Response> registerNotification(
   try {
     final registerNotificationRequest =
         RegisterNotificationRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
     final notificationChannel = await facade.registerNotification(
       registerNotificationRequest,
@@ -21,14 +21,18 @@ Future<Response> registerNotification(
     );
 
     return Response.ok(
-      RegisterNotificationResponse.fromNotificationChannel(notificationChannel)
-          .toString(),
+      RegisterNotificationResponse.fromNotificationChannel(
+        notificationChannel,
+      ).toString(),
     );
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Register notification failed: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Register notification failed: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

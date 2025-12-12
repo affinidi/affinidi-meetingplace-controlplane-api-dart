@@ -7,13 +7,9 @@ part of 'response_model.dart';
 // **************************************************************************
 
 DeregisterNotificationResponse _$DeregisterNotificationResponseFromJson(
-        Map<String, dynamic> json) =>
-    DeregisterNotificationResponse(
-      status: json['status'] as String,
-    );
+  Map<String, dynamic> json,
+) => DeregisterNotificationResponse(status: json['status'] as String);
 
 Map<String, dynamic> _$DeregisterNotificationResponseToJson(
-        DeregisterNotificationResponse instance) =>
-    <String, dynamic>{
-      'status': instance.status,
-    };
+  DeregisterNotificationResponse instance,
+) => <String, dynamic>{'status': instance.status};

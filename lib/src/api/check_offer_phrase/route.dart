@@ -9,16 +9,20 @@ Future<Response> checkOfferPhrase(
   ApplicationFacade facade,
 ) async {
   try {
-    final checkOfferPhraseRequest =
-        CheckOfferPhraseRequest.fromRequestParams(await request.readAsString());
+    final checkOfferPhraseRequest = CheckOfferPhraseRequest.fromRequestParams(
+      await request.readAsString(),
+    );
 
     final isInUse = await facade.checkOfferPhrase(checkOfferPhraseRequest);
     return Response.ok(CheckOfferPhraseResponse(isInUse: isInUse).toString());
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Error on check offer phrase',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on check offer phrase',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

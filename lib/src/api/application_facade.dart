@@ -76,7 +76,9 @@ class ApplicationFacade {
       logger: _logger,
       provider: config.pushNotificationProvider,
       mediatorSDK: MeetingPlaceMediatorSDK(
-          mediatorDid: '', didResolver: config.didResolver),
+        mediatorDid: '',
+        didResolver: config.didResolver,
+      ),
     );
 
     _deviceTokenMappingService = DeviceTokenMappingService(config.storage);
@@ -102,10 +104,7 @@ class ApplicationFacade {
       logger: _logger,
     );
 
-    _oobService = OobService(
-      storage: config.storage,
-      logger: _logger,
-    );
+    _oobService = OobService(storage: config.storage, logger: _logger);
 
     _groupService = GroupService(
       storage: config.storage,
@@ -129,12 +128,14 @@ class ApplicationFacade {
   late final Logger _logger;
 
   Future<Oob> createOob(CreateOobRequest request) {
-    return _oobService.create(CreateOobInput(
-      mediatorDid: request.mediatorDid,
-      mediatorEndpoint: request.mediatorEndpoint,
-      mediatorWSSEndpoint: request.mediatorWSSEndpoint,
-      didcommMessage: request.didcommMessage,
-    ));
+    return _oobService.create(
+      CreateOobInput(
+        mediatorDid: request.mediatorDid,
+        mediatorEndpoint: request.mediatorEndpoint,
+        mediatorWSSEndpoint: request.mediatorWSSEndpoint,
+        didcommMessage: request.didcommMessage,
+      ),
+    );
   }
 
   Future<Oob?> getOob(GetOobRequest request) {
@@ -147,32 +148,34 @@ class ApplicationFacade {
 
   Future<Offer> registerOffer(RegisterOfferRequest request, String authDid) {
     return _offerService.registerOffer(
-        RegisterOfferInput(
-          offerName: request.offerName,
-          offerDescription: request.offerDescription,
-          offerType: OfferType.chat,
-          didcommMessage: request.didcommMessage,
-          vcard: request.vcard,
-          validUntil: request.validUntil,
-          maximumUsage: request.maximumUsage,
-          deviceToken: request.deviceToken,
-          platformType: request.platformType,
-          mediatorDid: request.mediatorDid,
-          mediatorEndpoint: request.mediatorEndpoint,
-          mediatorWSSEndpoint: request.mediatorWSSEndpoint,
-          contactAttributes: request.contactAttributes,
-          customPhrase: request.customPhrase,
-        ),
-        authDid);
+      RegisterOfferInput(
+        offerName: request.offerName,
+        offerDescription: request.offerDescription,
+        offerType: OfferType.chat,
+        didcommMessage: request.didcommMessage,
+        vcard: request.vcard,
+        validUntil: request.validUntil,
+        maximumUsage: request.maximumUsage,
+        deviceToken: request.deviceToken,
+        platformType: request.platformType,
+        mediatorDid: request.mediatorDid,
+        mediatorEndpoint: request.mediatorEndpoint,
+        mediatorWSSEndpoint: request.mediatorWSSEndpoint,
+        contactAttributes: request.contactAttributes,
+        customPhrase: request.customPhrase,
+      ),
+      authDid,
+    );
   }
 
   Future<void> deregisterOffer(DeregisterOfferRequest request, String authDid) {
     return _offerService.deregisterOffer(
-        DeregisterOfferInput(
-          offerLink: request.offerLink,
-          mnemonic: request.mnemonic,
-        ),
-        authDid);
+      DeregisterOfferInput(
+        offerLink: request.offerLink,
+        mnemonic: request.mnemonic,
+      ),
+      authDid,
+    );
   }
 
   Future<(Offer, Group)> registerOfferGroup(
@@ -188,11 +191,11 @@ class ApplicationFacade {
         throw GroupCountLimitExceeded();
       }
 
-      final deviceTokenMapping =
-          await _deviceTokenMappingService.getDeviceTokenMapping(
-        devicePlatform: request.platformType,
-        deviceToken: request.deviceToken,
-      );
+      final deviceTokenMapping = await _deviceTokenMappingService
+          .getDeviceTokenMapping(
+            devicePlatform: request.platformType,
+            deviceToken: request.deviceToken,
+          );
 
       final offer = await _offerService.registerOffer(
         RegisterOfferInput(
@@ -226,18 +229,20 @@ class ApplicationFacade {
         ),
       );
 
-      await _groupService.addMemberToGroup(AddGroupMemberInput(
-        groupId: group.id,
-        offerLink: offer.offerLink,
-        memberDid: request.adminDid,
-        memberPublicKey: request.adminPublicKey,
-        memberReencryptionKey: request.adminReencryptionKey,
-        memberVCard: request.memberVCard,
-        platformType: request.platformType,
-        platformEndpointArn: deviceTokenMapping.platformEndpointArn,
-        controllingDid: authDid,
-        authDid: authDid,
-      ));
+      await _groupService.addMemberToGroup(
+        AddGroupMemberInput(
+          groupId: group.id,
+          offerLink: offer.offerLink,
+          memberDid: request.adminDid,
+          memberPublicKey: request.adminPublicKey,
+          memberReencryptionKey: request.adminReencryptionKey,
+          memberVCard: request.memberVCard,
+          platformType: request.platformType,
+          platformEndpointArn: deviceTokenMapping.platformEndpointArn,
+          controllingDid: authDid,
+          authDid: authDid,
+        ),
+      );
 
       offer.groupId = group.id;
       offer.groupDid = group.groupDid;
@@ -261,14 +266,15 @@ class ApplicationFacade {
 
   Future<Offer> acceptOffer(AcceptOfferRequest request, String authDid) async {
     return _acceptanceService.acceptOffer(
-        AcceptOfferInput(
-          acceptOfferAsDid: request.did,
-          mnemonic: request.mnemonic,
-          deviceToken: request.deviceToken,
-          platformType: request.platformType,
-          vcard: request.vcard,
-        ),
-        authDid);
+      AcceptOfferInput(
+        acceptOfferAsDid: request.did,
+        mnemonic: request.mnemonic,
+        deviceToken: request.deviceToken,
+        platformType: request.platformType,
+        vcard: request.vcard,
+      ),
+      authDid,
+    );
   }
 
   Future<Offer> acceptOfferGroup(
@@ -292,15 +298,16 @@ class ApplicationFacade {
     String authDid,
   ) async {
     return _acceptanceService.finaliseAcceptance(
-        FinaliseAcceptanceInput(
-          mnemonic: request.mnemonic,
-          offerLink: request.offerLink,
-          didUsedForAcceptance: request.did,
-          theirDid: request.theirDid,
-          deviceToken: request.deviceToken,
-          platformType: request.platformType,
-        ),
-        authDid);
+      FinaliseAcceptanceInput(
+        mnemonic: request.mnemonic,
+        offerLink: request.offerLink,
+        didUsedForAcceptance: request.did,
+        theirDid: request.theirDid,
+        deviceToken: request.deviceToken,
+        platformType: request.platformType,
+      ),
+      authDid,
+    );
   }
 
   Future<DeviceTokenMapping> registerDevice(
@@ -318,12 +325,12 @@ class ApplicationFacade {
       );
     }
 
-    final platformRegistration =
-        await _deviceNotificationService.attemptPlatformRegistration(
-      platformType: request.platformType,
-      deviceToken: request.deviceToken,
-      consumerDid: authDid,
-    );
+    final platformRegistration = await _deviceNotificationService
+        .attemptPlatformRegistration(
+          platformType: request.platformType,
+          deviceToken: request.deviceToken,
+          consumerDid: authDid,
+        );
 
     return _deviceTokenMappingService.createMapping(
       RegisterDeviceInput(
@@ -340,13 +347,14 @@ class ApplicationFacade {
     String authDid,
   ) async {
     return _notificationService.createNotificationChannel(
-        CreateNotificationChannelInput(
-          didUsedForAcceptance: input.myDid,
-          theirDid: input.theirDid,
-          deviceToken: input.deviceToken,
-          platformType: input.platformType,
-        ),
-        authDid);
+      CreateNotificationChannelInput(
+        didUsedForAcceptance: input.myDid,
+        theirDid: input.theirDid,
+        deviceToken: input.deviceToken,
+        platformType: input.platformType,
+      ),
+      authDid,
+    );
   }
 
   Future<NotificationItem> notifyChannel(
@@ -384,13 +392,15 @@ class ApplicationFacade {
       ),
     );
 
-    return _notificationService.notifyAcceptance(NotifyAcceptanceInput(
-      offer: offer,
-      acceptance: acceptance,
-      didUsedForAcceptance: request.did,
-      senderInfo: request.senderInfo,
-      authDid: authDid,
-    ));
+    return _notificationService.notifyAcceptance(
+      NotifyAcceptanceInput(
+        offer: offer,
+        acceptance: acceptance,
+        didUsedForAcceptance: request.did,
+        senderInfo: request.senderInfo,
+        authDid: authDid,
+      ),
+    );
   }
 
   Future<NotificationItem> notifyAcceptanceGroup(
@@ -414,23 +424,25 @@ class ApplicationFacade {
       ),
     );
 
-    return _notificationService.notifyAcceptanceGroup(NotifyAcceptanceInput(
-      offer: offer,
-      acceptance: acceptance,
-      didUsedForAcceptance: request.did,
-      senderInfo: request.senderInfo,
-      authDid: authDid,
-    ));
+    return _notificationService.notifyAcceptanceGroup(
+      NotifyAcceptanceInput(
+        offer: offer,
+        acceptance: acceptance,
+        didUsedForAcceptance: request.did,
+        senderInfo: request.senderInfo,
+        authDid: authDid,
+      ),
+    );
   }
 
   Future<List<NotificationItem>> getPendingNotifications(
     GetPendingNotificationsRequest request,
   ) async {
-    final deviceTokenMapping =
-        await _deviceTokenMappingService.getDeviceTokenMapping(
-      devicePlatform: request.platformType,
-      deviceToken: request.deviceToken,
-    );
+    final deviceTokenMapping = await _deviceTokenMappingService
+        .getDeviceTokenMapping(
+          devicePlatform: request.platformType,
+          deviceToken: request.deviceToken,
+        );
 
     _logger.info('device token mapping found:');
     _logger.info('- [endpoint] ${deviceTokenMapping.platformEndpointArn}');
@@ -446,26 +458,21 @@ class ApplicationFacade {
   Future<Map> deletePendingNotifications(
     DeletePendingNotificationsRequest request,
   ) async {
-    final deviceTokenMapping =
-        await _deviceTokenMappingService.getDeviceTokenMapping(
-      devicePlatform: request.platformType,
-      deviceToken: request.deviceToken,
-    );
+    final deviceTokenMapping = await _deviceTokenMappingService
+        .getDeviceTokenMapping(
+          devicePlatform: request.platformType,
+          deviceToken: request.deviceToken,
+        );
 
     String deviceHash = _deviceTokenMappingService.generateDeviceHash(
       deviceTokenMapping.platformEndpointArn,
     );
 
-    final deletedNotificationIds =
-        await _notificationService.deletePendingNotifications(
-      deviceHash,
-      request.notificationIds,
-    );
+    final deletedNotificationIds = await _notificationService
+        .deletePendingNotifications(deviceHash, request.notificationIds);
 
-    final remainingNotifications =
-        await _notificationService.getPendingNotifications(
-      deviceHash,
-    );
+    final remainingNotifications = await _notificationService
+        .getPendingNotifications(deviceHash);
     _logger.info(
       '''There are ${remainingNotifications.length} outstanding notifications for target device''',
     );
@@ -498,18 +505,20 @@ class ApplicationFacade {
       ),
     );
 
-    await _groupService.addMemberToGroup(AddGroupMemberInput(
-      groupId: request.groupId,
-      offerLink: request.offerLink,
-      memberDid: request.memberDid,
-      memberPublicKey: request.publicKey,
-      memberReencryptionKey: request.reencryptionKey,
-      memberVCard: request.vcard,
-      platformType: acceptance.platformType,
-      platformEndpointArn: acceptance.platformEndpointArn,
-      controllingDid: acceptance.createdBy,
-      authDid: authDid,
-    ));
+    await _groupService.addMemberToGroup(
+      AddGroupMemberInput(
+        groupId: request.groupId,
+        offerLink: request.offerLink,
+        memberDid: request.memberDid,
+        memberPublicKey: request.publicKey,
+        memberReencryptionKey: request.reencryptionKey,
+        memberVCard: request.vcard,
+        platformType: acceptance.platformType,
+        platformEndpointArn: acceptance.platformEndpointArn,
+        controllingDid: acceptance.createdBy,
+        authDid: authDid,
+      ),
+    );
 
     final group = await _groupService.getGroup(request.groupId);
     await _notificationService.notifyGroupMembershipFinalised(
@@ -522,40 +531,40 @@ class ApplicationFacade {
     );
   }
 
-  Future<void> sendGroupMessage(
-    GroupSendMessage request,
-    String authDid,
-  ) {
-    return _groupService.sendMessage(SendMessageInput(
-      offerLink: request.offerLink,
-      groupDid: request.groupDid,
-      controllingDid: authDid,
-      messagePayload: request.payload,
-      incSeqNo: request.incSeqNo,
-      notify: request.notify,
-    ));
+  Future<void> sendGroupMessage(GroupSendMessage request, String authDid) {
+    return _groupService.sendMessage(
+      SendMessageInput(
+        offerLink: request.offerLink,
+        groupDid: request.groupDid,
+        controllingDid: authDid,
+        messagePayload: request.payload,
+        incSeqNo: request.incSeqNo,
+        notify: request.notify,
+      ),
+    );
   }
 
   Future<void> deregisterMemberFromGroup(
     GroupMemberDeregisterRequest request,
     String authDid,
   ) async {
-    return _groupService.deregisterMember(DeregisterMemberInput(
-      groupId: request.groupId,
-      controllingDid: authDid,
-      messageToRelay: request.messageToRelay,
-    ));
+    return _groupService.deregisterMember(
+      DeregisterMemberInput(
+        groupId: request.groupId,
+        controllingDid: authDid,
+        messageToRelay: request.messageToRelay,
+      ),
+    );
   }
 
-  Future<void> deleteGroup(
-    GroupDeleteRequest request,
-    String authDid,
-  ) async {
-    await _groupService.deleteGroup(DeleteGroupInput(
-      groupId: request.groupId,
-      messageToRelay: request.messageToRelay,
-      controllingDid: authDid,
-    ));
+  Future<void> deleteGroup(GroupDeleteRequest request, String authDid) async {
+    await _groupService.deleteGroup(
+      DeleteGroupInput(
+        groupId: request.groupId,
+        messageToRelay: request.messageToRelay,
+        controllingDid: authDid,
+      ),
+    );
   }
 
   Future<void> notifyOutreach(
@@ -563,7 +572,9 @@ class ApplicationFacade {
     String authDid,
   ) async {
     final offer = await _offerService.queryOfferByMnemonic(
-        OfferAccessType.queryNoLimits, request.mnemonic);
+      OfferAccessType.queryNoLimits,
+      request.mnemonic,
+    );
 
     if (offer == null) throw OfferNotFound(mnemonic: request.mnemonic);
 
@@ -579,6 +590,5 @@ class ApplicationFacade {
     String message, {
     required Object error,
     required StackTrace stackTrace,
-  }) =>
-      _logger.error(message, error: error, stackTrace: stackTrace);
+  }) => _logger.error(message, error: error, stackTrace: stackTrace);
 }

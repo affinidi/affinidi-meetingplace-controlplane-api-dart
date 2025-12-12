@@ -12,7 +12,8 @@ class KmsKeyPairUtilsP256 {
     // Must be compressed (33 bytes, prefix 0x02 or 0x03)
     if (key.length != 33 || !(key[0] == 0x02 || key[0] == 0x03)) {
       throw ArgumentError(
-          'Key must be 33-byte compressed or 65-byte uncompressed.');
+        'Key must be 33-byte compressed or 65-byte uncompressed.',
+      );
     }
 
     // convert to hex string (no 0x prefix)
@@ -94,13 +95,15 @@ class KmsKeyPairUtilsP256 {
     }
 
     throw ArgumentError(
-        'Could not find uncompressed EC public key in DER data');
+      'Could not find uncompressed EC public key in DER data',
+    );
   }
 
   static Uint8List compressP256Key(Uint8List uncompressedKey) {
     if (uncompressedKey.length != 65 || uncompressedKey[0] != 0x04) {
       throw ArgumentError(
-          'Invalid uncompressed P-256 key format. Expected 65 bytes starting with 0x04');
+        'Invalid uncompressed P-256 key format. Expected 65 bytes starting with 0x04',
+      );
     }
 
     // Split into x and y coordinates (32 bytes each)
@@ -121,7 +124,8 @@ class KmsKeyPairUtilsP256 {
   static String formatForAWSKMS(Uint8List uncompressedKey) {
     if (uncompressedKey.length != 65 || uncompressedKey[0] != 0x04) {
       throw ArgumentError(
-          'Invalid uncompressed key format. Must be 65 bytes starting with 0x04');
+        'Invalid uncompressed key format. Must be 65 bytes starting with 0x04',
+      );
     }
 
     // Extract coordinates
@@ -137,12 +141,31 @@ class KmsKeyPairUtilsP256 {
 
   static Uint8List _createDEREncodedKey(Uint8List xCoord, Uint8List yCoord) {
     // secp256k1 OID: 1.3.132.0.10
-    final p256OID = Uint8List.fromList(
-        [0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07]);
+    final p256OID = Uint8List.fromList([
+      0x06,
+      0x08,
+      0x2A,
+      0x86,
+      0x48,
+      0xCE,
+      0x3D,
+      0x03,
+      0x01,
+      0x07,
+    ]);
 
     // EC Public Key OID: 1.2.840.10045.2.1
-    final ecPublicKeyOID = Uint8List.fromList(
-        [0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01]);
+    final ecPublicKeyOID = Uint8List.fromList([
+      0x06,
+      0x07,
+      0x2A,
+      0x86,
+      0x48,
+      0xCE,
+      0x3D,
+      0x02,
+      0x01,
+    ]);
 
     // Reconstruct uncompressed point
     final publicKeyPoint = Uint8List(65);
@@ -215,11 +238,13 @@ class KmsKeyPairUtilsP256 {
   }
 
   Uint8List _integerToBytes(BigInt value, int length) {
-    var bytes =
-        value.toUnsigned(8 * length).toRadixString(16).padLeft(length * 2, '0');
+    var bytes = value
+        .toUnsigned(8 * length)
+        .toRadixString(16)
+        .padLeft(length * 2, '0');
     return Uint8List.fromList([
       for (int i = 0; i < bytes.length; i += 2)
-        int.parse(bytes.substring(i, i + 2), radix: 16)
+        int.parse(bytes.substring(i, i + 2), radix: 16),
     ]);
   }
 

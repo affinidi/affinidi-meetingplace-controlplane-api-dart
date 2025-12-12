@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 RegisterOfferErrorResponse _$RegisterOfferErrorResponseFromJson(
-        Map<String, dynamic> json) =>
-    RegisterOfferErrorResponse(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-    );
+  Map<String, dynamic> json,
+) => RegisterOfferErrorResponse(
+  errorCode: json['errorCode'] as String,
+  errorMessage: json['errorMessage'] as String,
+);
 
 Map<String, dynamic> _$RegisterOfferErrorResponseToJson(
-        RegisterOfferErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  RegisterOfferErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};
