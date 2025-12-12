@@ -23,7 +23,11 @@ class RegisterOfferGroupRequestValidator extends LucidValidator {
     ruleFor(
       (request) => request['contactCard'] as String?,
       key: 'contactCard',
-    ).notEmptyOrNull();
+    ).must(
+      (value) => value != null,
+      'contactCard is required',
+      'contactCard_required',
+    );
 
     ruleFor(
       (request) => request['deviceToken'] as String?,
@@ -80,7 +84,11 @@ class RegisterOfferGroupRequestValidator extends LucidValidator {
     ruleFor(
       (request) => request['memberContactCard'] as String?,
       key: 'memberContactCard',
-    ).notEmptyOrNull();
+    ).must(
+      (value) => value != null,
+      'memberContactCard is required',
+      'memberContactCard_required',
+    );
 
     ruleFor((request) => request['maximumUsage'], key: 'maximumUsage').must(
       (value) => value == null || value >= 1,

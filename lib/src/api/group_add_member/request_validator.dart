@@ -35,10 +35,13 @@ class GroupAddMemberRequestValidator extends LucidValidator {
       (request) => request['publicKey'] as String?,
       key: 'publicKey',
     ).notEmptyOrNull();
-
     ruleFor(
       (request) => request['contactCard'] as String?,
       key: 'contactCard',
-    ).notEmptyOrNull();
+    ).must(
+      (value) => value != null,
+      'contactCard is required',
+      'contactCardRequired',
+    );
   }
 }
