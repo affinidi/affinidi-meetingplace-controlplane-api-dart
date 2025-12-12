@@ -11,7 +11,7 @@ RegisterOfferRequest getRegisterOfferRequestMock({
   offerName: 'test offer',
   offerDescription: 'offer used in tests',
   didcommMessage: 'ZGlkY29tbW1lc3NhZ2UK',
-  vcard: 'e30K',
+  contactCard: 'e30K',
   validUntil: validUntil,
   maximumUsage: maximumUsage,
   deviceToken: deviceToken,

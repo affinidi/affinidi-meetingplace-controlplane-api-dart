@@ -5,13 +5,14 @@ import 'package:dotenv/dotenv.dart';
 
 import 'lib/client_helper.dart';
 
-String generateVCard(String fullName) {
-  final vcard =
-      '''BEGIN:VCARD
-VERSION:4.0
-FN:$fullName
-END:VCARD''';
-  return base64Encode(utf8.encode(vcard));
+String generateContactCard(String fullName) {
+  final card = jsonEncode({
+    'firstName': fullName.split(' ').first,
+    'lastName': fullName.split(' ').length > 1
+        ? fullName.split(' ').sublist(1).join(' ')
+        : ''
+  });
+  return base64Encode(utf8.encode(card));
 }
 
 String generateDidcommInvitation(String did, String endpoint) {
@@ -45,8 +46,8 @@ Future<void> main() async {
   );
 
   print('1. Creating Alice\'s DID and authenticating...');
-  final (aliceDidManager, aliceKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (aliceDidManager, aliceKeyPair) =
+      await helper.createDidManagerWithKeyPair();
   final aliceDidDoc = await aliceDidManager.getDidDocument();
   final aliceToken = await helper.authenticate(aliceDidManager, aliceKeyPair);
   print('   Alice DID: ${aliceDidDoc.id}');
@@ -73,7 +74,7 @@ Future<void> main() async {
         aliceDidDoc.id,
         'https://mediator.yourdomain.com',
       ),
-      'vcard': generateVCard('Alice Example'),
+      'contactCard': generateContactCard('Alice Example'),
       'deviceToken': 'example-device-token-alice',
       'platformType': 'PUSH_NOTIFICATION',
       'mediatorDid': 'did:web:mediator',
@@ -88,8 +89,8 @@ Future<void> main() async {
   print('   Offer Link: ${registerResponse.data['offerLink']}\n');
 
   print('4. Creating Bob\'s DID and authenticating...');
-  final (bobDidManager, bobKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (bobDidManager, bobKeyPair) =
+      await helper.createDidManagerWithKeyPair();
   final bobDidDoc = await bobDidManager.getDidDocument();
   final bobToken = await helper.authenticate(bobDidManager, bobKeyPair);
   print('   Bob DID: ${bobDidDoc.id}');
@@ -121,7 +122,7 @@ Future<void> main() async {
       'mnemonic': mnemonic,
       'deviceToken': 'example-device-token-bob',
       'platformType': 'PUSH_NOTIFICATION',
-      'vcard': generateVCard('Bob Example'),
+      'contactCard': generateContactCard('Bob Example'),
     },
   );
   print('   Offer Link: ${acceptResponse.data['offerLink']}');

@@ -11,7 +11,7 @@ class RegisterOfferInput {
     required this.offerDescription,
     required this.offerType,
     required this.didcommMessage,
-    required this.vcard,
+    required this.contactCard,
     required this.deviceToken,
     required this.platformType,
     required this.mediatorDid,
@@ -31,7 +31,7 @@ class RegisterOfferInput {
   final String offerDescription;
   final OfferType offerType;
   final String didcommMessage;
-  final String vcard;
+  final String contactCard;
   final String deviceToken;
   final PlatformType platformType;
   final String mediatorDid;

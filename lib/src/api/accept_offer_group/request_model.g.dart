@@ -13,7 +13,7 @@ AcceptOfferGroupRequest _$AcceptOfferGroupRequestFromJson(
   mnemonic: json['mnemonic'] as String,
   deviceToken: json['deviceToken'] as String,
   platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
-  vcard: json['vcard'] as String,
+  contactCard: json['contactCard'] as String,
 );
 
 Map<String, dynamic> _$AcceptOfferGroupRequestToJson(
@@ -23,7 +23,7 @@ Map<String, dynamic> _$AcceptOfferGroupRequestToJson(
   'mnemonic': instance.mnemonic,
   'deviceToken': instance.deviceToken,
   'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
-  'vcard': instance.vcard,
+  'contactCard': instance.contactCard,
 };
 
 const _$PlatformTypeEnumMap = {

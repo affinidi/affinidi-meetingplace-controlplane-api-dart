@@ -130,7 +130,7 @@ class GroupService {
           memberDid: input.memberDid,
           memberPublicKey: input.memberPublicKey,
           memberReencryptionKey: input.memberReencryptionKey,
-          memberVCard: input.memberVCard,
+          memberContactCard: input.memberContactCard,
           platformEndpointArn: input.platformEndpointArn,
           platformType: input.platformType,
           controllingDid: input.controllingDid,

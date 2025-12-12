@@ -10,5 +10,5 @@
 | **acceptOfferAsDid** | **String** | Decentralised Identifier (DID) of when the member accepted the offer. | **`Required`**   |
 | **reencryptionKey** | **String** | The reencryption key for the group chat member. | **`Required`**   |
 | **publicKey** | **String** | The public key information of the group chat member. | **`Required`**   |
-| **vcard** | **String** | The vCard of the member to add to the group chat. | **`Required`**   |
+| **contactCard** | **String** | The ContactCard of the member to add to the group chat encoded in base64 format. | **`Required`**   |
 

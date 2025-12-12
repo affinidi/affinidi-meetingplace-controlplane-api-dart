@@ -26,7 +26,7 @@ class RegisterOfferGroupRequest {
     required this.offerName,
     required this.offerDescription,
     required this.didcommMessage,
-    required this.vcard,
+    required this.contactCard,
     required this.deviceToken,
     required this.platformType,
     required this.mediatorDid,
@@ -35,7 +35,7 @@ class RegisterOfferGroupRequest {
     required this.adminReencryptionKey,
     required this.adminDid,
     required this.adminPublicKey,
-    required this.memberVCard,
+    required this.memberContactCard,
     this.validUntil,
     this.maximumUsage,
     this.customPhrase,
@@ -45,7 +45,7 @@ class RegisterOfferGroupRequest {
   final String offerName;
   final String offerDescription;
   final String didcommMessage;
-  final String vcard;
+  final String contactCard;
   final String? validUntil;
   final int? maximumUsage;
   final String deviceToken;
@@ -56,7 +56,7 @@ class RegisterOfferGroupRequest {
   final String adminReencryptionKey;
   final String adminDid;
   final String adminPublicKey;
-  final String memberVCard;
+  final String memberContactCard;
 
   String? customPhrase;
   bool? isSearchable;

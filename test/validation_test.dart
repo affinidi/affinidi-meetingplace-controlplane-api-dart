@@ -26,7 +26,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -44,7 +44,7 @@ void main() {
         offerName: '',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -63,7 +63,7 @@ void main() {
         offerName: 'a' * 501,
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -82,7 +82,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'a' * 2001,
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -101,7 +101,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'a' * 2049,
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -120,7 +120,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -139,7 +139,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -164,7 +164,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -188,7 +188,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -208,7 +208,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -228,7 +228,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -250,7 +250,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -259,7 +259,7 @@ void main() {
         adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
         adminPublicKey: 'publickey',
-        memberVCard: 'membervcard',
+        memberContactCard: 'memberContactCard',
       );
 
       final result = RegisterOfferGroupRequestValidator().validate(
@@ -273,7 +273,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -282,7 +282,7 @@ void main() {
         adminReencryptionKey: '',
         adminDid: 'did:example:admin',
         adminPublicKey: 'publickey',
-        memberVCard: 'membervcard',
+        memberContactCard: 'memberContactCard',
       );
 
       final result = RegisterOfferGroupRequestValidator().validate(
@@ -305,7 +305,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -314,7 +314,7 @@ void main() {
         adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
         adminPublicKey: 'publickey',
-        memberVCard: 'membervcard',
+        memberContactCard: 'memberContactCard',
         validUntil: futureDate,
       );
 
@@ -334,7 +334,7 @@ void main() {
         offerName: 'test',
         offerDescription: 'description',
         didcommMessage: 'message',
-        vcard: 'vcard',
+        contactCard: 'contactCard',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
         mediatorDid: 'did:example:123',
@@ -343,7 +343,7 @@ void main() {
         adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
         adminPublicKey: 'publickey',
-        memberVCard: 'membervcard',
+        memberContactCard: 'memberContactCard',
         validUntil: pastDate,
       );
 
@@ -362,7 +362,7 @@ void main() {
         mnemonic: 'word1 word2 word3',
         deviceToken: 'token',
         platformType: PlatformType.DIDCOMM,
-        vcard: 'vcard',
+        contactCard: 'contactCard',
       );
 
       final result = AcceptOfferRequestValidator().validate(request.toJson());
@@ -375,7 +375,7 @@ void main() {
         mnemonic: 'word1 word2 word3',
         deviceToken: 'token',
         platformType: PlatformType.DIDCOMM,
-        vcard: 'vcard',
+        contactCard: 'contactCard',
       );
 
       final result = AcceptOfferRequestValidator().validate(request.toJson());
@@ -389,7 +389,7 @@ void main() {
         mnemonic: '',
         deviceToken: 'token',
         platformType: PlatformType.DIDCOMM,
-        vcard: 'vcard',
+        contactCard: 'contactCard',
       );
 
       final result = AcceptOfferRequestValidator().validate(request.toJson());
@@ -397,18 +397,18 @@ void main() {
       expect(result.exceptions.any((e) => e.key == 'mnemonic'), true);
     });
 
-    test('fails when vcard is empty', () {
+    test('fails when contactCard is empty', () {
       final request = AcceptOfferRequest(
         did: 'did:example:123',
         mnemonic: 'word1 word2 word3',
         deviceToken: 'token',
         platformType: PlatformType.DIDCOMM,
-        vcard: '',
+        contactCard: '',
       );
 
       final result = AcceptOfferRequestValidator().validate(request.toJson());
       expect(result.isValid, false);
-      expect(result.exceptions.any((e) => e.key == 'vcard'), true);
+      expect(result.exceptions.any((e) => e.key == 'contactCard'), true);
     });
 
     test('fails when deviceToken exceeds 2048 characters', () {
@@ -417,7 +417,7 @@ void main() {
         mnemonic: 'word1 word2 word3',
         deviceToken: 'a' * 2049,
         platformType: PlatformType.DIDCOMM,
-        vcard: 'vcard',
+        contactCard: 'contactCard',
       );
 
       final result = AcceptOfferRequestValidator().validate(request.toJson());
@@ -454,7 +454,7 @@ void main() {
         mnemonic: 'word1 word2 word3',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
-        vcard: 'vcard',
+        contactCard: 'contactCard',
       );
 
       final result = AcceptOfferGroupRequestValidator().validate(
@@ -469,7 +469,7 @@ void main() {
         mnemonic: 'word1 word2 word3',
         deviceToken: 'token',
         platformType: PlatformType.PUSH_NOTIFICATION,
-        vcard: 'vcard',
+        contactCard: 'contactCard',
       );
 
       final result = AcceptOfferGroupRequestValidator().validate(

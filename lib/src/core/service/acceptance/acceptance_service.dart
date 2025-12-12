@@ -62,7 +62,7 @@ class AcceptanceService {
       id: acceptanceId,
       did: input.acceptOfferAsDid,
       offerLink: offer.offerLink,
-      vcard: input.vcard,
+      contactCard: input.contactCard,
       status: Status.created,
       platformEndpointArn: deviceTokenMapping.platformEndpointArn,
       platformType: deviceTokenMapping.platformType,
