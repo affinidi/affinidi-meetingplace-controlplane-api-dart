@@ -30,8 +30,10 @@ class Redis implements Storage {
 
   @override
   Future<Redis> connect() async {
-    _command =
-        await RedisConnection().connect(getEnv('STORAGE_ENDPOINT'), 6379);
+    _command = await RedisConnection().connect(
+      getEnv('STORAGE_ENDPOINT'),
+      6379,
+    );
 
     return this;
   }
@@ -104,7 +106,10 @@ class Redis implements Storage {
 
   @override
   Future<T?> findOneById<T extends Entity>(
-      String entityName, String id, EntityFromJson<T> fromJson) async {
+    String entityName,
+    String id,
+    EntityFromJson<T> fromJson,
+  ) async {
     _command ??= (await connect())._command;
     final result = await _command?.send_object(['GET', "$entityName#$id"]);
 
@@ -123,8 +128,14 @@ class Redis implements Storage {
   Future<int> count(String entityName) async {
     // TODO: iterate if count > 500
     _command ??= (await connect())._command;
-    var response = await _command
-        ?.send_object(['SCAN', '0', 'MATCH', '$entityName*', 'COUNT', '500']);
+    var response = await _command?.send_object([
+      'SCAN',
+      '0',
+      'MATCH',
+      '$entityName*',
+      'COUNT',
+      '500',
+    ]);
 
     return (response[1] as List<dynamic>).length;
   }
@@ -155,8 +166,11 @@ class Redis implements Storage {
       JsonEncoder().convert(object),
     ]);
 
-    await _command?.send_object(
-        ['SADD', "$listName#${object.getListId()}", object.getId()]);
+    await _command?.send_object([
+      'SADD',
+      "$listName#${object.getListId()}",
+      object.getId(),
+    ]);
     return object;
   }
 
@@ -179,12 +193,10 @@ class Redis implements Storage {
   }
 
   Future<void> _setExpiry(Command command, String key, DateTime ttl) async {
-    await command.send_object(
-      [
-        'EXPIRE',
-        key,
-        ttl.difference(DateTime.now().toUtc()).inSeconds,
-      ],
-    );
+    await command.send_object([
+      'EXPIRE',
+      key,
+      ttl.difference(DateTime.now().toUtc()).inSeconds,
+    ]);
   }
 }

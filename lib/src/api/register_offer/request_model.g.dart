@@ -7,40 +7,40 @@ part of 'request_model.dart';
 // **************************************************************************
 
 RegisterOfferRequest _$RegisterOfferRequestFromJson(
-        Map<String, dynamic> json) =>
-    RegisterOfferRequest(
-      offerName: json['offerName'] as String,
-      offerDescription: json['offerDescription'] as String,
-      didcommMessage: json['didcommMessage'] as String,
-      vcard: json['vcard'] as String,
-      deviceToken: json['deviceToken'] as String,
-      platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
-      mediatorDid: json['mediatorDid'] as String,
-      mediatorEndpoint: json['mediatorEndpoint'] as String,
-      mediatorWSSEndpoint: json['mediatorWSSEndpoint'] as String,
-      contactAttributes: (json['contactAttributes'] as num).toInt(),
-      validUntil: json['validUntil'] as String?,
-      maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
-      customPhrase: json['customPhrase'],
-    );
+  Map<String, dynamic> json,
+) => RegisterOfferRequest(
+  offerName: json['offerName'] as String,
+  offerDescription: json['offerDescription'] as String,
+  didcommMessage: json['didcommMessage'] as String,
+  vcard: json['vcard'] as String,
+  deviceToken: json['deviceToken'] as String,
+  platformType: $enumDecode(_$PlatformTypeEnumMap, json['platformType']),
+  mediatorDid: json['mediatorDid'] as String,
+  mediatorEndpoint: json['mediatorEndpoint'] as String,
+  mediatorWSSEndpoint: json['mediatorWSSEndpoint'] as String,
+  contactAttributes: (json['contactAttributes'] as num).toInt(),
+  validUntil: json['validUntil'] as String?,
+  maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
+  customPhrase: json['customPhrase'],
+);
 
 Map<String, dynamic> _$RegisterOfferRequestToJson(
-        RegisterOfferRequest instance) =>
-    <String, dynamic>{
-      'offerName': instance.offerName,
-      'offerDescription': instance.offerDescription,
-      'didcommMessage': instance.didcommMessage,
-      'vcard': instance.vcard,
-      'deviceToken': instance.deviceToken,
-      'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
-      'mediatorDid': instance.mediatorDid,
-      'mediatorEndpoint': instance.mediatorEndpoint,
-      'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
-      'contactAttributes': instance.contactAttributes,
-      'maximumUsage': instance.maximumUsage,
-      'validUntil': instance.validUntil,
-      'customPhrase': instance.customPhrase,
-    };
+  RegisterOfferRequest instance,
+) => <String, dynamic>{
+  'offerName': instance.offerName,
+  'offerDescription': instance.offerDescription,
+  'didcommMessage': instance.didcommMessage,
+  'vcard': instance.vcard,
+  'deviceToken': instance.deviceToken,
+  'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
+  'mediatorDid': instance.mediatorDid,
+  'mediatorEndpoint': instance.mediatorEndpoint,
+  'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
+  'contactAttributes': instance.contactAttributes,
+  'maximumUsage': instance.maximumUsage,
+  'validUntil': instance.validUntil,
+  'customPhrase': instance.customPhrase,
+};
 
 const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',

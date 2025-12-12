@@ -7,13 +7,9 @@ part of 'request_model.dart';
 // **************************************************************************
 
 AuthChallengeRequest _$AuthChallengeRequestFromJson(
-        Map<String, dynamic> json) =>
-    AuthChallengeRequest(
-      did: json['did'] as String,
-    );
+  Map<String, dynamic> json,
+) => AuthChallengeRequest(did: json['did'] as String);
 
 Map<String, dynamic> _$AuthChallengeRequestToJson(
-        AuthChallengeRequest instance) =>
-    <String, dynamic>{
-      'did': instance.did,
-    };
+  AuthChallengeRequest instance,
+) => <String, dynamic>{'did': instance.did};

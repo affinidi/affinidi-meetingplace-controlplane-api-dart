@@ -8,9 +8,9 @@ class NotifyInvitationOutreachNotification extends DeviceNotification {
     required super.data,
     required String sender,
   }) : super(
-          subtitle: 'Request to connect',
-          body: '$sender has invited you to connect with them',
-          notificationType: NotificationItemType.invitationOutreach,
-          threadId: NotificationStackGroupingTypes.invitationOutreach.value,
-        );
+         subtitle: 'Request to connect',
+         body: '$sender has invited you to connect with them',
+         notificationType: NotificationItemType.invitationOutreach,
+         threadId: NotificationStackGroupingTypes.invitationOutreach.value,
+       );
 }

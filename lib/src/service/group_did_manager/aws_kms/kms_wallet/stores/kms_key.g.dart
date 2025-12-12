@@ -7,13 +7,13 @@ part of 'kms_key.dart';
 // **************************************************************************
 
 KmsKey _$KmsKeyFromJson(Map<String, dynamic> json) => KmsKey(
-      ttl: json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String),
-      keyId: json['keyId'] as String,
-      publicKey: json['publicKey'] as String,
-    );
+  ttl: json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String),
+  keyId: json['keyId'] as String,
+  publicKey: json['publicKey'] as String,
+);
 
 Map<String, dynamic> _$KmsKeyToJson(KmsKey instance) => <String, dynamic>{
-      'ttl': instance.ttl?.toIso8601String(),
-      'keyId': instance.keyId,
-      'publicKey': instance.publicKey,
-    };
+  'ttl': instance.ttl?.toIso8601String(),
+  'keyId': instance.keyId,
+  'publicKey': instance.publicKey,
+};

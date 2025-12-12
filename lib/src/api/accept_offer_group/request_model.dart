@@ -21,8 +21,9 @@ class AcceptOfferGroupRequest {
   factory AcceptOfferGroupRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        AcceptOfferGroupRequestValidator().validate(params);
+    final validationResult = AcceptOfferGroupRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

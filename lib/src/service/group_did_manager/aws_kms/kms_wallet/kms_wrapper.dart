@@ -10,11 +10,7 @@ enum KeyAgreementAlgorithm {
   final String value;
 }
 
-enum KeyUsageTypeExtension {
-  signVerify,
-  encryptDecrypt,
-  keyAgreement,
-}
+enum KeyUsageTypeExtension { signVerify, encryptDecrypt, keyAgreement }
 
 extension KeyUsageTypeValueExtension on KeyUsageTypeExtension {
   String toValue() {
@@ -37,16 +33,14 @@ class KMSWrapper implements KMS {
     s.AwsClientCredentialsProvider? credentialsProvider,
     s.Client? client,
     String? endpointUrl,
-  })  : _inner = inner,
-        _wrapperProtocol = s.JsonProtocol(
-          service: s.ServiceMetadata(
-            endpointPrefix: 'kms',
-          ),
-          region: region,
-          credentials: credentials,
-          credentialsProvider: credentialsProvider,
-          endpointUrl: endpointUrl,
-        );
+  }) : _inner = inner,
+       _wrapperProtocol = s.JsonProtocol(
+         service: s.ServiceMetadata(endpointPrefix: 'kms'),
+         region: region,
+         credentials: credentials,
+         credentialsProvider: credentialsProvider,
+         endpointUrl: endpointUrl,
+       );
   final s.JsonProtocol _wrapperProtocol;
 
   final Map<String, s.AwsExceptionFn> _exceptionMap = {
@@ -66,17 +60,11 @@ class KMSWrapper implements KMS {
     KeyAgreementAlgorithm keyAgreementAlg = KeyAgreementAlgorithm.ecdh,
   }) async {
     ArgumentError.checkNotNull(keyId, 'keyId');
-    s.validateStringLength(
-      'keyId',
-      keyId,
-      1,
-      2048,
-      isRequired: true,
-    );
+    s.validateStringLength('keyId', keyId, 1, 2048, isRequired: true);
 
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': 'TrentService.DeriveSharedSecret'
+      'X-Amz-Target': 'TrentService.DeriveSharedSecret',
     };
 
     final jsonResponse = await _wrapperProtocol.send(
@@ -106,27 +94,12 @@ class KMSWrapper implements KMS {
     String? policy,
     List<Tag>? tags,
   }) async {
-    s.validateStringLength(
-      'customKeyStoreId',
-      customKeyStoreId,
-      1,
-      64,
-    );
-    s.validateStringLength(
-      'description',
-      description,
-      0,
-      8192,
-    );
-    s.validateStringLength(
-      'policy',
-      policy,
-      1,
-      131072,
-    );
+    s.validateStringLength('customKeyStoreId', customKeyStoreId, 1, 64);
+    s.validateStringLength('description', description, 0, 8192);
+    s.validateStringLength('policy', policy, 1, 131072);
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': 'TrentService.CreateKey'
+      'X-Amz-Target': 'TrentService.CreateKey',
     };
     final jsonResponse = await _wrapperProtocol.send(
       method: 'POST',
@@ -160,16 +133,10 @@ class KMSWrapper implements KMS {
     List<String>? grantTokens,
   }) async {
     ArgumentError.checkNotNull(keyId, 'keyId');
-    s.validateStringLength(
-      'keyId',
-      keyId,
-      1,
-      2048,
-      isRequired: true,
-    );
+    s.validateStringLength('keyId', keyId, 1, 2048, isRequired: true);
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': 'TrentService.GetPublicKey'
+      'X-Amz-Target': 'TrentService.GetPublicKey',
     };
     final jsonResponse = await _wrapperProtocol.send(
       method: 'POST',
@@ -186,8 +153,9 @@ class KMSWrapper implements KMS {
       customerMasterKeySpec:
           (jsonResponse.body['CustomerMasterKeySpec'] as String?)
               ?.toCustomerMasterKeySpec(),
-      publicKey:
-          s.decodeNullableUint8List(jsonResponse.body['PublicKey'] as String?),
+      publicKey: s.decodeNullableUint8List(
+        jsonResponse.body['PublicKey'] as String?,
+      ),
     );
   }
 

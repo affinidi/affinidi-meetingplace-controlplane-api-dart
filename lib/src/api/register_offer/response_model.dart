@@ -36,7 +36,6 @@ class RegisterOfferResponse {
   final int? maximumUsage;
 
   @override
-  String toString() => JsonEncoder().convert(
-        _$RegisterOfferResponseToJson(this),
-      );
+  String toString() =>
+      JsonEncoder().convert(_$RegisterOfferResponseToJson(this));
 }

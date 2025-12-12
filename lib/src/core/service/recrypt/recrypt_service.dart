@@ -19,6 +19,8 @@ class RecryptService {
     final reEncryptionKey = ReEncryptionKey.fromBase64(reencryptionKeyBase64);
 
     return _recrypt.reEncrypt(
-        Capsule.fromBase64(capsuleBase64), reEncryptionKey);
+      Capsule.fromBase64(capsuleBase64),
+      reEncryptionKey,
+    );
   }
 }

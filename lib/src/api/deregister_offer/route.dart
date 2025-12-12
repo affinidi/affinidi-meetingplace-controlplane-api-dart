@@ -18,10 +18,7 @@ Future<Response> deregisterOffer(
       await request.readAsString(),
     );
 
-    await facade.deregisterOffer(
-      deregisterOfferRequest,
-      getAuthDid(request),
-    );
+    await facade.deregisterOffer(deregisterOfferRequest, getAuthDid(request));
 
     return Response.ok(DeregisterOfferResponse.success().toString());
   } on RequestValidationException catch (e) {
@@ -41,8 +38,11 @@ Future<Response> deregisterOffer(
       DeregisterOfferErrorResponse.permissionDenied().toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Deregister offer action failed: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Deregister offer action failed: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

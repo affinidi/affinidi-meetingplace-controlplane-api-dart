@@ -14,8 +14,11 @@ enum AuthAuthenticateErrorCodes {
 
 @JsonSerializable()
 class AuthAuthenticateErrorResponse {
-  AuthAuthenticateErrorResponse(
-      {required this.errorCode, required this.error, required this.issue});
+  AuthAuthenticateErrorResponse({
+    required this.errorCode,
+    required this.error,
+    required this.issue,
+  });
 
   factory AuthAuthenticateErrorResponse.invalidChallengeResponse(String issue) {
     return AuthAuthenticateErrorResponse(

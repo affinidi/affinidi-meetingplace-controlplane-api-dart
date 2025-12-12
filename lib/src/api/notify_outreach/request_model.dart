@@ -8,10 +8,7 @@ part 'request_model.g.dart';
 
 @JsonSerializable()
 class NotifyOutreachRequest {
-  NotifyOutreachRequest({
-    required this.mnemonic,
-    required this.senderInfo,
-  });
+  NotifyOutreachRequest({required this.mnemonic, required this.senderInfo});
 
   factory NotifyOutreachRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);

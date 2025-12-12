@@ -15,8 +15,10 @@ enum AcceptOfferErrorCodes {
 
 @JsonSerializable()
 class AcceptOfferErrorResponse {
-  AcceptOfferErrorResponse(
-      {required this.errorCode, required this.errorMessage});
+  AcceptOfferErrorResponse({
+    required this.errorCode,
+    required this.errorMessage,
+  });
 
   factory AcceptOfferErrorResponse.offerNotFound() {
     return AcceptOfferErrorResponse(

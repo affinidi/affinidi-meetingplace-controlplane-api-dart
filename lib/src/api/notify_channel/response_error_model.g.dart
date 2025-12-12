@@ -7,15 +7,15 @@ part of 'response_error_model.dart';
 // **************************************************************************
 
 NotifyChannelErrorResponse _$NotifyChannelErrorResponseFromJson(
-        Map<String, dynamic> json) =>
-    NotifyChannelErrorResponse(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-    );
+  Map<String, dynamic> json,
+) => NotifyChannelErrorResponse(
+  errorCode: json['errorCode'] as String,
+  errorMessage: json['errorMessage'] as String,
+);
 
 Map<String, dynamic> _$NotifyChannelErrorResponseToJson(
-        NotifyChannelErrorResponse instance) =>
-    <String, dynamic>{
-      'errorCode': instance.errorCode,
-      'errorMessage': instance.errorMessage,
-    };
+  NotifyChannelErrorResponse instance,
+) => <String, dynamic>{
+  'errorCode': instance.errorCode,
+  'errorMessage': instance.errorMessage,
+};

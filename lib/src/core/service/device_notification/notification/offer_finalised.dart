@@ -7,9 +7,9 @@ class OfferFinalisedDeviceNotification extends DeviceNotification {
     required super.badgeCount,
     required super.data,
   }) : super(
-          subtitle: 'Connection completed!',
-          body: 'Connection request approved!',
-          notificationType: NotificationItemType.offerFinalised,
-          threadId: NotificationStackGroupingTypes.offerFinalised.value,
-        );
+         subtitle: 'Connection completed!',
+         body: 'Connection request approved!',
+         notificationType: NotificationItemType.offerFinalised,
+         threadId: NotificationStackGroupingTypes.offerFinalised.value,
+       );
 }

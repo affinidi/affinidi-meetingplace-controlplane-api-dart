@@ -7,13 +7,9 @@ part of 'response_model.dart';
 // **************************************************************************
 
 CheckOfferPhraseResponse _$CheckOfferPhraseResponseFromJson(
-        Map<String, dynamic> json) =>
-    CheckOfferPhraseResponse(
-      isInUse: json['isInUse'] as bool,
-    );
+  Map<String, dynamic> json,
+) => CheckOfferPhraseResponse(isInUse: json['isInUse'] as bool);
 
 Map<String, dynamic> _$CheckOfferPhraseResponseToJson(
-        CheckOfferPhraseResponse instance) =>
-    <String, dynamic>{
-      'isInUse': instance.isInUse,
-    };
+  CheckOfferPhraseResponse instance,
+) => <String, dynamic>{'isInUse': instance.isInUse};

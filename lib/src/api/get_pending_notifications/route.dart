@@ -11,11 +11,12 @@ Future<Response> getPendingNotifications(
   try {
     final getPendingNotificationsRequest =
         GetPendingNotificationsRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
-    final pendingNotifications =
-        await facade.getPendingNotifications(getPendingNotificationsRequest);
+    final pendingNotifications = await facade.getPendingNotifications(
+      getPendingNotificationsRequest,
+    );
 
     facade.logInfo('Found ${pendingNotifications.length} notifications');
     return Response.ok(
@@ -26,8 +27,11 @@ Future<Response> getPendingNotifications(
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Error while getting pending notifications: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error while getting pending notifications: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

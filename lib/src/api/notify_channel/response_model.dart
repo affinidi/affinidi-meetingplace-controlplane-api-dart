@@ -11,9 +11,7 @@ class NotifyChannelResponse {
   factory NotifyChannelResponse.fromNotificationItem(
     NotificationItem notificationItem,
   ) {
-    return NotifyChannelResponse(
-      notificationId: notificationItem.getId(),
-    );
+    return NotifyChannelResponse(notificationId: notificationItem.getId());
   }
   final String? notificationId;
 

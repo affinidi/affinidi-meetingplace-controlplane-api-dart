@@ -22,8 +22,9 @@ class LocalDidResolver implements DidResolver {
 
   Future<DidDocument> _resolveLocalDid(String did) async {
     var port = did.split(':').last;
-    var res = await http
-        .get(Uri.parse('http://localhost:$port/.well-known/did.json'));
+    var res = await http.get(
+      Uri.parse('http://localhost:$port/.well-known/did.json'),
+    );
     if (res.statusCode == 200) {
       return DidDocument.fromJson(res.body);
     } else {

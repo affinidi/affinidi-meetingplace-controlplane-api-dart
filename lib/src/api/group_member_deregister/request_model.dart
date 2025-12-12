@@ -12,8 +12,9 @@ class GroupMemberDeregisterRequest {
   factory GroupMemberDeregisterRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        GroupMemberDeregisterRequestValidator().validate(params);
+    final validationResult = GroupMemberDeregisterRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

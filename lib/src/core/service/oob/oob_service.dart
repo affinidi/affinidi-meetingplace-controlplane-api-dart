@@ -8,8 +8,8 @@ import 'package:uuid/uuid.dart';
 
 class OobService {
   OobService({required Storage storage, required Logger logger})
-      : _storage = storage,
-        _logger = logger;
+    : _storage = storage,
+      _logger = logger;
 
   final Storage _storage;
   final Logger _logger;
@@ -24,14 +24,16 @@ class OobService {
     );
     _logger.info('ttl for oob: $ttl');
 
-    return _storage.create(Oob(
-      oobId: oobId,
-      didcommMessage: input.didcommMessage,
-      mediatorDid: input.mediatorDid,
-      mediatorEndpoint: input.mediatorEndpoint,
-      mediatorWSSEndpoint: input.mediatorWSSEndpoint,
-      ttl: ttl,
-    ));
+    return _storage.create(
+      Oob(
+        oobId: oobId,
+        didcommMessage: input.didcommMessage,
+        mediatorDid: input.mediatorDid,
+        mediatorEndpoint: input.mediatorEndpoint,
+        mediatorWSSEndpoint: input.mediatorWSSEndpoint,
+        ttl: ttl,
+      ),
+    );
   }
 
   Future<Oob?> get(String id) {

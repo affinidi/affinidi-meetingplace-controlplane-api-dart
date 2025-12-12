@@ -21,7 +21,7 @@ kms.SigningAlgorithmSpec signingAlgorithmForScheme(SignatureScheme scheme) {
 }
 
 const _supportedKeyTypesForDerDecoding = [
-  kms.CustomerMasterKeySpec.eccNistP256
+  kms.CustomerMasterKeySpec.eccNistP256,
 ];
 
 class KmsKeyPair implements KeyPair {
@@ -73,8 +73,8 @@ class KmsKeyPair implements KeyPair {
 
   @override
   List<SignatureScheme> get supportedSignatureSchemes => [
-        SignatureScheme.ecdsa_p256_sha256,
-      ];
+    SignatureScheme.ecdsa_p256_sha256,
+  ];
 
   @override
   SignatureScheme get defaultSignatureScheme =>
@@ -142,10 +142,13 @@ class KmsKeyPair implements KeyPair {
   @override
   Future<Uint8List> computeEcdhSecret(Uint8List publicKey) async {
     final kmsPublicKey = KmsKeyPairUtilsP256.formatForAWSKMS(
-        KmsKeyPairUtilsP256.uncompressPublicKey(publicKey));
+      KmsKeyPairUtilsP256.uncompressPublicKey(publicKey),
+    );
 
-    final response =
-        await kmsClient.deriveKey(keyId: id, publicKey: kmsPublicKey);
+    final response = await kmsClient.deriveKey(
+      keyId: id,
+      publicKey: kmsPublicKey,
+    );
 
     return Uint8List.fromList(base64Decode(response['SharedSecret'] as String));
   }

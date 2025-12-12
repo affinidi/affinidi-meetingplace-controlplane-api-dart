@@ -13,8 +13,9 @@ class CheckOfferPhraseRequest {
   factory CheckOfferPhraseRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        CheckOfferPhraseRequestValidator().validate(params);
+    final validationResult = CheckOfferPhraseRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

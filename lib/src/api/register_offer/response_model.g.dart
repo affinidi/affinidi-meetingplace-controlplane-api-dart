@@ -7,19 +7,19 @@ part of 'response_model.dart';
 // **************************************************************************
 
 RegisterOfferResponse _$RegisterOfferResponseFromJson(
-        Map<String, dynamic> json) =>
-    RegisterOfferResponse(
-      offerLink: json['offerLink'] as String,
-      mnemonic: json['mnemonic'] as String,
-      validUntil: json['validUntil'] as String?,
-      maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
-    );
+  Map<String, dynamic> json,
+) => RegisterOfferResponse(
+  offerLink: json['offerLink'] as String,
+  mnemonic: json['mnemonic'] as String,
+  validUntil: json['validUntil'] as String?,
+  maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
+);
 
 Map<String, dynamic> _$RegisterOfferResponseToJson(
-        RegisterOfferResponse instance) =>
-    <String, dynamic>{
-      'offerLink': instance.offerLink,
-      'mnemonic': instance.mnemonic,
-      'validUntil': instance.validUntil,
-      'maximumUsage': instance.maximumUsage,
-    };
+  RegisterOfferResponse instance,
+) => <String, dynamic>{
+  'offerLink': instance.offerLink,
+  'mnemonic': instance.mnemonic,
+  'validUntil': instance.validUntil,
+  'maximumUsage': instance.maximumUsage,
+};

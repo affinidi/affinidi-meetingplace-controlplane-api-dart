@@ -5,9 +5,9 @@ class MpxRegistrationToken {
     required String issuer,
     required Map data,
     required int expiresInMinutes,
-  })  : _issuer = issuer,
-        _data = data,
-        _expiresInMinutes = expiresInMinutes;
+  }) : _issuer = issuer,
+       _data = data,
+       _expiresInMinutes = expiresInMinutes;
   final String _issuer;
   final Map _data;
   final int _expiresInMinutes;

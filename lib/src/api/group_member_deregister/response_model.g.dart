@@ -7,15 +7,12 @@ part of 'response_model.dart';
 // **************************************************************************
 
 GroupMemberDeregisterReponse _$GroupMemberDeregisterReponseFromJson(
-        Map<String, dynamic> json) =>
-    GroupMemberDeregisterReponse(
-      status: json['status'] as String,
-      message: json['message'] as String,
-    );
+  Map<String, dynamic> json,
+) => GroupMemberDeregisterReponse(
+  status: json['status'] as String,
+  message: json['message'] as String,
+);
 
 Map<String, dynamic> _$GroupMemberDeregisterReponseToJson(
-        GroupMemberDeregisterReponse instance) =>
-    <String, dynamic>{
-      'status': instance.status,
-      'message': instance.message,
-    };
+  GroupMemberDeregisterReponse instance,
+) => <String, dynamic>{'status': instance.status, 'message': instance.message};

@@ -11,8 +11,8 @@ class KMSWalletGroupDidManager implements GroupDidManager {
   KMSWalletGroupDidManager({
     required KmsWallet wallet,
     required Storage storage,
-  })  : _wallet = wallet,
-        _storage = storage;
+  }) : _wallet = wallet,
+       _storage = storage;
   final Storage _storage;
   final KmsWallet _wallet;
 
@@ -61,10 +61,14 @@ class KMSWalletGroupDidManager implements GroupDidManager {
   @override
   Future<void> removeKeys(String groupId) async {
     final signingKeyReference = await _getKeyReference(
-        keyUsage: KeyUsage.signingVerify, groupId: groupId);
+      keyUsage: KeyUsage.signingVerify,
+      groupId: groupId,
+    );
 
     final keyAgreementReference = await _getKeyReference(
-        keyUsage: KeyUsage.keyAgreement, groupId: groupId);
+      keyUsage: KeyUsage.keyAgreement,
+      groupId: groupId,
+    );
 
     await _wallet.deleteKeyPair(signingKeyReference.keyId);
     await _removeKeyReference(signingKeyReference.keyId);
@@ -76,10 +80,14 @@ class KMSWalletGroupDidManager implements GroupDidManager {
   @override
   Future<DidManager> get(groupId) async {
     final signingKeyReference = await _getKeyReference(
-        keyUsage: KeyUsage.signingVerify, groupId: groupId);
+      keyUsage: KeyUsage.signingVerify,
+      groupId: groupId,
+    );
 
     final keyAgreementReference = await _getKeyReference(
-        keyUsage: KeyUsage.keyAgreement, groupId: groupId);
+      keyUsage: KeyUsage.keyAgreement,
+      groupId: groupId,
+    );
 
     final groupDidManager = await _getDidManager(
       wallet: _wallet,
@@ -95,19 +103,25 @@ class KMSWalletGroupDidManager implements GroupDidManager {
     required String signingKeyPairId,
     required String keyAgreementKeyPairId,
   }) async {
-    final groupDidManager =
-        DidPeerManager(wallet: wallet, store: InMemoryDidStore());
+    final groupDidManager = DidPeerManager(
+      wallet: wallet,
+      store: InMemoryDidStore(),
+    );
 
     await groupDidManager.init();
-    await groupDidManager
-        .addVerificationMethod(signingKeyPairId, relationships: {
-      VerificationRelationship.authentication,
-      VerificationRelationship.assertionMethod,
-      VerificationRelationship.capabilityInvocation,
-      VerificationRelationship.capabilityDelegation,
-    });
-    await groupDidManager.addVerificationMethod(keyAgreementKeyPairId,
-        relationships: {VerificationRelationship.keyAgreement});
+    await groupDidManager.addVerificationMethod(
+      signingKeyPairId,
+      relationships: {
+        VerificationRelationship.authentication,
+        VerificationRelationship.assertionMethod,
+        VerificationRelationship.capabilityInvocation,
+        VerificationRelationship.capabilityDelegation,
+      },
+    );
+    await groupDidManager.addVerificationMethod(
+      keyAgreementKeyPairId,
+      relationships: {VerificationRelationship.keyAgreement},
+    );
 
     return groupDidManager;
   }
@@ -117,8 +131,9 @@ class KMSWalletGroupDidManager implements GroupDidManager {
     required KeyUsage keyUsage,
     required String entityId,
   }) async {
-    await _storage.create(KeyReference(
-        keyId: keyPair.id, entityId: '$entityId-${keyUsage.name}'));
+    await _storage.create(
+      KeyReference(keyId: keyPair.id, entityId: '$entityId-${keyUsage.name}'),
+    );
   }
 
   Future<void> _removeKeyReference(String keyId) async {
@@ -131,11 +146,15 @@ class KMSWalletGroupDidManager implements GroupDidManager {
   }) async {
     final keyReferenceId = '$groupId-${keyUsage.name}';
     final result = await _storage.findOneById(
-        KeyReference.entityName, keyReferenceId, KeyReference.fromJson);
+      KeyReference.entityName,
+      keyReferenceId,
+      KeyReference.fromJson,
+    );
 
     if (result == null) {
       throw KmsWalletException.keyReferenceNotFound(
-          keyReferenceId: keyReferenceId);
+        keyReferenceId: keyReferenceId,
+      );
     }
 
     return result;

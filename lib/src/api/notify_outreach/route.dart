@@ -1,4 +1,3 @@
-import '../../core/service/device_notification/device_notification.dart';
 import '../../core/service/device_notification/device_notification_exception.dart';
 import '../../core/service/offer/offer_service.dart';
 import '../error_helper.dart';

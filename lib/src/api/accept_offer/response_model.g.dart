@@ -20,15 +20,15 @@ AcceptOfferResponse _$AcceptOfferResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$AcceptOfferResponseToJson(
-        AcceptOfferResponse instance) =>
-    <String, dynamic>{
-      'didcommMessage': instance.didcommMessage,
-      'offerLink': instance.offerLink,
-      'name': instance.name,
-      'description': instance.description,
-      'vcard': instance.vcard,
-      'validUntil': instance.validUntil,
-      'mediatorDid': instance.mediatorDid,
-      'mediatorEndpoint': instance.mediatorEndpoint,
-      'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
-    };
+  AcceptOfferResponse instance,
+) => <String, dynamic>{
+  'didcommMessage': instance.didcommMessage,
+  'offerLink': instance.offerLink,
+  'name': instance.name,
+  'description': instance.description,
+  'vcard': instance.vcard,
+  'validUntil': instance.validUntil,
+  'mediatorDid': instance.mediatorDid,
+  'mediatorEndpoint': instance.mediatorEndpoint,
+  'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
+};

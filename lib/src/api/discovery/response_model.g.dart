@@ -7,11 +7,7 @@ part of 'response_model.dart';
 // **************************************************************************
 
 DiscoveryResponse _$DiscoveryResponseFromJson(Map<String, dynamic> json) =>
-    DiscoveryResponse(
-      token: json['token'] as String,
-    );
+    DiscoveryResponse(token: json['token'] as String);
 
 Map<String, dynamic> _$DiscoveryResponseToJson(DiscoveryResponse instance) =>
-    <String, dynamic>{
-      'token': instance.token,
-    };
+    <String, dynamic>{'token': instance.token};

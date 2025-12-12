@@ -21,8 +21,9 @@ class FinaliseAcceptanceRequest {
   factory FinaliseAcceptanceRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        FinaliseAcceptanceRequestValidator().validate(params);
+    final validationResult = FinaliseAcceptanceRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

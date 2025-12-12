@@ -7,31 +7,31 @@ part of 'response_model.dart';
 // **************************************************************************
 
 AcceptOfferGroupResponse _$AcceptOfferGroupResponseFromJson(
-        Map<String, dynamic> json) =>
-    AcceptOfferGroupResponse(
-      didcommMessage: json['didcommMessage'] as String,
-      offerLink: json['offerLink'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String,
-      vcard: json['vcard'] as String,
-      validUntil: json['validUntil'] as String?,
-      mediatorDid: json['mediatorDid'] as String,
-      mediatorEndpoint: json['mediatorEndpoint'] as String,
-      mediatorWSSEndpoint: json['mediatorWSSEndpoint'] as String,
-      metadata: json['metadata'] as String?,
-    );
+  Map<String, dynamic> json,
+) => AcceptOfferGroupResponse(
+  didcommMessage: json['didcommMessage'] as String,
+  offerLink: json['offerLink'] as String,
+  name: json['name'] as String,
+  description: json['description'] as String,
+  vcard: json['vcard'] as String,
+  validUntil: json['validUntil'] as String?,
+  mediatorDid: json['mediatorDid'] as String,
+  mediatorEndpoint: json['mediatorEndpoint'] as String,
+  mediatorWSSEndpoint: json['mediatorWSSEndpoint'] as String,
+  metadata: json['metadata'] as String?,
+);
 
 Map<String, dynamic> _$AcceptOfferGroupResponseToJson(
-        AcceptOfferGroupResponse instance) =>
-    <String, dynamic>{
-      'didcommMessage': instance.didcommMessage,
-      'offerLink': instance.offerLink,
-      'name': instance.name,
-      'description': instance.description,
-      'vcard': instance.vcard,
-      'validUntil': instance.validUntil,
-      'mediatorDid': instance.mediatorDid,
-      'mediatorEndpoint': instance.mediatorEndpoint,
-      'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
-      'metadata': instance.metadata,
-    };
+  AcceptOfferGroupResponse instance,
+) => <String, dynamic>{
+  'didcommMessage': instance.didcommMessage,
+  'offerLink': instance.offerLink,
+  'name': instance.name,
+  'description': instance.description,
+  'vcard': instance.vcard,
+  'validUntil': instance.validUntil,
+  'mediatorDid': instance.mediatorDid,
+  'mediatorEndpoint': instance.mediatorEndpoint,
+  'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
+  'metadata': instance.metadata,
+};

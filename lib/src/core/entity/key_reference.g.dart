@@ -7,9 +7,9 @@ part of 'key_reference.dart';
 // **************************************************************************
 
 KeyReference _$KeyReferenceFromJson(Map<String, dynamic> json) => KeyReference(
-      keyId: json['keyId'] as String,
-      entityId: json['entityId'] as String,
-    )..ttl = json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String);
+  keyId: json['keyId'] as String,
+  entityId: json['entityId'] as String,
+)..ttl = json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String);
 
 Map<String, dynamic> _$KeyReferenceToJson(KeyReference instance) =>
     <String, dynamic>{

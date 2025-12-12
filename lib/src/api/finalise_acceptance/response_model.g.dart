@@ -7,13 +7,11 @@ part of 'response_model.dart';
 // **************************************************************************
 
 FinaliseAcceptanceResponse _$FinaliseAcceptanceResponseFromJson(
-        Map<String, dynamic> json) =>
-    FinaliseAcceptanceResponse(
-      notificationToken: json['notificationToken'] as String?,
-    );
+  Map<String, dynamic> json,
+) => FinaliseAcceptanceResponse(
+  notificationToken: json['notificationToken'] as String?,
+);
 
 Map<String, dynamic> _$FinaliseAcceptanceResponseToJson(
-        FinaliseAcceptanceResponse instance) =>
-    <String, dynamic>{
-      'notificationToken': instance.notificationToken,
-    };
+  FinaliseAcceptanceResponse instance,
+) => <String, dynamic>{'notificationToken': instance.notificationToken};

@@ -15,11 +15,13 @@ class GetPendingNotificationsRequest {
   });
 
   factory GetPendingNotificationsRequest.fromRequestParams(
-      String requestParams) {
+    String requestParams,
+  ) {
     final params = jsonDecode(requestParams);
 
-    final validationResult =
-        GetPendingNotificationsRequestValidator().validate(params);
+    final validationResult = GetPendingNotificationsRequestValidator().validate(
+      params,
+    );
 
     if (!validationResult.isValid) {
       throw RequestValidationException.fromValidationResult(validationResult);

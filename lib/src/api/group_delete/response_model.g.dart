@@ -13,8 +13,5 @@ GroupDeleteResponse _$GroupDeleteResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$GroupDeleteResponseToJson(
-        GroupDeleteResponse instance) =>
-    <String, dynamic>{
-      'status': instance.status,
-      'message': instance.message,
-    };
+  GroupDeleteResponse instance,
+) => <String, dynamic>{'status': instance.status, 'message': instance.message};

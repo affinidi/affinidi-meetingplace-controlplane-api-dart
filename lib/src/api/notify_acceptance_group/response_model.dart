@@ -12,7 +12,8 @@ class NotifyAcceptanceGroupResponse {
     NotificationItem notificationItem,
   ) {
     return NotifyAcceptanceGroupResponse(
-        notificationId: notificationItem.getId());
+      notificationId: notificationItem.getId(),
+    );
   }
   final String? notificationId;
 

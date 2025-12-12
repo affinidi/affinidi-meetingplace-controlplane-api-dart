@@ -24,11 +24,11 @@ class AcceptanceService {
     required DeviceTokenMappingService deviceTokenMappingService,
     required NotificationService notificationService,
     required Logger logger,
-  })  : _storage = storage,
-        _offerService = offerService,
-        _deviceTokenMappingService = deviceTokenMappingService,
-        _notificationService = notificationService,
-        _logger = logger;
+  }) : _storage = storage,
+       _offerService = offerService,
+       _deviceTokenMappingService = deviceTokenMappingService,
+       _notificationService = notificationService,
+       _logger = logger;
 
   final Storage _storage;
   final OfferService _offerService;
@@ -37,11 +37,11 @@ class AcceptanceService {
   final Logger _logger;
 
   Future<Offer> acceptOffer(AcceptOfferInput input, String authDid) async {
-    final deviceTokenMapping =
-        await _deviceTokenMappingService.getDeviceTokenMapping(
-      devicePlatform: input.platformType,
-      deviceToken: input.deviceToken,
-    );
+    final deviceTokenMapping = await _deviceTokenMappingService
+        .getDeviceTokenMapping(
+          devicePlatform: input.platformType,
+          deviceToken: input.deviceToken,
+        );
 
     final offer = await _offerService.queryOfferByMnemonic(
       OfferAccessType.claim,
@@ -80,23 +80,25 @@ class AcceptanceService {
     FinaliseAcceptanceInput input,
     String authDid,
   ) async {
-    final acceptance = await queryAcceptance(QueryAcceptanceInput(
-      mnemonic: input.mnemonic,
-      didUsedForAcceptance: input.didUsedForAcceptance,
-      offerLink: input.offerLink,
-    ));
-
-    final notificationChannelId =
-        await _notificationService.notifyFinaliseAcceptance(
-      NotifyFinaliseAcceptanceInput(
-        acceptance: acceptance,
+    final acceptance = await queryAcceptance(
+      QueryAcceptanceInput(
+        mnemonic: input.mnemonic,
         didUsedForAcceptance: input.didUsedForAcceptance,
-        theirDid: input.theirDid,
-        authDid: authDid,
-        deviceToken: input.deviceToken,
-        platformType: input.platformType,
+        offerLink: input.offerLink,
       ),
     );
+
+    final notificationChannelId = await _notificationService
+        .notifyFinaliseAcceptance(
+          NotifyFinaliseAcceptanceInput(
+            acceptance: acceptance,
+            didUsedForAcceptance: input.didUsedForAcceptance,
+            theirDid: input.theirDid,
+            authDid: authDid,
+            deviceToken: input.deviceToken,
+            platformType: input.platformType,
+          ),
+        );
 
     return notificationChannelId;
   }

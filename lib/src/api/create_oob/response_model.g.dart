@@ -13,7 +13,4 @@ CreateOobResponse _$CreateOobResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$CreateOobResponseToJson(CreateOobResponse instance) =>
-    <String, dynamic>{
-      'oobId': instance.oobId,
-      'oobUrl': instance.oobUrl,
-    };
+    <String, dynamic>{'oobId': instance.oobId, 'oobUrl': instance.oobUrl};

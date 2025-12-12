@@ -17,11 +17,13 @@ class DerDecoder {
   }
 
   static Uint8List _integerToBytes(BigInt value, int length) {
-    var bytes =
-        value.toUnsigned(8 * length).toRadixString(16).padLeft(length * 2, '0');
+    var bytes = value
+        .toUnsigned(8 * length)
+        .toRadixString(16)
+        .padLeft(length * 2, '0');
     return Uint8List.fromList([
       for (int i = 0; i < bytes.length; i += 2)
-        int.parse(bytes.substring(i, i + 2), radix: 16)
+        int.parse(bytes.substring(i, i + 2), radix: 16),
     ]);
   }
 }

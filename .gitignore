@@ -2,6 +2,7 @@
 # Created by `dart pub`
 .dart_tool/
 .env
+.vscode/
 keys/
 didcomm-dart/
 secrets/
@@ -10,6 +11,7 @@ secrets_v2/
 docker-compose.yml
 static/well-known-did.json
 did.json
+
 
 .DS_Store
 coverage/*

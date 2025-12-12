@@ -11,8 +11,8 @@ Future<Response> deletePendingNotifications(
   try {
     final deletePendingNotificationsRequest =
         DeletePendingNotificationsRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
     final result = await facade.deletePendingNotifications(
       deletePendingNotificationsRequest,
@@ -38,8 +38,11 @@ Future<Response> deletePendingNotifications(
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Error deleting pending notifications: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error deleting pending notifications: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

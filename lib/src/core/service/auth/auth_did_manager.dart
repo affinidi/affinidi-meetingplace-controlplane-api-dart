@@ -30,10 +30,7 @@ class AuthDidManager {
     _keyStore = InMemoryKeyStore();
     _wallet = PersistentWallet(_keyStore);
 
-    didManager = DidWebManager(
-      wallet: _wallet,
-      store: InMemoryDidStore(),
-    );
+    didManager = DidWebManager(wallet: _wallet, store: InMemoryDidStore());
 
     for (final jwk in jwks.asMap().entries) {
       if (jwk.value['privateKeyJwk'] == null) continue;
@@ -54,14 +51,18 @@ class AuthDidManager {
 
       // Reflect messaging atlas DID document construction
       if (jwk.key <= 1) {
-        await didManager.addVerificationMethod(keyId, relationships: {
-          VerificationRelationship.authentication,
-          VerificationRelationship.assertionMethod
-        });
+        await didManager.addVerificationMethod(
+          keyId,
+          relationships: {
+            VerificationRelationship.authentication,
+            VerificationRelationship.assertionMethod,
+          },
+        );
       } else {
-        await didManager.addVerificationMethod(keyId, relationships: {
-          VerificationRelationship.keyAgreement,
-        });
+        await didManager.addVerificationMethod(
+          keyId,
+          relationships: {VerificationRelationship.keyAgreement},
+        );
       }
     }
   }

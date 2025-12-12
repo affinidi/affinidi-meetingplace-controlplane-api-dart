@@ -16,8 +16,8 @@ Future<Response> registerOfferGroup(
   try {
     final registerOfferGroupRequest =
         RegisterOfferGroupRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
     final (offer, group) = await facade.registerOfferGroup(
       registerOfferGroupRequest,
@@ -40,12 +40,15 @@ Future<Response> registerOfferGroup(
     );
   } on GroupCountLimitExceeded {
     return Response.badRequest(
-      body:
-          RegisterOfferGroupErrorResponse.groupCountLimitExceeded().toString(),
+      body: RegisterOfferGroupErrorResponse.groupCountLimitExceeded()
+          .toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Internal server error: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Internal server error: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

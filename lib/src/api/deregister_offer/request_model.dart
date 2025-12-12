@@ -8,10 +8,7 @@ part 'request_model.g.dart';
 
 @JsonSerializable()
 class DeregisterOfferRequest {
-  DeregisterOfferRequest({
-    required this.offerLink,
-    required this.mnemonic,
-  });
+  DeregisterOfferRequest({required this.offerLink, required this.mnemonic});
 
   factory DeregisterOfferRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);

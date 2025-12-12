@@ -35,8 +35,11 @@ Future<Response> acceptOfferGroup(
       body: AcceptOfferErrorResponse.offerInvalid().toString(),
     );
   } catch (e, stackTrace) {
-    facade.logError('Error on accept offer group',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on accept offer group',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

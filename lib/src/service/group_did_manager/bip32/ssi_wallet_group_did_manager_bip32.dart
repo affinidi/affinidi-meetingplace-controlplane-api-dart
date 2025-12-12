@@ -11,23 +11,29 @@ class SsiWalletGroupDidManagerBip32 implements GroupDidManager {
   SsiWalletGroupDidManagerBip32({
     required Wallet wallet,
     required Storage storage,
-  })  : _wallet = wallet,
-        _storage = storage;
+  }) : _wallet = wallet,
+       _storage = storage;
   final Storage _storage;
   final Wallet _wallet;
 
   @override
   Future<DidDocument> createDid(String offerLink) async {
     final accountIndex = await _storage.findOneById<Bip32>(
-        Bip32.entityName, 'accountIndex', Bip32.fromJson);
+      Bip32.entityName,
+      'accountIndex',
+      Bip32.fromJson,
+    );
 
-    final nextAccountIndex =
-        accountIndex != null ? int.parse(accountIndex.accountingIndex) + 1 : 1;
+    final nextAccountIndex = accountIndex != null
+        ? int.parse(accountIndex.accountingIndex) + 1
+        : 1;
 
     final derivationPath = "m/44'/60'/0'/0'/$nextAccountIndex'";
 
     final keyPair = await _wallet.generateKey(
-        keyType: KeyType.secp256k1, keyId: derivationPath);
+      keyType: KeyType.secp256k1,
+      keyId: derivationPath,
+    );
     final groupDidManager = await _getDidManager(_wallet, keyPair);
     final didDocument = await groupDidManager.getDidDocument();
 
@@ -38,8 +44,9 @@ class SsiWalletGroupDidManagerBip32 implements GroupDidManager {
 
     await _storage.create(KeyReference(keyId: keyPair.id, entityId: groupId));
     if (accountIndex == null) {
-      await _storage
-          .create(Bip32(accountingIndex: nextAccountIndex.toString()));
+      await _storage.create(
+        Bip32(accountingIndex: nextAccountIndex.toString()),
+      );
     } else {
       accountIndex.accountingIndex = nextAccountIndex.toString();
       await _storage.update(accountIndex);
@@ -58,7 +65,9 @@ class SsiWalletGroupDidManagerBip32 implements GroupDidManager {
 
     if (keyReference == null) {
       throw GroupDidManagerException(
-          message: 'Key reference not found', code: 'key_reference_not_found');
+        message: 'Key reference not found',
+        code: 'key_reference_not_found',
+      );
     }
 
     final keyPair = await _wallet.generateKey(

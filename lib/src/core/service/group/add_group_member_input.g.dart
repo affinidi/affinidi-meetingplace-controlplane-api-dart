@@ -21,19 +21,19 @@ AddGroupMemberInput _$AddGroupMemberInputFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$AddGroupMemberInputToJson(
-        AddGroupMemberInput instance) =>
-    <String, dynamic>{
-      'groupId': instance.groupId,
-      'offerLink': instance.offerLink,
-      'memberDid': instance.memberDid,
-      'memberPublicKey': instance.memberPublicKey,
-      'memberReencryptionKey': instance.memberReencryptionKey,
-      'memberVCard': instance.memberVCard,
-      'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
-      'platformEndpointArn': instance.platformEndpointArn,
-      'controllingDid': instance.controllingDid,
-      'authDid': instance.authDid,
-    };
+  AddGroupMemberInput instance,
+) => <String, dynamic>{
+  'groupId': instance.groupId,
+  'offerLink': instance.offerLink,
+  'memberDid': instance.memberDid,
+  'memberPublicKey': instance.memberPublicKey,
+  'memberReencryptionKey': instance.memberReencryptionKey,
+  'memberVCard': instance.memberVCard,
+  'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
+  'platformEndpointArn': instance.platformEndpointArn,
+  'controllingDid': instance.controllingDid,
+  'authDid': instance.authDid,
+};
 
 const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',

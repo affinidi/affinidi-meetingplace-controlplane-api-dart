@@ -51,9 +51,8 @@ class QueryOfferErrorResponse {
   final String errorMessage;
 
   @override
-  String toString() => JsonEncoder().convert(
-        _$QueryOfferErrorResponseToJson(this),
-      );
+  String toString() =>
+      JsonEncoder().convert(_$QueryOfferErrorResponseToJson(this));
 
   toJson() => _$QueryOfferErrorResponseToJson(this);
 }

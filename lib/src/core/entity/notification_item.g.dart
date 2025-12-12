@@ -7,133 +7,133 @@ part of 'notification_item.dart';
 // **************************************************************************
 
 InvitationAcceptPayload _$InvitationAcceptPayloadFromJson(
-        Map<String, dynamic> json) =>
-    InvitationAcceptPayload(
-      id: json['id'] as String,
-      notificationDate: json['notificationDate'] as String,
-      pendingCount: (json['pendingCount'] as num).toInt(),
-      offerLink: json['offerLink'] as String,
-      did: json['did'] as String,
-    );
+  Map<String, dynamic> json,
+) => InvitationAcceptPayload(
+  id: json['id'] as String,
+  notificationDate: json['notificationDate'] as String,
+  pendingCount: (json['pendingCount'] as num).toInt(),
+  offerLink: json['offerLink'] as String,
+  did: json['did'] as String,
+);
 
 Map<String, dynamic> _$InvitationAcceptPayloadToJson(
-        InvitationAcceptPayload instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationDate': instance.notificationDate,
-      'pendingCount': instance.pendingCount,
-      'offerLink': instance.offerLink,
-      'did': instance.did,
-    };
+  InvitationAcceptPayload instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationDate': instance.notificationDate,
+  'pendingCount': instance.pendingCount,
+  'offerLink': instance.offerLink,
+  'did': instance.did,
+};
 
 InvitationGroupAcceptPayload _$InvitationGroupAcceptPayloadFromJson(
-        Map<String, dynamic> json) =>
-    InvitationGroupAcceptPayload(
-      id: json['id'] as String,
-      notificationDate: json['notificationDate'] as String,
-      pendingCount: (json['pendingCount'] as num).toInt(),
-      offerLink: json['offerLink'] as String,
-      did: json['did'] as String,
-    );
+  Map<String, dynamic> json,
+) => InvitationGroupAcceptPayload(
+  id: json['id'] as String,
+  notificationDate: json['notificationDate'] as String,
+  pendingCount: (json['pendingCount'] as num).toInt(),
+  offerLink: json['offerLink'] as String,
+  did: json['did'] as String,
+);
 
 Map<String, dynamic> _$InvitationGroupAcceptPayloadToJson(
-        InvitationGroupAcceptPayload instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationDate': instance.notificationDate,
-      'pendingCount': instance.pendingCount,
-      'offerLink': instance.offerLink,
-      'did': instance.did,
-    };
+  InvitationGroupAcceptPayload instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationDate': instance.notificationDate,
+  'pendingCount': instance.pendingCount,
+  'offerLink': instance.offerLink,
+  'did': instance.did,
+};
 
 GroupMembershipFinalisedPayload _$GroupMembershipFinalisedPayloadFromJson(
-        Map<String, dynamic> json) =>
-    GroupMembershipFinalisedPayload(
-      id: json['id'] as String,
-      notificationDate: json['notificationDate'] as String,
-      pendingCount: (json['pendingCount'] as num).toInt(),
-      offerLink: json['offerLink'] as String,
-      startSeqNo: (json['startSeqNo'] as num).toInt(),
-    );
+  Map<String, dynamic> json,
+) => GroupMembershipFinalisedPayload(
+  id: json['id'] as String,
+  notificationDate: json['notificationDate'] as String,
+  pendingCount: (json['pendingCount'] as num).toInt(),
+  offerLink: json['offerLink'] as String,
+  startSeqNo: (json['startSeqNo'] as num).toInt(),
+);
 
 Map<String, dynamic> _$GroupMembershipFinalisedPayloadToJson(
-        GroupMembershipFinalisedPayload instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationDate': instance.notificationDate,
-      'pendingCount': instance.pendingCount,
-      'offerLink': instance.offerLink,
-      'startSeqNo': instance.startSeqNo,
-    };
+  GroupMembershipFinalisedPayload instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationDate': instance.notificationDate,
+  'pendingCount': instance.pendingCount,
+  'offerLink': instance.offerLink,
+  'startSeqNo': instance.startSeqNo,
+};
 
 InvitationOutreachPayload _$InvitationOutreachPayloadFromJson(
-        Map<String, dynamic> json) =>
-    InvitationOutreachPayload(
-      id: json['id'] as String,
-      notificationDate: json['notificationDate'] as String,
-      pendingCount: (json['pendingCount'] as num).toInt(),
-      offerLink: json['offerLink'] as String,
-    );
+  Map<String, dynamic> json,
+) => InvitationOutreachPayload(
+  id: json['id'] as String,
+  notificationDate: json['notificationDate'] as String,
+  pendingCount: (json['pendingCount'] as num).toInt(),
+  offerLink: json['offerLink'] as String,
+);
 
 Map<String, dynamic> _$InvitationOutreachPayloadToJson(
-        InvitationOutreachPayload instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationDate': instance.notificationDate,
-      'pendingCount': instance.pendingCount,
-      'offerLink': instance.offerLink,
-    };
+  InvitationOutreachPayload instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationDate': instance.notificationDate,
+  'pendingCount': instance.pendingCount,
+  'offerLink': instance.offerLink,
+};
 
 ChannelActivityPayload _$ChannelActivityPayloadFromJson(
-        Map<String, dynamic> json) =>
-    ChannelActivityPayload(
-      id: json['id'] as String,
-      notificationDate: json['notificationDate'] as String,
-      pendingCount: (json['pendingCount'] as num).toInt(),
-      did: json['did'] as String,
-      type: json['type'] as String,
-    );
+  Map<String, dynamic> json,
+) => ChannelActivityPayload(
+  id: json['id'] as String,
+  notificationDate: json['notificationDate'] as String,
+  pendingCount: (json['pendingCount'] as num).toInt(),
+  did: json['did'] as String,
+  type: json['type'] as String,
+);
 
 Map<String, dynamic> _$ChannelActivityPayloadToJson(
-        ChannelActivityPayload instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationDate': instance.notificationDate,
-      'pendingCount': instance.pendingCount,
-      'did': instance.did,
-      'type': instance.type,
-    };
+  ChannelActivityPayload instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationDate': instance.notificationDate,
+  'pendingCount': instance.pendingCount,
+  'did': instance.did,
+  'type': instance.type,
+};
 
 OfferFinalisedPayload _$OfferFinalisedPayloadFromJson(
-        Map<String, dynamic> json) =>
-    OfferFinalisedPayload(
-      id: json['id'] as String,
-      notificationDate: json['notificationDate'] as String,
-      pendingCount: (json['pendingCount'] as num).toInt(),
-      offerLink: json['offerLink'] as String,
-      notificationToken: json['notificationToken'] as String,
-    );
+  Map<String, dynamic> json,
+) => OfferFinalisedPayload(
+  id: json['id'] as String,
+  notificationDate: json['notificationDate'] as String,
+  pendingCount: (json['pendingCount'] as num).toInt(),
+  offerLink: json['offerLink'] as String,
+  notificationToken: json['notificationToken'] as String,
+);
 
 Map<String, dynamic> _$OfferFinalisedPayloadToJson(
-        OfferFinalisedPayload instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationDate': instance.notificationDate,
-      'pendingCount': instance.pendingCount,
-      'offerLink': instance.offerLink,
-      'notificationToken': instance.notificationToken,
-    };
+  OfferFinalisedPayload instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationDate': instance.notificationDate,
+  'pendingCount': instance.pendingCount,
+  'offerLink': instance.offerLink,
+  'notificationToken': instance.notificationToken,
+};
 
 NotificationItem _$NotificationItemFromJson(Map<String, dynamic> json) =>
     NotificationItem(
-      id: json['id'] as String,
-      type: $enumDecode(_$NotificationItemTypeEnumMap, json['type']),
-      deviceHash: json['deviceHash'] as String,
-      consumerAuthDid: json['consumerAuthDid'] as String,
-      payload: json['payload'] as String,
-      offerLink: json['offerLink'] as String?,
-      acceptChannelDid: json['acceptChannelDid'] as String?,
-    )
+        id: json['id'] as String,
+        type: $enumDecode(_$NotificationItemTypeEnumMap, json['type']),
+        deviceHash: json['deviceHash'] as String,
+        consumerAuthDid: json['consumerAuthDid'] as String,
+        payload: json['payload'] as String,
+        offerLink: json['offerLink'] as String?,
+        acceptChannelDid: json['acceptChannelDid'] as String?,
+      )
       ..ttl = json['ttl'] == null ? null : DateTime.parse(json['ttl'] as String)
       ..createdAt = json['createdAt'] as String;
 

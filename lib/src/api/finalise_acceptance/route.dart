@@ -12,8 +12,8 @@ Future<Response> finaliseAcceptance(
   try {
     final finaliseAcceptanceRequest =
         FinaliseAcceptanceRequest.fromRequestParams(
-      await request.readAsString(),
-    );
+          await request.readAsString(),
+        );
 
     final String? notificationToken = await facade.finaliseAcceptance(
       finaliseAcceptanceRequest,
@@ -28,8 +28,11 @@ Future<Response> finaliseAcceptance(
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Finalise acceptance failed: $e',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Finalise acceptance failed: $e',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError();
   }
 }

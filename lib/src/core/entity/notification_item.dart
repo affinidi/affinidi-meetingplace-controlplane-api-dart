@@ -45,9 +45,9 @@ class InvitationAcceptPayload extends NotificationItemPayload {
 
   @override
   String toString() => JsonEncoder().convert({
-        'type': NotificationItemType.invitationAccept.value,
-        'data': _$InvitationAcceptPayloadToJson(this),
-      });
+    'type': NotificationItemType.invitationAccept.value,
+    'data': _$InvitationAcceptPayloadToJson(this),
+  });
 }
 
 @JsonSerializable()
@@ -64,9 +64,9 @@ class InvitationGroupAcceptPayload extends NotificationItemPayload {
 
   @override
   String toString() => JsonEncoder().convert({
-        'type': NotificationItemType.invitationGroupAccept.value,
-        'data': _$InvitationGroupAcceptPayloadToJson(this),
-      });
+    'type': NotificationItemType.invitationGroupAccept.value,
+    'data': _$InvitationGroupAcceptPayloadToJson(this),
+  });
 }
 
 @JsonSerializable()
@@ -83,9 +83,9 @@ class GroupMembershipFinalisedPayload extends NotificationItemPayload {
 
   @override
   String toString() => JsonEncoder().convert({
-        'type': NotificationItemType.groupMembershipFinalised.value,
-        'data': _$GroupMembershipFinalisedPayloadToJson(this),
-      });
+    'type': NotificationItemType.groupMembershipFinalised.value,
+    'data': _$GroupMembershipFinalisedPayloadToJson(this),
+  });
 }
 
 @JsonSerializable()
@@ -100,9 +100,9 @@ class InvitationOutreachPayload extends NotificationItemPayload {
 
   @override
   String toString() => JsonEncoder().convert({
-        'type': NotificationItemType.invitationOutreach.value,
-        'data': _$InvitationOutreachPayloadToJson(this),
-      });
+    'type': NotificationItemType.invitationOutreach.value,
+    'data': _$InvitationOutreachPayloadToJson(this),
+  });
 }
 
 @JsonSerializable()
@@ -119,9 +119,9 @@ class ChannelActivityPayload extends NotificationItemPayload {
 
   @override
   String toString() => JsonEncoder().convert({
-        'type': NotificationItemType.channelActivity.value,
-        'data': _$ChannelActivityPayloadToJson(this),
-      });
+    'type': NotificationItemType.channelActivity.value,
+    'data': _$ChannelActivityPayloadToJson(this),
+  });
 }
 
 @JsonSerializable()
@@ -138,9 +138,9 @@ class OfferFinalisedPayload extends NotificationItemPayload {
 
   @override
   String toString() => JsonEncoder().convert({
-        'type': NotificationItemType.offerFinalised.value,
-        'data': _$OfferFinalisedPayloadToJson(this),
-      });
+    'type': NotificationItemType.offerFinalised.value,
+    'data': _$OfferFinalisedPayloadToJson(this),
+  });
 }
 
 @JsonSerializable()
@@ -164,21 +164,20 @@ class NotificationItem extends Entity {
     required String acceptChannelDid,
     required String offerLink,
     required DeviceNotificationData payload,
-  }) =>
-      NotificationItem(
-        id: id,
-        type: NotificationItemType.invitationAccept,
-        deviceHash: deviceHash,
-        consumerAuthDid: consumerAuthDid,
-        acceptChannelDid: acceptChannelDid,
-        payload: InvitationAcceptPayload(
-          id: id,
-          notificationDate: payload.notificationDate,
-          pendingCount: payload.pendingCount,
-          offerLink: offerLink,
-          did: acceptChannelDid,
-        ).toString(),
-      );
+  }) => NotificationItem(
+    id: id,
+    type: NotificationItemType.invitationAccept,
+    deviceHash: deviceHash,
+    consumerAuthDid: consumerAuthDid,
+    acceptChannelDid: acceptChannelDid,
+    payload: InvitationAcceptPayload(
+      id: id,
+      notificationDate: payload.notificationDate,
+      pendingCount: payload.pendingCount,
+      offerLink: offerLink,
+      did: acceptChannelDid,
+    ).toString(),
+  );
 
   factory NotificationItem.invitationGroupAccept({
     required String id,
@@ -187,21 +186,20 @@ class NotificationItem extends Entity {
     required String acceptChannelDid,
     required String offerLink,
     required DeviceNotificationData payload,
-  }) =>
-      NotificationItem(
-        id: id,
-        type: NotificationItemType.invitationGroupAccept,
-        deviceHash: deviceHash,
-        consumerAuthDid: consumerAuthDid,
-        acceptChannelDid: acceptChannelDid,
-        payload: InvitationGroupAcceptPayload(
-          id: id,
-          notificationDate: payload.notificationDate,
-          pendingCount: payload.pendingCount,
-          offerLink: offerLink,
-          did: acceptChannelDid,
-        ).toString(),
-      );
+  }) => NotificationItem(
+    id: id,
+    type: NotificationItemType.invitationGroupAccept,
+    deviceHash: deviceHash,
+    consumerAuthDid: consumerAuthDid,
+    acceptChannelDid: acceptChannelDid,
+    payload: InvitationGroupAcceptPayload(
+      id: id,
+      notificationDate: payload.notificationDate,
+      pendingCount: payload.pendingCount,
+      offerLink: offerLink,
+      did: acceptChannelDid,
+    ).toString(),
+  );
 
   factory NotificationItem.groupMembershipFinalised({
     required String id,
@@ -211,21 +209,20 @@ class NotificationItem extends Entity {
     required String offerLink,
     required int startSeqNo,
     required DeviceNotificationData payload,
-  }) =>
-      NotificationItem(
-        id: id,
-        type: NotificationItemType.groupMembershipFinalised,
-        deviceHash: deviceHash,
-        consumerAuthDid: consumerAuthDid,
-        acceptChannelDid: acceptChannelDid,
-        payload: GroupMembershipFinalisedPayload(
-          id: id,
-          notificationDate: payload.notificationDate,
-          pendingCount: payload.pendingCount,
-          offerLink: offerLink,
-          startSeqNo: startSeqNo,
-        ).toString(),
-      );
+  }) => NotificationItem(
+    id: id,
+    type: NotificationItemType.groupMembershipFinalised,
+    deviceHash: deviceHash,
+    consumerAuthDid: consumerAuthDid,
+    acceptChannelDid: acceptChannelDid,
+    payload: GroupMembershipFinalisedPayload(
+      id: id,
+      notificationDate: payload.notificationDate,
+      pendingCount: payload.pendingCount,
+      offerLink: offerLink,
+      startSeqNo: startSeqNo,
+    ).toString(),
+  );
 
   factory NotificationItem.channelActivity({
     required String id,
@@ -234,21 +231,20 @@ class NotificationItem extends Entity {
     required String consumerAuthDid,
     required String acceptChannelDid,
     required DeviceNotificationData payload,
-  }) =>
-      NotificationItem(
-        id: id,
-        type: NotificationItemType.channelActivity,
-        deviceHash: deviceHash,
-        consumerAuthDid: consumerAuthDid,
-        acceptChannelDid: acceptChannelDid,
-        payload: ChannelActivityPayload(
-          id: payload.id,
-          notificationDate: payload.notificationDate,
-          pendingCount: payload.pendingCount,
-          did: acceptChannelDid,
-          type: type,
-        ).toString(),
-      );
+  }) => NotificationItem(
+    id: id,
+    type: NotificationItemType.channelActivity,
+    deviceHash: deviceHash,
+    consumerAuthDid: consumerAuthDid,
+    acceptChannelDid: acceptChannelDid,
+    payload: ChannelActivityPayload(
+      id: payload.id,
+      notificationDate: payload.notificationDate,
+      pendingCount: payload.pendingCount,
+      did: acceptChannelDid,
+      type: type,
+    ).toString(),
+  );
 
   factory NotificationItem.offerFinalised({
     required String id,
@@ -257,20 +253,19 @@ class NotificationItem extends Entity {
     required String offerLink,
     required String notificationToken,
     required DeviceNotificationData payload,
-  }) =>
-      NotificationItem(
-        id: id,
-        type: NotificationItemType.offerFinalised,
-        deviceHash: deviceHash,
-        consumerAuthDid: consumerAuthDid,
-        payload: OfferFinalisedPayload(
-          id: payload.id,
-          notificationDate: payload.notificationDate,
-          pendingCount: payload.pendingCount,
-          offerLink: offerLink,
-          notificationToken: notificationToken,
-        ).toString(),
-      );
+  }) => NotificationItem(
+    id: id,
+    type: NotificationItemType.offerFinalised,
+    deviceHash: deviceHash,
+    consumerAuthDid: consumerAuthDid,
+    payload: OfferFinalisedPayload(
+      id: payload.id,
+      notificationDate: payload.notificationDate,
+      pendingCount: payload.pendingCount,
+      offerLink: offerLink,
+      notificationToken: notificationToken,
+    ).toString(),
+  );
 
   factory NotificationItem.invitationOutreach({
     required String id,
@@ -278,19 +273,18 @@ class NotificationItem extends Entity {
     required String consumerAuthDid,
     required String offerLink,
     required DeviceNotificationData payload,
-  }) =>
-      NotificationItem(
-        id: id,
-        type: NotificationItemType.invitationOutreach,
-        deviceHash: deviceHash,
-        consumerAuthDid: consumerAuthDid,
-        payload: InvitationOutreachPayload(
-          id: id,
-          notificationDate: payload.notificationDate,
-          pendingCount: payload.pendingCount,
-          offerLink: offerLink,
-        ).toString(),
-      );
+  }) => NotificationItem(
+    id: id,
+    type: NotificationItemType.invitationOutreach,
+    deviceHash: deviceHash,
+    consumerAuthDid: consumerAuthDid,
+    payload: InvitationOutreachPayload(
+      id: id,
+      notificationDate: payload.notificationDate,
+      pendingCount: payload.pendingCount,
+      offerLink: offerLink,
+    ).toString(),
+  );
 
   @override
   factory NotificationItem.fromJson(Map<String, dynamic> json) =>

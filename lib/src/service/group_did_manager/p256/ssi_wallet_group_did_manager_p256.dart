@@ -10,8 +10,8 @@ class SsiWalletGroupDidManagerP256 implements GroupDidManager {
   SsiWalletGroupDidManagerP256({
     required Wallet wallet,
     required Storage storage,
-  })  : _wallet = wallet,
-        _storage = storage;
+  }) : _wallet = wallet,
+       _storage = storage;
   final Storage _storage;
   final Wallet _wallet;
 
@@ -22,7 +22,9 @@ class SsiWalletGroupDidManagerP256 implements GroupDidManager {
     final didDocument = await groupDidManager.getDidDocument();
 
     final groupId = GroupUtils.generateGroupId(
-        offerLink: offerLink, groupDid: didDocument.id);
+      offerLink: offerLink,
+      groupDid: didDocument.id,
+    );
 
     await _storage.create(KeyReference(keyId: keyPair.id, entityId: groupId));
     return didDocument;
@@ -31,15 +33,22 @@ class SsiWalletGroupDidManagerP256 implements GroupDidManager {
   @override
   Future<DidManager> get(groupId) async {
     final keyReference = await _storage.findOneById(
-        KeyReference.entityName, groupId, KeyReference.fromJson);
+      KeyReference.entityName,
+      groupId,
+      KeyReference.fromJson,
+    );
 
     if (keyReference == null) {
       throw GroupDidManagerException(
-          message: 'Key reference not found', code: 'key_reference_not_found');
+        message: 'Key reference not found',
+        code: 'key_reference_not_found',
+      );
     }
 
     final keyPair = await _wallet.generateKey(
-        keyId: keyReference.keyId, keyType: KeyType.secp256k1);
+      keyId: keyReference.keyId,
+      keyType: KeyType.secp256k1,
+    );
 
     return _getDidManager(_wallet, keyPair);
   }

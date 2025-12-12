@@ -9,13 +9,14 @@ import 'package:aws_ssm_api/ssm-2014-11-06.dart' as ssm;
 import '../credentials_manager/aws_credentials_manager.dart';
 
 class AwsSsmDidDocumentManager implements DidDocumentManager {
-  AwsSsmDidDocumentManager._(
-      {required String region, required AwsClientCredentials credentials})
-      : _credentials = credentials,
-        _provider = ssm.SSM(
-          region: getEnv('AWS_REGION'),
-          credentials: credentials,
-        );
+  AwsSsmDidDocumentManager._({
+    required String region,
+    required AwsClientCredentials credentials,
+  }) : _credentials = credentials,
+       _provider = ssm.SSM(
+         region: getEnv('AWS_REGION'),
+         credentials: credentials,
+       );
 
   final Map<String, dynamic> _inMemoryStorage = {};
   ssm.SSM _provider;

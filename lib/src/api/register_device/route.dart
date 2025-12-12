@@ -28,8 +28,11 @@ Future<Response> registerDevice(
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } catch (e, stackTrace) {
-    facade.logError('Error on register device',
-        error: e, stackTrace: stackTrace);
+    facade.logError(
+      'Error on register device',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return Response.internalServerError(
       body: RegisterDeviceResponse.error().toString(),
     );

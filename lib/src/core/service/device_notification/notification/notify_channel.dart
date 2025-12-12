@@ -3,15 +3,13 @@ import '../device_notification.dart';
 import '../../../entity/notification_item.dart';
 
 class NotifyChannelNotification extends DeviceNotification {
-  NotifyChannelNotification({
-    required super.badgeCount,
-    required super.data,
-  }) : super(
-          subtitle: '',
-          body: '',
-          notificationType: NotificationItemType.channelActivity,
-          threadId: NotificationStackGroupingTypes.channelActivity.value,
-        );
+  NotifyChannelNotification({required super.badgeCount, required super.data})
+    : super(
+        subtitle: '',
+        body: '',
+        notificationType: NotificationItemType.channelActivity,
+        threadId: NotificationStackGroupingTypes.channelActivity.value,
+      );
 
   @override
   String getSubtitle() {
