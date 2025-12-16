@@ -161,7 +161,7 @@ class GroupService {
     required String groupId,
   }) async {
     // TODO: add pagination
-    final groupMembers = await _storage.listAll(
+    final groupMembers = await _storage.findAllById(
       GroupMember.entityName,
       groupId,
       GroupMember.fromJson,
@@ -314,7 +314,7 @@ class GroupService {
   }
 
   Future<List<GroupMember>> _getGroupMembers(final String groupId) {
-    return _storage.listAll<GroupMember>(
+    return _storage.findAllById<GroupMember>(
       GroupMember.entityName,
       groupId,
       GroupMember.fromJson,

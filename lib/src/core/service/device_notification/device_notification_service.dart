@@ -82,7 +82,7 @@ class DeviceNotificationService {
       metadata: '[Authenticated as ] $consumerDid',
     );
 
-    _logger.info('Received plainform endpoint: $endpointArn');
+    _logger.info('Received platform endpoint: $endpointArn');
     return endpointArn!;
   }
 }

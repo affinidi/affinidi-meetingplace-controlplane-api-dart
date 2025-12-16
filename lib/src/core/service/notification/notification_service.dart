@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../../config/config.dart';
+import '../../entity/pending_notification.dart';
 import '../../logger/logger.dart';
 import '../device_notification/device_notification.dart';
 import '../device_notification/device_notification_exception.dart';
@@ -89,24 +90,38 @@ class NotificationService {
     NotificationItem notificationItem,
   ) async {
     _logger.info('save notification item');
-    return _storage.add('PendingNotifications', notificationItem);
+    await _storage.create(notificationItem);
+
+    final pendingNotification = PendingNotification(
+      id: notificationItem.id,
+      deviceHash: notificationItem.deviceHash,
+    );
+
+    await _storage.add(
+      pendingNotification.getEntityName(),
+      pendingNotification,
+    );
+
+    return notificationItem;
   }
 
   Future<List<NotificationItem>> getPendingNotifications(
     String deviceHash,
   ) async {
-    final collection = await _storage.findAllById(
-      'PendingNotifications',
+    final pendingNotifications = await _storage.findAllById(
+      PendingNotification.entityName,
       deviceHash,
+      PendingNotification.fromJson,
     );
 
     final List<NotificationItem> notifications = [];
-    for (var notificationId in collection) {
+    for (var pendingNotification in pendingNotifications) {
       final notification = await _storage.findOneById(
         NotificationItem.entityName,
-        notificationId,
+        pendingNotification.getId(),
         NotificationItem.fromJson,
       );
+
       if (notification != null) {
         notifications.add(notification);
       }
@@ -423,7 +438,7 @@ class NotificationService {
     for (final notificationId in notificationIds) {
       try {
         await _storage.deleteFromlist(
-          'PendingNotifications',
+          PendingNotification.entityName,
           deviceHash,
           NotificationItem.entityName,
           notificationId,

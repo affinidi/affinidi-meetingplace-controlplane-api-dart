@@ -118,10 +118,16 @@ class Redis implements Storage {
   }
 
   @override
-  Future<List<String>> findAllById(String entityName, String id) async {
+  Future<List<T>> findAllById<T>(
+    String entityName,
+    String id,
+    EntityFromJson<T> fromJson,
+  ) async {
     _command ??= (await connect())._command;
     final result = await _command?.send_object(['SMEMBERS', "$entityName#$id"]);
-    return result.toList().cast<String>();
+
+    if (result.isEmpty) return <T>[];
+    return result.map((item) => fromJson(jsonDecode(item))).toList().cast<T>();
   }
 
   @override
@@ -147,14 +153,7 @@ class Redis implements Storage {
     EntityFromJson<T> fromJson,
   ) async {
     _command ??= (await connect())._command;
-    final members = await findAllById(entityName, id);
-
-    final results = <T>[];
-    for (final member in members) {
-      final result = await findOneById<T>(entityName, member, fromJson);
-      if (result != null) results.add(result);
-    }
-    return results;
+    return findAllById(entityName, id, fromJson);
   }
 
   @override
@@ -169,13 +168,13 @@ class Redis implements Storage {
     await _command?.send_object([
       'SADD',
       "$listName#${object.getListId()}",
-      object.getId(),
+      jsonEncode(object),
     ]);
     return object;
   }
 
   @override
-  Future<dynamic> deleteFromlist(
+  Future<void> deleteFromlist(
     String listName,
     String listId,
     String entityName,
@@ -183,7 +182,7 @@ class Redis implements Storage {
   ) async {
     _command ??= (await connect())._command;
     await delete(entityName, id);
-    return _command?.send_object(['SREM', '$listName#$listId', id]);
+    await _command?.send_object(['SREM', '$listName#$listId', id]);
   }
 
   Future<bool> _doesKeyExist(String key) async {

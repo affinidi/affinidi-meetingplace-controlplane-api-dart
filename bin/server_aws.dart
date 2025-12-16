@@ -20,7 +20,7 @@ void main(List<String> args) async {
 
   // Environment dependent configuration
   final logger = ProdLogger();
-  final storage = await Redis.init(logger: logger);
+  final storage = await DynamoDBStorage.init(logger: logger);
   final serverConfig = ServerConfig(
     secretManager: secretManager,
     storage: storage,
