@@ -239,13 +239,11 @@ class DynamoDBStorage implements Storage {
     await _getClient();
     final pk = _getPrimaryKey(entityName, id);
 
-    // Query all items with this PK (all entities of this type for the tenant)
     final result = await _client.query(
       tableName: _tableName,
       keyConditionExpression: 'PK = :pk',
       expressionAttributeValues: {':pk': aws.AttributeValue(s: pk)},
       consistentRead: true,
-      // projectionExpression: 'SK',
     );
 
     if (result.items == null) return [];
@@ -278,18 +276,7 @@ class DynamoDBStorage implements Storage {
   }
 
   @override
-  Future<List<T>> listAll<T extends Entity>(
-    String entityName,
-    String id,
-    EntityFromJson<T> fromJson,
-  ) async {
-    await _getClient();
-    return findAllById(entityName, id, fromJson);
-  }
-
-  @override
   Future<T> add<T extends Entity>(String listName, T object) async {
-    // await create(object);
     await _addListItem(listName, object);
     return object;
   }
@@ -302,7 +289,7 @@ class DynamoDBStorage implements Storage {
     String id,
   ) async {
     await Future.wait([
-      delete(entityName, id), // TODO: move to service?
+      delete(entityName, id),
       _deleteListItem(listName: listName, listId: listId, entityId: id),
     ]);
   }
@@ -360,7 +347,7 @@ class DynamoDBStorage implements Storage {
         m: _toAttributeMap(value.cast<String, dynamic>()),
       );
     }
-    // Fallback to string representation
+
     return aws.AttributeValue(s: value.toString());
   }
 
@@ -374,7 +361,6 @@ class DynamoDBStorage implements Storage {
     return result;
   }
 
-  /// Convert AttributeValue back to dynamic value
   dynamic _fromAttributeValue(aws.AttributeValue value) {
     if (value.s != null) return value.s;
     if (value.n != null) return num.tryParse(value.n!) ?? value.n;

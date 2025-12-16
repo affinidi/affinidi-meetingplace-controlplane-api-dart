@@ -36,12 +36,6 @@ abstract interface class Storage {
 
   Future<int> count(String entityName);
 
-  Future<List<T>> listAll<T extends Entity>(
-    String entityName,
-    String id,
-    EntityFromJson<T> fromJson,
-  );
-
   Future<void> deleteFromlist(
     String listName,
     String listId,

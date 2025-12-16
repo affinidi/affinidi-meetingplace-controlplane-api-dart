@@ -125,14 +125,9 @@ class Redis implements Storage {
   ) async {
     _command ??= (await connect())._command;
     final result = await _command?.send_object(['SMEMBERS', "$entityName#$id"]);
-    if (result.isEmpty) return <T>[];
 
-    return result
-        .map((item) {
-          return fromJson(jsonDecode(item));
-        })
-        .toList()
-        .cast<T>();
+    if (result.isEmpty) return <T>[];
+    return result.map((item) => fromJson(jsonDecode(item))).toList().cast<T>();
   }
 
   @override
