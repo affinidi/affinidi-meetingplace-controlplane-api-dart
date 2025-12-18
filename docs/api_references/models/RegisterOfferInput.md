@@ -7,7 +7,7 @@
 | **offerDescription** | **String** | Describes the purpose of the connection offer. |   |
 | **offerType** | **Integer** | Specifies the type of the offer: 1-Chat, 2-Poll, 3-Group Chat, and 4-Outreach. |   |
 | **didcommMessage** | **String** | A plaintext DIDComm message containing the offer encoded in base64 format. | **`Required`**   |
-| **vcard** | **String** | A vCard of the user who registered the offer encoded in base64 format. | **`Required`**   |
+| **contactCard** | **String** | A ContactCard of the user who registered the offer encoded in base64 format. | **`Required`**   |
 | **validUntil** | **String** | The validity date and time in ISO-8601 format, e.g., 2023-09-20T07:12:13  or an empty string for no expiry. |   |
 | **maximumUsage** | **BigDecimal** | The maximum number of times other users can claim the offer. Set 0 for unlimited claims. |   |
 | **deviceToken** | **String** | The device token for push notification when the offer is accessed.  Maximum length of 2048 characters. | **`Required`**   |

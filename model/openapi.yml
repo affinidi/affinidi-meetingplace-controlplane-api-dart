@@ -520,10 +520,10 @@ components:
             - NONE
           type: string
           description: Platform type for sending notification.
-        vcard:
+        contactCard:
           type: string
           maxLength: 409600
-          description: A vCard containing the details of the offer encoded in base64 format.
+          description: A ContactCard containing the details of the offer encoded in base64 format.
         offerLink:
           type: string
       required:
@@ -531,7 +531,7 @@ components:
         - did
         - deviceToken
         - platformType
-        - vcard
+        - contactCard
         - offerLink
     AcceptOfferInput:
       type: object
@@ -556,10 +556,10 @@ components:
             - NONE
           type: string
           description: Platform type for sending notification.
-        vcard:
+        contactCard:
           type: string
           maxLength: 409600
-          description: A vCard containing the details of the offer encoded in base64 format.
+          description: A ContactCard containing the details of the offer encoded in base64 format.
         offerLink:
           type: string
       required:
@@ -567,7 +567,7 @@ components:
         - did
         - deviceToken
         - platformType
-        - vcard
+        - contactCard
         - offerLink
     DeletePendingNotificationsInput:
       type: object
@@ -739,9 +739,9 @@ components:
         publicKey:
           type: string
           description: The public key information of the group chat member.
-        vcard:
+        contactCard:
           type: string
-          description: The vCard of the member to add to the group chat.
+          description: The ContactCard of the member to add to the group chat.
       required:
         - mnemonic
         - groupId
@@ -749,7 +749,7 @@ components:
         - memberDid
         - reencryptionKey
         - publicKey
-        - vcard
+        - contactCard
         - acceptOfferAsDid
     RegisterOfferInput:
       type: object
@@ -773,9 +773,9 @@ components:
         didcommMessage:
           type: string
           description: A plaintext DIDComm message containing the offer encoded in base64 format.
-        vcard:
+        contactCard:
           type: string
-          description: A vCard of the user who registered the offer encoded in base64 format.
+          description: A ContactCard of the user who registered the offer encoded in base64 format.
         validUntil:
           type: string
           description: >-
@@ -824,7 +824,7 @@ components:
         - didcommMessage
         - deviceToken
         - platformType
-        - vcard
+        - contactCard
         - mediatorDid
         - mediatorEndpoint
         - mediatorWSSEndpoint
@@ -843,9 +843,9 @@ components:
         didcommMessage:
           type: string
           description: A plaintext DIDComm message containing the offer encoded in base64 format.
-        vcard:
+        contactCard:
           type: string
-          description: A vCard of the user who registered the offer encoded in base64 format.
+          description: A ContactCard of the user who registered the offer encoded in base64 format.
         validUntil:
           type: string
           description: >-
@@ -895,23 +895,23 @@ components:
         adminPublicKey:
           type: string
           description: The public key information of the group chat admin.
-        memberVCard:
+        memberContactCard:
           type: string
-          description: A vCard of the group chat member encoded in base64 format.
+          description: A ContactCard of the group chat member encoded in base64 format.
       required:
         - offerName
         - offerDescription
         - didcommMessage
         - deviceToken
         - platformType
-        - vcard
+        - contactCard
         - mediatorEndpoint
         - mediatorWSSEndpoint
         - mediatorDid
         - adminDid
         - adminPublicKey
         - adminReencryptionKey
-        - memberVCard
+        - memberContactCard
     RegisterDeviceInput:
       type: object
       additionalProperties: false
@@ -995,7 +995,7 @@ components:
         - offerLink
         - groupId
         - groupDid
-        - memberVCard
+        - memberContactCard
     DeregisterOfferOK:
       type: object
       additionalProperties: false
@@ -1060,9 +1060,9 @@ components:
         validUntil:
           type: string
           description: validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13
-        vcard:
+        contactCard:
           type: string
-          description: A vCard containing the details of the offer encoded in base64 format.
+          description: A ContactCard containing the details of the offer encoded in base64 format.
         mediatorDid:
           type: string
           description: The mediator DID use to register the offer.
@@ -1077,7 +1077,7 @@ components:
         - offerLink
         - name
         - description
-        - vcard
+        - contactCard
         - mediatorDid
         - mediatorEndpoint
         - mediatorWSSEndpoint
@@ -1102,9 +1102,9 @@ components:
           description: validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13
         maximumUsage:
           type: number
-        vcard:
+        contactCard:
           type: string
-          description: A vCard containing the details of the offer encoded in base64 format.
+          description: A ContactCard containing the details of the offer encoded in base64 format.
         mediatorDid:
           type: string
           description: The mediator DID use to register the offer.
@@ -1119,7 +1119,7 @@ components:
         - offerLink
         - name
         - description
-        - vcard
+        - contactCard
         - mediatorDid
         - mediatorEndpoint
         - mediatorWSSEndpoint
@@ -1140,9 +1140,9 @@ components:
         validUntil:
           type: string
           description: validity date and time in ISO-8601 format, e.g. 2023-09-20T07:12:13
-        vcard:
+        contactCard:
           type: string
-          description: A vCard containing the details of the offer encoded in base64 format.
+          description: A ContactCard containing the details of the offer encoded in base64 format.
         contactAttributes:
           type: number
           description: A bitfield of contact attributes
@@ -1176,7 +1176,7 @@ components:
         - name
         - status
         - description
-        - vcard
+        - contactCard
         - contactAttributes
         - mediatorDid
         - mediatorEndpoint

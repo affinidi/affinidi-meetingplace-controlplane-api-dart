@@ -15,7 +15,7 @@ class AddGroupMemberInput {
     required this.memberDid,
     required this.memberPublicKey,
     required this.memberReencryptionKey,
-    required this.memberVCard,
+    required this.memberContactCard,
     required this.platformType,
     required this.platformEndpointArn,
     required this.controllingDid,
@@ -27,7 +27,7 @@ class AddGroupMemberInput {
   final String memberDid;
   final String memberPublicKey;
   final String memberReencryptionKey;
-  final String memberVCard;
+  final String memberContactCard;
   final PlatformType platformType;
   final String platformEndpointArn;
   final String controllingDid;
