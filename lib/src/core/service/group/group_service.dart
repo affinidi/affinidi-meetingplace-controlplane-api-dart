@@ -261,7 +261,12 @@ class GroupService {
           ciphertext: payload['ciphertext'],
           iv: payload['iv'],
           authenticationTag: payload['authentication_tag'],
-          preCapsule: payload['capsule'],
+          preCapsule: _recryptService
+              .reEncryptCapsule(
+                payload['capsule'],
+                reencryptionKeyBase64: groupMember.memberReencryptionKey,
+              )
+              .toBase64(),
           fromDid: sender.memberDid,
           seqNo: group.seqNo,
         );

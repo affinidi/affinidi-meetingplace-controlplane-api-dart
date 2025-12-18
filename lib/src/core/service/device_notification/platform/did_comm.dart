@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:didcomm/didcomm.dart';
 import 'package:meeting_place_core/meeting_place_core.dart';
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
