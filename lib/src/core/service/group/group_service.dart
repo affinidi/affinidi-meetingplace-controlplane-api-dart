@@ -258,22 +258,17 @@ class GroupService {
         final messageToSend = GroupMessage.create(
           from: group.groupDid,
           to: [recipientDidDoc.id],
-          iv: payload['iv'],
-          authenticationTag: payload['authenticationTag'],
           ciphertext: payload['ciphertext'],
-          preCapsule: _recryptService
-              .reEncryptCapsule(
-                payload['capsule'],
-                reencryptionKeyBase64: groupMember.memberReencryptionKey,
-              )
-              .toBase64(),
+          iv: payload['iv'],
+          authenticationTag: payload['authentication_tag'],
+          preCapsule: payload['capsule'],
           fromDid: sender.memberDid,
           seqNo: group.seqNo,
         );
 
         try {
           await mediatorSDK.sendMessage(
-            messageToSend,
+            messageToSend.toPlainTextMessage(),
             senderDidManager: groupDidManager,
             recipientDidDocument: recipientDidDoc,
             mediatorDid: group.mediatorDid,

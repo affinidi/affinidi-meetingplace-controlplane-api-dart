@@ -35,7 +35,9 @@ class ClientHelper {
 
     final plaintextMessage = PlainTextMessage(
       id: const Uuid().v4(),
-      type: Uri.parse('https://affinidi.io/mpx/control-plane/authenticate'),
+      type: Uri.parse(
+        'https://affinidi.com/didcomm/protocols/meeting-place-control-plane/1.0/authenticate',
+      ),
       body: {'challenge': challengeToken},
       to: [controlPlaneDid],
       from: didDocument.id,
