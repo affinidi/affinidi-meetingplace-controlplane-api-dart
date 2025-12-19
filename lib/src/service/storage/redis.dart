@@ -147,16 +147,6 @@ class Redis implements Storage {
   }
 
   @override
-  Future<List<T>> listAll<T extends Entity>(
-    String entityName,
-    String id,
-    EntityFromJson<T> fromJson,
-  ) async {
-    _command ??= (await connect())._command;
-    return findAllById(entityName, id, fromJson);
-  }
-
-  @override
   Future<T> add<T extends Entity>(String listName, T object) async {
     _command ??= (await connect())._command;
     await _command?.send_object([

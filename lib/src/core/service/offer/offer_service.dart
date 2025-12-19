@@ -100,7 +100,7 @@ class OfferService {
       description: input.offerDescription,
       offerType: input.offerType,
       didcommMessage: input.didcommMessage,
-      vcard: input.vcard,
+      contactCard: input.contactCard,
       platformType: deviceTokenMapping.platformType,
       platformEndpointArn: deviceTokenMapping.platformEndpointArn,
       maximumQueries: offerLimits['maximumQueries'],

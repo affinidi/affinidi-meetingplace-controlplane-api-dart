@@ -60,7 +60,7 @@ void main() {
           'ciphertext': 'cipher-sample',
           'capsule': (result['capsule'] as Capsule).toBase64(),
           'iv': 'iv-sample',
-          'authenticationTag': 'auth-tag-sample',
+          'authentication_tag': 'auth-tag-sample',
         }),
       ),
     );
@@ -179,7 +179,10 @@ void main() {
       equals(registerOfferRequest.offerDescription),
     );
 
-    expect(findOfferResponse.data['vcard'], equals(registerOfferRequest.vcard));
+    expect(
+      findOfferResponse.data['contactCard'],
+      equals(registerOfferRequest.contactCard),
+    );
 
     expect(
       findOfferResponse.data['validUntil'],
@@ -252,7 +255,10 @@ void main() {
       registerOfferRequest.offerDescription,
     );
 
-    expect(acceptOfferResponse.data['vcard'], registerOfferRequest.vcard);
+    expect(
+      acceptOfferResponse.data['contactCard'],
+      registerOfferRequest.contactCard,
+    );
 
     expect(
       acceptOfferResponse.data['validUntil'],
@@ -424,7 +430,10 @@ void main() {
       registerOfferRequest.offerDescription,
     );
 
-    expect(acceptOfferResponse.data['vcard'], registerOfferRequest.vcard);
+    expect(
+      acceptOfferResponse.data['contactCard'],
+      registerOfferRequest.contactCard,
+    );
 
     expect(
       acceptOfferResponse.data['validUntil'],
@@ -1353,7 +1362,7 @@ void main() {
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
         reencryptionKey: reencryptionKey.toBase64(),
         publicKey: reencryptKeyPair.publicKeyToBase64(),
-        vcard: '',
+        contactCard: '',
       ).toJson(),
       options: Options(
         headers: {
@@ -1402,7 +1411,7 @@ void main() {
       'offerLink': registerOfferResponse.data['offerLink'],
       'name': registerOfferRequestMock.offerName,
       'description': registerOfferRequestMock.offerDescription,
-      'vcard': registerOfferRequestMock.vcard,
+      'contactCard': registerOfferRequestMock.contactCard,
       'validUntil': registerOfferResponse.data['validUntil'],
       'maximumUsage': registerOfferResponse.data['maximumUsage'],
       'mediatorDid': registerOfferRequestMock.mediatorDid,
@@ -1887,7 +1896,7 @@ void main() {
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
         reencryptionKey: reencryptionKey.toBase64(),
         publicKey: reencryptKeyPair.publicKeyToBase64(),
-        vcard: '',
+        contactCard: '',
       ).toJson(),
       options: Options(
         headers: {
@@ -1916,7 +1925,7 @@ void main() {
               'ciphertext': expCiphertext,
               'capsule': expCapsule,
               'iv': expIV,
-              'authenticationTag': expAuthenticationTag,
+              'authentication_tag': expAuthenticationTag,
             }),
           ),
         ),
@@ -1944,12 +1953,12 @@ void main() {
     expect(receivedMessage.body!['ciphertext'], equals(expCiphertext));
     expect(receivedMessage.body!['iv'], equals(expIV));
     expect(
-      receivedMessage.body!['authenticationTag'],
+      receivedMessage.body!['authentication_tag'],
       equals(expAuthenticationTag),
     );
-    expect(receivedMessage.body!['preCapsule'], isNotNull);
-    expect(receivedMessage.body!['fromDid'], registerOfferRequest.adminDid);
-    expect(receivedMessage.body!['seqNo'], equals(1));
+    expect(receivedMessage.body!['pre_capsule'], isNotNull);
+    expect(receivedMessage.body!['from_did'], registerOfferRequest.adminDid);
+    expect(receivedMessage.body!['seq_no'], equals(1));
   });
 
   test('group-add-member: fails due to missing permissions', () async {
@@ -2010,7 +2019,7 @@ void main() {
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
           reencryptionKey: reencryptionKey.toBase64(),
           publicKey: reencryptKeyPair.publicKeyToBase64(),
-          vcard: '',
+          contactCard: '',
         ).toJson(),
         options: Options(
           headers: {
@@ -2090,7 +2099,7 @@ void main() {
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
         reencryptionKey: reencryptionKey.toBase64(),
         publicKey: reencryptKeyPair.publicKeyToBase64(),
-        vcard: '',
+        contactCard: '',
       ).toJson(),
       options: Options(
         headers: {
@@ -2181,7 +2190,7 @@ void main() {
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
           reencryptionKey: reencryptionKey.toBase64(),
           publicKey: reencryptKeyPair.toBase64(),
-          vcard: '',
+          contactCard: '',
         ).toJson(),
         options: Options(
           headers: {
@@ -2433,7 +2442,7 @@ void main() {
       );
 
       final expectedMessageType =
-          '${getEnv('CONTROL_PLANE_DID')}/mpx/control-plane/invitation-accept';
+          'https://affinidi.com/didcomm/protocols/mpx/1.0/notification-invitation-accept';
 
       channel.listen((message) {
         if (message.type.toString() == expectedMessageType) {

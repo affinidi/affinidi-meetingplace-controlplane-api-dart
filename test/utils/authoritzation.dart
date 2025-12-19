@@ -18,7 +18,9 @@ PlainTextMessage buildPlaintextMessage({
 
   return PlainTextMessage(
     id: const Uuid().v4(),
-    type: Uri.parse('https://affinidi.io/mpx/control-plane/authenticate'),
+    type: Uri.parse(
+      'https://affinidi.com/didcomm/protocols/mpx/1.0/authenticate',
+    ),
     body: {'challenge': challengeToken},
     to: [getEnv('CONTROL_PLANE_DID')],
     from: did,

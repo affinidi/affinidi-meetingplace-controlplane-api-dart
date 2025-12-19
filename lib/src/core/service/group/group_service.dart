@@ -130,7 +130,7 @@ class GroupService {
           memberDid: input.memberDid,
           memberPublicKey: input.memberPublicKey,
           memberReencryptionKey: input.memberReencryptionKey,
-          memberVCard: input.memberVCard,
+          memberContactCard: input.memberContactCard,
           platformEndpointArn: input.platformEndpointArn,
           platformType: input.platformType,
           controllingDid: input.controllingDid,
@@ -258,9 +258,9 @@ class GroupService {
         final messageToSend = GroupMessage.create(
           from: group.groupDid,
           to: [recipientDidDoc.id],
-          iv: payload['iv'],
-          authenticationTag: payload['authenticationTag'],
           ciphertext: payload['ciphertext'],
+          iv: payload['iv'],
+          authenticationTag: payload['authentication_tag'],
           preCapsule: _recryptService
               .reEncryptCapsule(
                 payload['capsule'],
@@ -273,7 +273,7 @@ class GroupService {
 
         try {
           await mediatorSDK.sendMessage(
-            messageToSend,
+            messageToSend.toPlainTextMessage(),
             senderDidManager: groupDidManager,
             recipientDidDocument: recipientDidDoc,
             mediatorDid: group.mediatorDid,

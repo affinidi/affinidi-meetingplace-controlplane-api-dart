@@ -29,7 +29,7 @@ class GroupAddMemberRequest {
     required this.acceptOfferAsDid,
     required this.reencryptionKey,
     required this.publicKey,
-    required this.vcard,
+    required this.contactCard,
   });
   final String offerLink;
   final String mnemonic;
@@ -38,7 +38,7 @@ class GroupAddMemberRequest {
   final String acceptOfferAsDid;
   final String reencryptionKey;
   final String publicKey;
-  final String vcard;
+  final String contactCard;
 
   toJson() => _$GroupAddMemberRequestToJson(this);
 }

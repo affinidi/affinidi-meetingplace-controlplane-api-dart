@@ -12,7 +12,7 @@ class AcceptOfferGroupResponse {
     required this.offerLink,
     required this.name,
     required this.description,
-    required this.vcard,
+    required this.contactCard,
     required this.validUntil,
     required this.mediatorDid,
     required this.mediatorEndpoint,
@@ -26,7 +26,7 @@ class AcceptOfferGroupResponse {
       offerLink: offer.offerLink,
       name: offer.name,
       description: offer.description,
-      vcard: offer.vcard,
+      contactCard: offer.contactCard,
       validUntil: offer.validUntil,
       mediatorDid: offer.mediatorDid,
       mediatorEndpoint: offer.mediatorEndpoint,
@@ -38,7 +38,7 @@ class AcceptOfferGroupResponse {
   final String offerLink;
   final String name;
   final String description;
-  final String vcard;
+  final String contactCard;
   final String? validUntil;
   final String mediatorDid;
   final String mediatorEndpoint;
