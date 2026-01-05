@@ -115,6 +115,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/DeregisterOfferInput'
+    AdminDeregisterOfferInput:
+      description: List of required and optional parameters to deregister a connection offer as admin.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AdminDeregisterOfferInput'
     CreateOobInput:
       description: List of required and optional parameters to create an Out-of-Band (OOB) offer.
       required: true
@@ -217,6 +224,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/DeregisterOfferOK'
+    AdminDeregisterOfferOK:
+      description: DeregisterOfferOK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AdminDeregisterOfferOK'
     FinaliseOfferOK:
       description: FinaliseOfferOK
       content:
@@ -405,7 +418,6 @@ components:
           description: A unique phrase used to publish and identify the offer.
       required:
         - mnemonic
-        - did
     FinaliseOfferInput:
       description: List of required and optional parameters to finalise the acceptance of an offer.
       type: object
@@ -686,6 +698,16 @@ components:
       required:
         - mnemonic
         - offerLink
+    AdminDeregisterOfferInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mnemonic:
+          type: string
+          maxLength: 256
+          description: A unique phrase used to publish and identify the offer.
+      required:
+        - mnemonic
     RegisterNotificationInput:
       type: object
       additionalProperties: false
@@ -1004,6 +1026,14 @@ components:
           type: string
         message:
           type: string
+    AdminDeregisterOfferOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
     FinaliseOfferOK:
       type: object
       additionalProperties: false
@@ -1015,7 +1045,6 @@ components:
         notificationToken:
           type: string
       required:
-        - offerLink
         - notificationToken
     NotifyAcceptOfferGroupOK:
       type: object
@@ -1852,6 +1881,18 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/DeregisterOfferOK'
+  /v1/admin/deregister-offer:
+    post:
+      operationId: adminDeregisterOfferToConnect
+      description: Deregisters an Out-of-Band (OOB) offer as admin.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/AdminDeregisterOfferInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/AdminDeregisterOfferOK'
   /v1/accept-offer:
     post:
       operationId: acceptOfferToConnect
