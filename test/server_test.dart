@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:meeting_place_control_plane_api/src/api/accept_offer/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/admin/deregister_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/check_offer_phrase/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/create_oob/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/delete_pending_notifications/request_model.dart';
@@ -68,6 +69,7 @@ void main() {
 
   late String aliceAccessToken;
   late String bobAccessToken;
+  late String adminAccessToken;
 
   late Wallet aliceWallet;
   late Wallet bobWallet;
@@ -93,8 +95,16 @@ void main() {
     );
     await bobDidManager.addVerificationMethod(bobKeyPair.id);
 
+    final (adminDidManager, adminKeyPair) =
+        await getAdminDidManagerAndKeyPair();
+
     aliceAccessToken = await handleAuthorization(aliceDidManager, aliceKeyPair);
     bobAccessToken = await handleAuthorization(bobDidManager, bobKeyPair);
+    adminAccessToken = await handleAuthorization(
+      adminDidManager,
+      adminKeyPair,
+      SignatureScheme.ecdsa_secp256k1_sha256,
+    );
 
     await dio.post(
       '$apiEndpoint/v1/register-device',
@@ -898,6 +908,94 @@ void main() {
       ),
     );
   });
+
+  test('#admin/deregister-offer: success', () async {
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer',
+      data: getRegisterOfferRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/admin/deregister-offer',
+      data: AdminDeregisterOfferRequest(
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': adminAccessToken,
+        },
+      ),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    expect(response.data, {
+      'status': 'success',
+      'message': 'Offer deleted successfully',
+    });
+  });
+
+  test(
+    '#admin/deregister-offer: not whitelisted admin is not allowed to deregister offer',
+    () async {
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      final (didManager, keyPair) = await getAdminDidManagerAndKeyPair(
+        "m/44'/60'/0'/1",
+      );
+
+      final accessToken = await handleAuthorization(
+        didManager,
+        keyPair,
+        SignatureScheme.ecdsa_secp256k1_sha256,
+      );
+
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/admin/deregister-offer',
+          data: AdminDeregisterOfferRequest(
+            mnemonic: registerOfferResponse.data['mnemonic'],
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': accessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate((e) {
+            return e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] == 'FORBIDDEN' &&
+                e.response?.data['errorMessage'] ==
+                    'Access to this resource is forbidden';
+          }),
+        ),
+      );
+    },
+  );
 
   test('#finalise-acceptance: success', () async {
     final registerOfferResponse = await dio.post(

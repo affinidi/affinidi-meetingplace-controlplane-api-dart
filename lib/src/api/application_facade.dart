@@ -12,9 +12,11 @@ import '../core/service/group/send_message_input.dart';
 import '../core/entity/group.dart';
 import '../core/service/notification/notify_group_membership_finalised_input.dart';
 import '../core/service/notification/notify_outreach_input.dart';
+import '../core/service/offer/admin_deregister_offer_input.dart';
 import '../utils/platform_type.dart';
 import 'accept_offer/request_model.dart';
 import 'accept_offer_group/request_model.dart';
+import 'admin/deregister_offer/request_model.dart';
 import 'check_offer_phrase/request_model.dart';
 import 'create_oob/request_model.dart';
 import 'delete_pending_notifications/request_model.dart';
@@ -174,6 +176,16 @@ class ApplicationFacade {
         offerLink: request.offerLink,
         mnemonic: request.mnemonic,
       ),
+      authDid,
+    );
+  }
+
+  Future<void> deregisterOfferAsAdmin(
+    AdminDeregisterOfferRequest request,
+    String authDid,
+  ) {
+    return _offerService.deregisterOfferAsAdmin(
+      AdminDeregisterOfferInput(mnemonic: request.mnemonic),
       authDid,
     );
   }

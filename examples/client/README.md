@@ -2,6 +2,8 @@
 
 Standalone example showing how to integrate with the Meeting Place Control Plane API.
 
+[TOC]
+
 ## Prerequisites
 
 - Dart SDK >=3.6.0
@@ -17,6 +19,9 @@ dart pub get
 
 # Run the example (server must be running)
 dart run example_native_flow.dart
+
+# Run the admin script to deregister an offer (server must be running)
+dart run admin/admin_deregister_offer.dart --mnemonic <offer-mnemonic>
 ```
 
 ## What It Shows
@@ -55,6 +60,10 @@ Default configuration:
 ```properties
 API_ENDPOINT=http://localhost:3000
 CONTROL_PLANE_DID=did:localhost:3000
+
+# Required for admin actions
+WALLET_SEED=<hex-encoded-seed>
+ADMIN_WHITELIST=<did1,did2,did3>
 ```
 
 ## Using in Your Project
@@ -84,9 +93,32 @@ final dio = helper.getDioWithAuth(token);
 final response = await dio.post('/v1/register-offer', data: {...});
 ```
 
+## Deregistering an Existing Offer
+To deregister an existing offer on an API instance, follow the example provided below. Before running the command, ensure that all required environment variables are correctly set.
+
+### Required Environment Variables
+
+- **`API_ENDPOINT`**    
+The URL of the specific API instance you want to target.
+
+- **`CONTROL_PLANE_DID`**    
+The DID (Decentralized Identifier) of the control plane for the API instance.
+
+- **`WALLET_SEED`**    
+A hex-encoded BIP39 mnemonic used to derive the DID for administrative actions from a BIP32 wallet.
+
+- **`ADMIN_WHITELIST`**    
+A comma-separated list of admin DIDs. These DIDs are authorized to perform administrative actions.---
+
+### Example Command
+```bash
+dart run admin/admin_deregister_offer.dart --mnemonic <offer-mnemonic>
+```
+
 ## Files
 
 - `lib/client_helper.dart` - Reusable authentication helper
 - `example_native_flow.dart` - Complete Alice-to-Bob workflow
+- `admin/admin_deregister_offer.dart` - Admin action to deregister an offer
 - `.env.example` - Configuration template
 

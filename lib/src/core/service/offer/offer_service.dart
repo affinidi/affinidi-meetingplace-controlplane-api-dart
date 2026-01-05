@@ -1,8 +1,10 @@
 import 'dart:async';
+import '../../../utils/admin_whitelist.dart';
 import '../../config/config.dart';
 import '../../logger/logger.dart';
 import '../../storage/exception/already_exists_exception.dart';
 import '../../storage/exception/conditional_update_failed_exception.dart';
+import 'admin_deregister_offer_input.dart';
 import 'deregister_offer_input.dart';
 import 'register_offer_input.dart';
 import '../../storage/storage.dart';
@@ -154,6 +156,20 @@ class OfferService {
     }
 
     if (offer.createdBy != authDid) {
+      _logger.info('Authenticated did not authorized to deregister offer');
+      throw NotAuthorizedException();
+    }
+
+    return _storage.delete(Offer.entityName, offer.id);
+  }
+
+  Future<void> deregisterOfferAsAdmin(
+    AdminDeregisterOfferInput input,
+    String authDid,
+  ) async {
+    final offer = await _getOfferByMnemonic(input.mnemonic);
+
+    if (!isAdmin(authDid)) {
       _logger.info('Authenticated did not authorized to deregister offer');
       throw NotAuthorizedException();
     }
@@ -322,5 +338,21 @@ class OfferService {
     }
 
     throw AccessTypeNotSupported();
+  }
+
+  Future<Offer> _getOfferByMnemonic(String mnemonic) async {
+    final offerId = _generateId(mnemonic);
+    final offer = await _storage.findOneById(
+      Offer.entityName,
+      offerId,
+      Offer.fromJson,
+    );
+
+    if (offer == null) {
+      _logger.info('Offer not found');
+      throw OfferNotFound(mnemonic: mnemonic);
+    }
+
+    return offer;
   }
 }

@@ -18,7 +18,7 @@ packages:
     source: hosted
     version: "4.0.7"
   args:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: args
       sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  aws_dynamodb_api:
+    dependency: transitive
+    description:
+      name: aws_dynamodb_api
+      sha256: f97d0b247770164640135123c05b6833c64cf224b402728786fe5625edd85ae1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   aws_kms_api:
     dependency: transitive
     description:
@@ -138,7 +146,7 @@ packages:
     source: hosted
     version: "1.19.1"
   convert:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: convert
       sha256: b30acd5944035672bc15c6b7a8b47d773e41e2f17de064350988c5d02adb1c68
@@ -181,10 +189,10 @@ packages:
     dependency: "direct main"
     description:
       name: didcomm
-      sha256: "4f18c62fdfd98eb011d7613517840cc7c905fd0028c2716ebee4a74fcdcf6d0f"
+      sha256: "8a6de5c8e2406603071b866b2e478028e16062596f68805f196a40ef58d31d62"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.3"
+    version: "2.3.0"
   dio:
     dependency: "direct main"
     description:
@@ -365,10 +373,10 @@ packages:
     dependency: transitive
     description:
       name: meeting_place_control_plane
-      sha256: f3efa3821894336f8d6ce1212cbfc23a9815bf16214bb5edb251acd12474fe9a
+      sha256: "73139ae964cfcf467d1092e484b538c48bd090e253622c00f14d3baf22205bae"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1-dev.9"
+    version: "0.0.1-dev.11"
   meeting_place_control_plane_api:
     dependency: "direct main"
     description:
@@ -380,18 +388,18 @@ packages:
     dependency: transitive
     description:
       name: meeting_place_core
-      sha256: "0bf391bc3beada18374a78140d0ab5d50718313ea50b4cecfd458f0805e5a69d"
+      sha256: e8729b43b35e4fc4f645f0f64dcc1675091e0f473d73f1a4c4fae7ac25ccaffc
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1-dev.12"
+    version: "0.0.1-dev.18"
   meeting_place_mediator:
     dependency: transitive
     description:
       name: meeting_place_mediator
-      sha256: c7e33dd8cf31d76304f1c9f9ac732fdc0c29c1b8cf1a818ff3087af26eddb741
+      sha256: efaa724b1bb8b5f5db3fa5a6c4b87e76aa553f1dffe236879ba10a16afb98b95
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1-dev.7"
+    version: "0.0.1-dev.10"
   meta:
     dependency: transitive
     description:
