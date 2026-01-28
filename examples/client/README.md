@@ -62,7 +62,6 @@ API_ENDPOINT=http://localhost:3000
 CONTROL_PLANE_DID=did:localhost:3000
 
 # Required for admin actions
-WALLET_SEED=<hex-encoded-seed>
 ADMIN_WHITELIST=<did1,did2,did3>
 ```
 
@@ -103,9 +102,6 @@ The URL of the specific API instance you want to target.
 
 - **`CONTROL_PLANE_DID`**    
 The DID (Decentralized Identifier) of the control plane for the API instance.
-
-- **`WALLET_SEED`**    
-A hex-encoded BIP39 mnemonic used to derive the DID for administrative actions from a BIP32 wallet.
 
 - **`ADMIN_WHITELIST`**    
 A comma-separated list of admin DIDs. These DIDs are authorized to perform administrative actions.---
