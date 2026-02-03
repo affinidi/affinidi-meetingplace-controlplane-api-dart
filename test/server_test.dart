@@ -44,7 +44,7 @@ import 'mocks/accept_offer_request.dart';
 import 'mocks/devices.dart';
 import 'mocks/register_offer_group_request.dart';
 import 'mocks/register_offer_request.dart';
-import 'utils/authoritzation.dart';
+import 'utils/authorization.dart';
 import 'utils/did_generator.dart';
 import 'utils/recrypt.dart';
 
