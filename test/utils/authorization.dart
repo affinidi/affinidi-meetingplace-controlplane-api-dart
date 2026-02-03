@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:base_codecs/base_codecs.dart';
 import 'package:meeting_place_control_plane_api/meeting_place_control_plane_api.dart';
 
 import 'package:didcomm/didcomm.dart';
@@ -29,7 +31,11 @@ PlainTextMessage buildPlaintextMessage({
   );
 }
 
-handleAuthorization(DidManager didManager, KeyPair keyPair) async {
+handleAuthorization(
+  DidManager didManager,
+  KeyPair keyPair, [
+  SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
+]) async {
   final dioInstance = Dio();
   final didDocument = await didManager.getDidDocument();
 
@@ -65,7 +71,7 @@ handleAuthorization(DidManager didManager, KeyPair keyPair) async {
       did: senderDidDoc.id,
       didKeyId: didKeyId,
       keyPair: keyPair,
-      signatureScheme: SignatureScheme.ecdsa_p256_sha256,
+      signatureScheme: signatureScheme,
     ),
   );
 
@@ -76,4 +82,25 @@ handleAuthorization(DidManager didManager, KeyPair keyPair) async {
   );
 
   return authenticateResponse.data['access_token'];
+}
+
+Future<(DidManager, KeyPair)> getAdminDidManagerAndKeyPair([
+  String keyid = "m/44'/60'/0'/0/0",
+]) async {
+  // Note: Seed used here for example purposes only.
+  // In production, use secure key management.
+  final adminSeed =
+      'a2fd9c0c6c6f4df0e3b3c8e9f1a4d5e2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8';
+  final adminWallet = Bip32Wallet.fromSeed(
+    Uint8List.fromList(hex.decode(adminSeed)),
+  );
+
+  final adminKeyPair = await adminWallet.generateKey(keyId: keyid);
+  final adminDidManager = DidKeyManager(
+    wallet: adminWallet,
+    store: InMemoryDidStore(),
+  );
+  await adminDidManager.addVerificationMethod(adminKeyPair.id);
+
+  return (adminDidManager, adminKeyPair);
 }

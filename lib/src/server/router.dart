@@ -9,6 +9,7 @@ import 'middleware/auth.dart';
 
 import '../api/accept_offer/route.dart';
 import '../api/accept_offer_group/route.dart';
+import '../api/admin/deregister_offer/route.dart';
 import '../api/check_offer_phrase/route.dart';
 import '../api/application_facade.dart';
 import '../api/create_oob/route.dart';
@@ -42,7 +43,13 @@ publicPipeline(handler, ApplicationFacade facade) {
 
 privatePipeline(handler, ApplicationFacade facade) {
   return Pipeline()
-      .addMiddleware(authorize(facade.config.logger))
+      .addMiddleware(authorize(facade.config.logger, adminOnly: false))
+      .addHandler((Request req) => handler(req, facade));
+}
+
+adminPipeline(handler, ApplicationFacade facade) {
+  return Pipeline()
+      .addMiddleware(authorize(facade.config.logger, adminOnly: true))
       .addHandler((Request req) => handler(req, facade));
 }
 
@@ -58,6 +65,11 @@ Router createRouter(ApplicationFacade facade) {
     // authentication routes
     ..post('/v1/authenticate', publicPipeline(authAuthenticate, facade))
     ..post('/v1/authenticate/challenge', publicPipeline(authChallenge, facade))
+    // admin routes
+    ..post(
+      '/v1/admin/deregister-offer',
+      adminPipeline(adminDeregisterOffer, facade),
+    )
     // offer routes
     ..post('/v1/register-offer', privatePipeline(registerOffer, facade))
     ..post(

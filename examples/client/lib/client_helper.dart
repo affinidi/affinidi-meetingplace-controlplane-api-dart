@@ -18,12 +18,24 @@ class ClientHelper {
   Future<(DidKeyManager, KeyPair)> createDidManagerWithKeyPair() async {
     final wallet = PersistentWallet(InMemoryKeyStore());
     final keyPair = await wallet.generateKey(keyId: "m/44'/60'/0'/0");
-    final didManager = DidKeyManager(wallet: wallet, store: InMemoryDidStore());
-    await didManager.addVerificationMethod(keyPair.id);
-    return (didManager, keyPair);
+    return (
+      await createDidManagerFromKeyPair(wallet: wallet, keyPair: keyPair),
+      keyPair
+    );
   }
 
-  Future<String> authenticate(DidKeyManager didManager, KeyPair keyPair) async {
+  Future<DidKeyManager> createDidManagerFromKeyPair(
+      {required Wallet wallet, required KeyPair keyPair}) async {
+    final didManager = DidKeyManager(wallet: wallet, store: InMemoryDidStore());
+    await didManager.addVerificationMethod(keyPair.id);
+    return didManager;
+  }
+
+  Future<String> authenticate({
+    required DidKeyManager didManager,
+    required KeyPair keyPair,
+    SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
+  }) async {
     final didDocument = await didManager.getDidDocument();
 
     final challengeResponse = await _dio.post(
@@ -48,8 +60,7 @@ class ClientHelper {
     final resolver = LocalDidResolver();
     final controlPlaneDidDoc = await resolver.resolveDid(controlPlaneDid);
     final didKeyId = didDocument
-        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc])
-        .first;
+        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc]).first;
 
     final encrypted = await DidcommMessage.packIntoSignedAndEncryptedMessages(
       plaintextMessage,
@@ -62,7 +73,7 @@ class ClientHelper {
         did: didDocument.id,
         didKeyId: didKeyId,
         keyPair: keyPair,
-        signatureScheme: SignatureScheme.ecdsa_p256_sha256,
+        signatureScheme: signatureScheme,
       ),
     );
 

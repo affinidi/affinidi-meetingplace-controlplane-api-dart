@@ -49,7 +49,9 @@ Future<void> main() async {
   final (aliceDidManager, aliceKeyPair) =
       await helper.createDidManagerWithKeyPair();
   final aliceDidDoc = await aliceDidManager.getDidDocument();
-  final aliceToken = await helper.authenticate(aliceDidManager, aliceKeyPair);
+  final aliceToken = await helper.authenticate(
+      didManager: aliceDidManager, keyPair: aliceKeyPair);
+
   print('   Alice DID: ${aliceDidDoc.id}');
   print('   Alice authenticated\n');
 
@@ -92,7 +94,8 @@ Future<void> main() async {
   final (bobDidManager, bobKeyPair) =
       await helper.createDidManagerWithKeyPair();
   final bobDidDoc = await bobDidManager.getDidDocument();
-  final bobToken = await helper.authenticate(bobDidManager, bobKeyPair);
+  final bobToken =
+      await helper.authenticate(didManager: bobDidManager, keyPair: bobKeyPair);
   print('   Bob DID: ${bobDidDoc.id}');
   print('   Bob authenticated\n');
 
