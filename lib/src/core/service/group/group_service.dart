@@ -240,77 +240,74 @@ class GroupService {
 
     final groupMembers = await _getGroupMembers(groupId);
 
-    await Future.wait(
-      groupMembers.map((groupMember) async {
-        // Skip sender
-        if (groupMember.memberDid == sender.memberDid) {
-          return Future.value();
-        }
-
-        final recipientDidDoc = await _didResolver.resolveDid(
-          groupMember.memberDid,
-        );
-
-        final payload = jsonDecode(
-          utf8.decode(base64.decode(input.messagePayload)),
-        );
-
-        final messageToSend = GroupMessage.create(
-          from: group.groupDid,
-          to: [recipientDidDoc.id],
-          ciphertext: payload['ciphertext'],
-          iv: payload['iv'],
-          authenticationTag: payload['authentication_tag'],
-          preCapsule: _recryptService
-              .reEncryptCapsule(
-                payload['capsule'],
-                reencryptionKeyBase64: groupMember.memberReencryptionKey,
-              )
-              .toBase64(),
-          fromDid: sender.memberDid,
-          seqNo: group.seqNo,
-        );
-
-        try {
-          await mediatorSDK.sendMessage(
-            messageToSend.toPlainTextMessage(),
-            senderDidManager: groupDidManager,
-            recipientDidDocument: recipientDidDoc,
-            mediatorDid: group.mediatorDid,
-          );
-
-          if (input.notify) {
-            await _notificationService.notifyChannelGroup(
-              type: 'chat-activity',
-              platformType: groupMember.platformType,
-              platformEndpointArn: groupMember.platformEndpointArn,
-              authDid: input.controllingDid,
-              recipientDid: recipientDidDoc.id,
-            );
-          }
-        } on MeetingPlaceMediatorSDKException catch (e, stackTrace) {
-          final clientException = e.innerException;
-          if (clientException is MediatorClientException) {
-            _logger.error(
-              clientException.innerMessage,
-              error: clientException,
-              stackTrace: stackTrace,
-            );
-          }
-          _logger.error(
-            'Message could not be send from group to member: ${e.message}',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        } catch (e, stackTrace) {
-          _logger.error(
-            'Message could not be send from group to member: ${e.toString()}',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        }
-      }).toList(),
+    final payload = jsonDecode(
+      utf8.decode(base64.decode(input.messagePayload)),
     );
+
+    for (final groupMember in groupMembers) {
+      if (groupMember.memberDid == sender.memberDid) {
+        continue;
+      }
+
+      final recipientDidDoc = await _didResolver.resolveDid(
+        groupMember.memberDid,
+      );
+
+      final messageToSend = GroupMessage.create(
+        from: group.groupDid,
+        to: [recipientDidDoc.id],
+        ciphertext: payload['ciphertext'],
+        iv: payload['iv'],
+        authenticationTag: payload['authentication_tag'],
+        preCapsule: _recryptService
+            .reEncryptCapsule(
+              payload['capsule'],
+              reencryptionKeyBase64: groupMember.memberReencryptionKey,
+            )
+            .toBase64(),
+        fromDid: sender.memberDid,
+        seqNo: group.seqNo,
+      );
+
+      try {
+        await mediatorSDK.sendMessage(
+          messageToSend.toPlainTextMessage(),
+          senderDidManager: groupDidManager,
+          recipientDidDocument: recipientDidDoc,
+          mediatorDid: group.mediatorDid,
+        );
+
+        if (input.notify) {
+          await _notificationService.notifyChannelGroup(
+            type: 'chat-activity',
+            platformType: groupMember.platformType,
+            platformEndpointArn: groupMember.platformEndpointArn,
+            authDid: input.controllingDid,
+            recipientDid: recipientDidDoc.id,
+          );
+        }
+      } on MeetingPlaceMediatorSDKException catch (e, stackTrace) {
+        final clientException = e.innerException;
+        if (clientException is MediatorClientException) {
+          _logger.error(
+            clientException.innerMessage,
+            error: clientException,
+            stackTrace: stackTrace,
+          );
+        }
+        _logger.error(
+          'Message could not be send from group to member: ${e.message}',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      } catch (e, stackTrace) {
+        _logger.error(
+          'Message could not be send from group to member: ${e.toString()}',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
+    }
   }
 
   Future<List<GroupMember>> _getGroupMembers(final String groupId) {
