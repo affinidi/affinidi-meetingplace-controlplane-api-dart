@@ -10,15 +10,25 @@ import 'package:ssi/ssi.dart';
 Future<void> main(List<String> arguments) async {
   final env = DotEnv()..load(['.env']);
 
-  final apiEndpoint = env['API_ENDPOINT'] ?? 'http://localhost:3000';
-  final controlPlaneDid = env['CONTROL_PLANE_DID'] ?? 'did:localhost:3000';
+  final apiEndpoint = env['API_ENDPOINT'];
+  final controlPlaneDid = env['CONTROL_PLANE_DID'];
 
   // Note: Seed used here for example purposes only.
   // In production, use secure key management.
-  final walletSeed =
-      'a2fd9c0c6c6f4df0e3b3c8e9f1a4d5e2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8';
+  final walletSeed = env['ADMIN_WALLET_SEED'];
 
-  print('=== Client Example ===\n');
+  if (apiEndpoint == null ||
+      apiEndpoint.isEmpty ||
+      controlPlaneDid == null ||
+      controlPlaneDid.isEmpty ||
+      walletSeed == null ||
+      walletSeed.isEmpty) {
+    print(
+      'Please ensure that API_ENDPOINT, CONTROL_PLANE_DID, and '
+      'ADMIN_WALLET_SEED are set in the .env file.',
+    );
+    exit(1);
+  }
 
   final helper = ClientHelper(
     apiEndpoint: apiEndpoint,
