@@ -16,6 +16,8 @@ import 'package:meeting_place_control_plane_api/src/api/register_offer/request_m
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_validator.dart';
+import 'package:meeting_place_control_plane_api/src/api/update_offer_vrc_count/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/update_offer_vrc_count/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:test/test.dart';
 
@@ -681,6 +683,49 @@ void main() {
       final result = GroupSendMessageValidator().validate(request.toJson());
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'expiresTime'), true);
+    });
+  });
+
+  group('UpdateOffersVrcCountRequestValidator', () {
+    test('validates valid request', () {
+      final request = UpdateOffersVrcCountRequest(
+        score: 5,
+        offerLinks: ['offer1', 'offer2'],
+      );
+      final result = UpdateOffersVrcCountRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, true);
+    });
+
+    test('fails when score is negative', () {
+      final request = UpdateOffersVrcCountRequest(
+        score: -1,
+        offerLinks: ['offer1'],
+      );
+      final result = UpdateOffersVrcCountRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'score'), true);
+    });
+
+    test('fails when offerLinks is empty', () {
+      final request = UpdateOffersVrcCountRequest(score: 1, offerLinks: []);
+      final result = UpdateOffersVrcCountRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'offerLinks'), true);
+    });
+
+    test('fails when offerLinks is null', () {
+      final result = UpdateOffersVrcCountRequestValidator().validate({
+        'score': 1,
+        'offerLinks': null,
+      });
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'offerLinks'), true);
     });
   });
 }

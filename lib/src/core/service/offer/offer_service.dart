@@ -243,6 +243,16 @@ class OfferService {
     return offer != null;
   }
 
+  Future<Offer?> getOfferByLink(String offerLink) async {
+    final offers = await _storage.findAllById(
+      Offer.entityName,
+      offerLink,
+      Offer.fromJson,
+    );
+
+    return offers.isNotEmpty ? offers.first : null;
+  }
+
   bool _hasOfferExpired(Offer offer, OfferAccessType accessType) {
     if (offer.validUntil == null) {
       return false;

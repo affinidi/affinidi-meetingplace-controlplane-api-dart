@@ -31,6 +31,7 @@ Offer _$OfferFromJson(Map<String, dynamic> json) =>
         metadata: json['metadata'] as String?,
         groupId: json['groupId'] as String?,
         groupDid: json['groupDid'] as String?,
+        vrcCount: (json['vrcCount'] as num?)?.toInt(),
       )
       ..queryCount = (json['queryCount'] as num).toInt()
       ..claimCount = (json['claimCount'] as num).toInt()
@@ -52,6 +53,7 @@ Map<String, dynamic> _$OfferToJson(Offer instance) => <String, dynamic>{
   'validUntil': instance.validUntil,
   'customPhrase': instance.customPhrase,
   'metadata': instance.metadata,
+  'vrcCount': instance.vrcCount,
   'groupId': instance.groupId,
   'groupDid': instance.groupDid,
   'queryCount': instance.queryCount,

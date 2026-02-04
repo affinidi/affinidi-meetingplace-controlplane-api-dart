@@ -596,6 +596,22 @@ class ApplicationFacade {
     );
   }
 
+  Future<List<Offer>> updateOffersVrcCount(
+    int score,
+    List<String> offerLinks,
+  ) async {
+    final List<Offer> updated = [];
+    for (final link in offerLinks) {
+      Offer? offer = await _offerService.getOfferByLink(link);
+      if (offer != null) {
+        offer.vrcCount = score;
+        await _offerService.updateOffer(offer);
+        updated.add(offer);
+      }
+    }
+    return updated;
+  }
+
   logInfo(String message) => _logger.info(message);
 
   logError(
