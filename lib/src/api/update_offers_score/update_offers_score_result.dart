@@ -1,11 +1,12 @@
 import '../../core/entity/offer.dart';
+import 'response_model.dart';
 
 class UpdateOffersScoreResult {
   UpdateOffersScoreResult({
     required this.updatedOffers,
-    required this.unauthorizedMnemonics,
+    required this.failedOffers,
   });
 
   final List<Offer> updatedOffers;
-  final List<String> unauthorizedMnemonics;
+  final List<FailedOffer> failedOffers;
 }

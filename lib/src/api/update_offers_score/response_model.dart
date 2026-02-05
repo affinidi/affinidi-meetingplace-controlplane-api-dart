@@ -7,7 +7,7 @@ part 'response_model.g.dart';
 class UpdateOffersScoreResponse {
   UpdateOffersScoreResponse({
     required this.updatedOffers,
-    required this.unauthorizedMnemonics,
+    required this.failedOffers,
   });
 
   factory UpdateOffersScoreResponse.fromJson(Map<String, dynamic> json) =>
@@ -16,5 +16,18 @@ class UpdateOffersScoreResponse {
   Map<String, dynamic> toJson() => _$UpdateOffersScoreResponseToJson(this);
 
   final List<Offer> updatedOffers;
-  final List<String> unauthorizedMnemonics;
+  final List<FailedOffer> failedOffers;
+}
+
+@JsonSerializable()
+class FailedOffer {
+  FailedOffer({required this.mnemonic, required this.reason});
+
+  factory FailedOffer.fromJson(Map<String, dynamic> json) =>
+      _$FailedOfferFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FailedOfferToJson(this);
+
+  final String mnemonic;
+  final String reason;
 }

@@ -27,7 +27,7 @@ Future<Response> updateOffersScore(
 
     final response = UpdateOffersScoreResponse(
       updatedOffers: result.updatedOffers,
-      unauthorizedMnemonics: result.unauthorizedMnemonics,
+      failedOffers: result.failedOffers,
     );
 
     return Response.ok(

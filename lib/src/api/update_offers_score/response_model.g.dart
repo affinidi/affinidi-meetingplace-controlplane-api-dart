@@ -12,8 +12,8 @@ UpdateOffersScoreResponse _$UpdateOffersScoreResponseFromJson(
   updatedOffers: (json['updatedOffers'] as List<dynamic>)
       .map((e) => Offer.fromJson(e as Map<String, dynamic>))
       .toList(),
-  unauthorizedMnemonics: (json['unauthorizedMnemonics'] as List<dynamic>)
-      .map((e) => e as String)
+  failedOffers: (json['failedOffers'] as List<dynamic>)
+      .map((e) => FailedOffer.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
@@ -21,5 +21,13 @@ Map<String, dynamic> _$UpdateOffersScoreResponseToJson(
   UpdateOffersScoreResponse instance,
 ) => <String, dynamic>{
   'updatedOffers': instance.updatedOffers,
-  'unauthorizedMnemonics': instance.unauthorizedMnemonics,
+  'failedOffers': instance.failedOffers,
 };
+
+FailedOffer _$FailedOfferFromJson(Map<String, dynamic> json) => FailedOffer(
+  mnemonic: json['mnemonic'] as String,
+  reason: json['reason'] as String,
+);
+
+Map<String, dynamic> _$FailedOfferToJson(FailedOffer instance) =>
+    <String, dynamic>{'mnemonic': instance.mnemonic, 'reason': instance.reason};
