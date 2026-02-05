@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 
-import '../api/update_offer_vrc_count/route.dart';
+import '../api/update_offers_score/route.dart';
 import 'middleware/auth.dart';
 
 import '../api/accept_offer/route.dart';
@@ -83,8 +83,8 @@ Router createRouter(ApplicationFacade facade) {
     ..post('/v1/accept-offer-group', privatePipeline(acceptOfferGroup, facade))
     ..post('/v1/check-offer-phrase', privatePipeline(checkOfferPhrase, facade))
     ..post(
-      '/v1/update-offers-vrc-count',
-      privatePipeline(updateOffersVrcCount, facade),
+      '/v1/update-offers-score',
+      privatePipeline(updateOffersScore, facade),
     )
     // acceptance routes
     ..post(

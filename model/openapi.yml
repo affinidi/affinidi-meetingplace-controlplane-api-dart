@@ -2087,10 +2087,10 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/CheckOfferPhraseOK"
-  /v1/update-offers-vrc-count:
+  /v1/update-offers-score:
   post:
-    operationId: updateOffersVrcCount
-    description: Batch update the VRC count for multiple offers.
+    operationId: updateOffersScore
+    description: Batch update the score for multiple offers.
     security:
       - DidCommTokenAuth: []
     parameters: []
@@ -2103,7 +2103,7 @@ paths:
             properties:
               score:
                 type: integer
-                description: Latest VRC count to set.
+                description: Latest score to set.
               offerLinks:
                 type: array
                 items:

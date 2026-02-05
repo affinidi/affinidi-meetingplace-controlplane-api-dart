@@ -6,14 +6,14 @@ part of 'response_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UpdateOffersVrcCountResponse _$UpdateOffersVrcCountResponseFromJson(
+UpdateOffersScoreResponse _$UpdateOffersScoreResponseFromJson(
   Map<String, dynamic> json,
-) => UpdateOffersVrcCountResponse(
+) => UpdateOffersScoreResponse(
   updatedOffers: (json['updatedOffers'] as List<dynamic>)
       .map((e) => Offer.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
-Map<String, dynamic> _$UpdateOffersVrcCountResponseToJson(
-  UpdateOffersVrcCountResponse instance,
+Map<String, dynamic> _$UpdateOffersScoreResponseToJson(
+  UpdateOffersScoreResponse instance,
 ) => <String, dynamic>{'updatedOffers': instance.updatedOffers};

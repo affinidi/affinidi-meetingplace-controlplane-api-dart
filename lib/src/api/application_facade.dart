@@ -596,7 +596,7 @@ class ApplicationFacade {
     );
   }
 
-  Future<List<Offer>> updateOffersVrcCount(
+  Future<List<Offer>> updateOffersScore(
     int score,
     List<String> offerLinks,
   ) async {
@@ -604,7 +604,7 @@ class ApplicationFacade {
     for (final link in offerLinks) {
       Offer? offer = await _offerService.getOfferByLink(link);
       if (offer != null) {
-        offer.vrcCount = score;
+        offer.score = score;
         await _offerService.updateOffer(offer);
         updated.add(offer);
       }

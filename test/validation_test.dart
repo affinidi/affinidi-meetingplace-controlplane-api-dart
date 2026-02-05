@@ -16,8 +16,8 @@ import 'package:meeting_place_control_plane_api/src/api/register_offer/request_m
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_validator.dart';
-import 'package:meeting_place_control_plane_api/src/api/update_offer_vrc_count/request_model.dart';
-import 'package:meeting_place_control_plane_api/src/api/update_offer_vrc_count/request_validator.dart';
+import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:test/test.dart';
 
@@ -686,24 +686,24 @@ void main() {
     });
   });
 
-  group('UpdateOffersVrcCountRequestValidator', () {
+  group('UpdateOffersScoreRequestValidator', () {
     test('validates valid request', () {
-      final request = UpdateOffersVrcCountRequest(
+      final request = UpdateOffersScoreRequest(
         score: 5,
         offerLinks: ['offer1', 'offer2'],
       );
-      final result = UpdateOffersVrcCountRequestValidator().validate(
+      final result = UpdateOffersScoreRequestValidator().validate(
         request.toJson(),
       );
       expect(result.isValid, true);
     });
 
     test('fails when score is negative', () {
-      final request = UpdateOffersVrcCountRequest(
+      final request = UpdateOffersScoreRequest(
         score: -1,
         offerLinks: ['offer1'],
       );
-      final result = UpdateOffersVrcCountRequestValidator().validate(
+      final result = UpdateOffersScoreRequestValidator().validate(
         request.toJson(),
       );
       expect(result.isValid, false);
@@ -711,8 +711,8 @@ void main() {
     });
 
     test('fails when offerLinks is empty', () {
-      final request = UpdateOffersVrcCountRequest(score: 1, offerLinks: []);
-      final result = UpdateOffersVrcCountRequestValidator().validate(
+      final request = UpdateOffersScoreRequest(score: 1, offerLinks: []);
+      final result = UpdateOffersScoreRequestValidator().validate(
         request.toJson(),
       );
       expect(result.isValid, false);
@@ -720,7 +720,7 @@ void main() {
     });
 
     test('fails when offerLinks is null', () {
-      final result = UpdateOffersVrcCountRequestValidator().validate({
+      final result = UpdateOffersScoreRequestValidator().validate({
         'score': 1,
         'offerLinks': null,
       });

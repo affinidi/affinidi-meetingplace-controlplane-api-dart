@@ -1,7 +1,7 @@
 import 'package:lucid_validation/lucid_validation.dart';
 
-class UpdateOffersVrcCountRequestValidator extends LucidValidator {
-  UpdateOffersVrcCountRequestValidator() {
+class UpdateOffersScoreRequestValidator extends LucidValidator {
+  UpdateOffersScoreRequestValidator() {
     ruleFor((request) => request['score'] as int?, key: 'score')
         .must((v) => v != null, 'Score is required', 'missingScore')
         .must((v) => v is int, 'Score must be an integer', 'invalidScoreType')

@@ -1520,6 +1520,7 @@ void main() {
       'contactAttributes': registerOfferRequestMock.contactAttributes,
       'groupId': null,
       'groupDid': null,
+      'score': null,
     });
   });
 
@@ -2617,7 +2618,7 @@ void main() {
         '''Doesnt work on local server instance because mediator cant resolve did:web document of the server''',
   );
 
-  test('update-offers-vrc-count: success', () async {
+  test('update-offers-score: success', () async {
     final registerOfferResponse = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: getRegisterOfferRequestMock(
@@ -2635,7 +2636,7 @@ void main() {
     final offerLink = registerOfferResponse.data['offerLink'];
 
     final response = await dio.post(
-      '$apiEndpoint/v1/update-offers-vrc-count',
+      '$apiEndpoint/v1/update-offers-score',
       data: {
         'score': 10,
         'offerLinks': [offerLink],
@@ -2650,12 +2651,12 @@ void main() {
 
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data['updatedOffers'], isList);
-    expect(response.data['updatedOffers'].first['vrcCount'], 10);
+    expect(response.data['updatedOffers'].first['score'], 10);
   });
 
-  test('update-offers-vrc-count: fails with negative score', () async {
+  test('update-offers-score: fails with negative score', () async {
     final response = await dio.post(
-      '$apiEndpoint/v1/update-offers-vrc-count',
+      '$apiEndpoint/v1/update-offers-score',
       data: {
         'score': -1,
         'offerLinks': ['offer1'],
@@ -2671,9 +2672,9 @@ void main() {
     expect(response.data.toString(), contains('score'));
   });
 
-  test('update-offers-vrc-count: fails with empty offerLinks', () async {
+  test('update-offers-score: fails with empty offerLinks', () async {
     final response = await dio.post(
-      '$apiEndpoint/v1/update-offers-vrc-count',
+      '$apiEndpoint/v1/update-offers-score',
       data: {'score': 1, 'offerLinks': []},
       options: Options(
         headers: {

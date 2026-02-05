@@ -22,7 +22,7 @@ QueryOfferResponse _$QueryOfferResponseFromJson(Map<String, dynamic> json) =>
       contactAttributes: (json['contactAttributes'] as num).toInt(),
       groupId: json['groupId'] as String?,
       groupDid: json['groupDid'] as String?,
-      vrcCount: (json['vrcCount'] as num?)?.toInt(),
+      score: (json['score'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$QueryOfferResponseToJson(QueryOfferResponse instance) =>
@@ -41,5 +41,5 @@ Map<String, dynamic> _$QueryOfferResponseToJson(QueryOfferResponse instance) =>
       'maximumUsage': instance.maximumUsage,
       'groupId': instance.groupId,
       'groupDid': instance.groupDid,
-      'vrcCount': instance.vrcCount,
+      'score': instance.score,
     };

@@ -6,17 +6,17 @@ part of 'request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UpdateOffersVrcCountRequest _$UpdateOffersVrcCountRequestFromJson(
+UpdateOffersScoreRequest _$UpdateOffersScoreRequestFromJson(
   Map<String, dynamic> json,
-) => UpdateOffersVrcCountRequest(
+) => UpdateOffersScoreRequest(
   score: (json['score'] as num).toInt(),
   offerLinks: (json['offerLinks'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
 );
 
-Map<String, dynamic> _$UpdateOffersVrcCountRequestToJson(
-  UpdateOffersVrcCountRequest instance,
+Map<String, dynamic> _$UpdateOffersScoreRequestToJson(
+  UpdateOffersScoreRequest instance,
 ) => <String, dynamic>{
   'score': instance.score,
   'offerLinks': instance.offerLinks,
