@@ -19,14 +19,19 @@ Future<Response> updateOffersScore(
 
     final authDid = request.context['authDid'] as String;
 
-    final updatedOffers = await facade.updateOffersScore(
+    final result = await facade.updateOffersScore(
       input.score,
       input.mnemonics,
       authDid,
     );
 
+    final response = UpdateOffersScoreResponse(
+      updatedOffers: result.updatedOffers,
+      unauthorizedMnemonics: result.unauthorizedMnemonics,
+    );
+
     return Response.ok(
-      jsonEncode(UpdateOffersScoreResponse(updatedOffers: updatedOffers)),
+      jsonEncode(response.toJson()),
       headers: {'content-type': 'application/json'},
     );
   } on RequestValidationException catch (e) {

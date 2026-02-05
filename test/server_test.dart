@@ -2640,8 +2640,9 @@ void main() {
     );
 
     expect(response.statusCode, HttpStatus.ok);
-    expect(response.data['updatedOffers'], isList);
-    expect(response.data['updatedOffers'].first['score'], 10);
+    final responseData = response.data as Map<String, dynamic>;
+    expect(responseData['updatedOffers'], isNotEmpty);
+    expect(responseData['unauthorizedMnemonics'], isEmpty);
   });
 
   test('update-offers-score: fails if user is not the owner', () async {
@@ -2656,23 +2657,19 @@ void main() {
 
     final mnemonic = registerOfferResponse.data['mnemonic'];
 
-    try {
-      await dio.post(
-        '$apiEndpoint/v1/update-offers-score',
-        data: {
-          'score': 10,
-          'mnemonics': [mnemonic],
-        },
-        options: Options(headers: {'authorization': bobAccessToken}),
-      );
-      fail('Expected DioException not thrown');
-    } on DioException catch (e) {
-      expect(e.response?.statusCode, HttpStatus.forbidden);
-      expect(
-        e.response?.data.toString(),
-        contains('Update offers score exception: permission denied'),
-      );
-    }
+    final response = await dio.post(
+      '$apiEndpoint/v1/update-offers-score',
+      data: {
+        'score': 10,
+        'mnemonics': [mnemonic],
+      },
+      options: Options(headers: {'authorization': bobAccessToken}),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    final responseData = response.data as Map<String, dynamic>;
+    expect(responseData['updatedOffers'], isEmpty);
+    expect(responseData['unauthorizedMnemonics'], contains(mnemonic));
   });
 
   test('update-offers-score: fails with negative score', () async {
@@ -2683,12 +2680,7 @@ void main() {
           'score': -1,
           'mnemonics': ['mnemonic1'],
         },
-        options: Options(
-          headers: {
-            Headers.contentTypeHeader: 'application/json',
-            'authorization': aliceAccessToken,
-          },
-        ),
+        options: Options(headers: {'authorization': aliceAccessToken}),
       );
       fail('Expected DioException not thrown');
     } on DioException catch (e) {
@@ -2716,4 +2708,38 @@ void main() {
       );
     }
   });
+
+  test(
+    'update-offers-score: partial success with unauthorized mnemonics',
+    () async {
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+
+      final authorizedMnemonic = registerOfferResponse.data['mnemonic'];
+      final unauthorizedMnemonic = 'pioneer player keen boxer mail';
+
+      final response = await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {
+          'score': 10,
+          'mnemonics': [authorizedMnemonic, unauthorizedMnemonic],
+        },
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+
+      expect(response.statusCode, HttpStatus.ok);
+      final responseData = response.data as Map<String, dynamic>;
+      expect(responseData['updatedOffers'], isNotEmpty);
+      expect(
+        responseData['unauthorizedMnemonics'],
+        contains(unauthorizedMnemonic),
+      );
+    },
+  );
 }

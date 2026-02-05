@@ -62,6 +62,7 @@ import '../core/service/notification/notification_service.dart'
 import '../core/service/offer/register_offer_input.dart';
 import '../core/service/oob/create_oob_input.dart';
 import '../core/service/oob/oob_service.dart';
+import 'update_offers_score/update_offers_score_result.dart';
 
 class GroupCountLimitExceeded implements Exception {}
 
@@ -597,12 +598,13 @@ class ApplicationFacade {
     );
   }
 
-  Future<List<Offer>> updateOffersScore(
+  Future<UpdateOffersScoreResult> updateOffersScore(
     int score,
     List<String> mnemonics,
     String authDid,
   ) async {
     final List<Offer> updated = [];
+    final List<String> unauthorizedMnemonics = [];
     final Set<String> processedOfferIds = {};
 
     for (final mnemonic in mnemonics) {
@@ -618,7 +620,8 @@ class ApplicationFacade {
 
       if (offer.createdBy != authDid) {
         _logger.info('User $authDid is not authorized to update this offer');
-        throw NotAuthorizedException();
+        unauthorizedMnemonics.add(mnemonic);
+        continue;
       }
 
       if (!processedOfferIds.contains(offer.id)) {
@@ -629,7 +632,10 @@ class ApplicationFacade {
       }
     }
 
-    return updated;
+    return UpdateOffersScoreResult(
+      updatedOffers: updated,
+      unauthorizedMnemonics: unauthorizedMnemonics,
+    );
   }
 
   logInfo(String message) => _logger.info(message);
