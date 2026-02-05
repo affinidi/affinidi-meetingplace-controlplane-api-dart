@@ -2644,6 +2644,34 @@ void main() {
     expect(response.data['updatedOffers'].first['score'], 10);
   });
 
+  test('update-offers-score: fails if user is not the owner', () async {
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer',
+      data: getRegisterOfferRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+      ).toJson(),
+      options: Options(headers: {'authorization': aliceAccessToken}),
+    );
+
+    final mnemonic = registerOfferResponse.data['mnemonic'];
+
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {
+          'score': 10,
+          'mnemonics': [mnemonic],
+        },
+        options: Options(headers: {'authorization': bobAccessToken}),
+      );
+      fail('Expected DioException not thrown');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.forbidden);
+      expect(e.response?.data.toString(), contains('Not authorized'));
+    }
+  });
+
   test('update-offers-score: fails with negative score', () async {
     try {
       await dio.post(

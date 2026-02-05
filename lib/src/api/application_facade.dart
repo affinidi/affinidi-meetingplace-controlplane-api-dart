@@ -57,7 +57,8 @@ import '../core/entity/device_token_mapping.dart';
 import '../core/service/device_mapping/device_token_mapping_service.dart';
 import '../core/entity/notification_channel.dart';
 import '../core/entity/notification_item.dart';
-import '../core/service/notification/notification_service.dart';
+import '../core/service/notification/notification_service.dart'
+    hide NotAuthorizedException;
 import '../core/service/offer/register_offer_input.dart';
 import '../core/service/oob/create_oob_input.dart';
 import '../core/service/oob/oob_service.dart';
@@ -599,6 +600,7 @@ class ApplicationFacade {
   Future<List<Offer>> updateOffersScore(
     int score,
     List<String> mnemonics,
+    String authDid,
   ) async {
     final List<Offer> updated = [];
     final Set<String> processedOfferIds = {};
@@ -612,6 +614,11 @@ class ApplicationFacade {
       if (offer == null) {
         _logger.info('Offer not found for mnemonic: $mnemonic');
         continue;
+      }
+
+      if (offer.createdBy != authDid) {
+        _logger.info('User $authDid is not authorized to update this offer');
+        throw NotAuthorizedException();
       }
 
       if (!processedOfferIds.contains(offer.id)) {

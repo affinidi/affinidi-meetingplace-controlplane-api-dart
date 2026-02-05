@@ -13,18 +13,22 @@ Future<Response> updateOffersScore(
 ) async {
   try {
     final requestBody = await request.readAsString();
-
     final input = UpdateOffersScoreRequest.fromRequestParams(requestBody);
+
+    final authDid = request.context['authDid'] as String;
 
     final updatedOffers = await facade.updateOffersScore(
       input.score,
       input.mnemonics,
+      authDid,
     );
 
     return Response.ok(
       jsonEncode(UpdateOffersScoreResponse(updatedOffers: updatedOffers)),
       headers: {'content-type': 'application/json'},
     );
+  } on NotAuthorizedException {
+    return Response.forbidden(jsonEncode({'error': 'Not authorized'}));
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
   } on OfferNotFound {
