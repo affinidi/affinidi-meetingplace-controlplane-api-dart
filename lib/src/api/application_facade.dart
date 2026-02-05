@@ -605,7 +605,7 @@ class ApplicationFacade {
 
     for (final mnemonic in mnemonics) {
       Offer? offer = await _offerService.queryOfferByMnemonic(
-        OfferAccessType.query,
+        OfferAccessType.queryNoLimits,
         mnemonic,
       );
 
