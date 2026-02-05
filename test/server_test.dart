@@ -2722,9 +2722,18 @@ void main() {
       );
 
       final authorizedMnemonic = registerOfferResponse.data['mnemonic'];
-      final unauthorizedMnemonic = 'pioneer player keen boxer mail';
 
-      await Future.delayed(Duration(seconds: 1));
+      final unauthorizedMnemonicResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+        ).toJson(),
+        options: Options(headers: {'authorization': bobAccessToken}),
+      );
+
+      final unauthorizedMnemonic =
+          unauthorizedMnemonicResponse.data['mnemonic'];
 
       final response = await dio.post(
         '$apiEndpoint/v1/update-offers-score',
