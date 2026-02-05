@@ -2625,28 +2625,18 @@ void main() {
         deviceToken: AliceDevice.deviceToken,
         platformType: AliceDevice.platformType,
       ).toJson(),
-      options: Options(
-        headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
-        },
-      ),
+      options: Options(headers: {'authorization': aliceAccessToken}),
     );
 
-    final offerLink = registerOfferResponse.data['offerLink'];
+    final mnemonic = registerOfferResponse.data['mnemonic'];
 
     final response = await dio.post(
       '$apiEndpoint/v1/update-offers-score',
       data: {
         'score': 10,
-        'offerLinks': [offerLink],
+        'mnemonics': [mnemonic],
       },
-      options: Options(
-        headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
-        },
-      ),
+      options: Options(headers: {'authorization': aliceAccessToken}),
     );
 
     expect(response.statusCode, HttpStatus.ok);
@@ -2655,35 +2645,44 @@ void main() {
   });
 
   test('update-offers-score: fails with negative score', () async {
-    final response = await dio.post(
-      '$apiEndpoint/v1/update-offers-score',
-      data: {
-        'score': -1,
-        'offerLinks': ['offer1'],
-      },
-      options: Options(
-        headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {
+          'score': -1,
+          'mnemonics': ['mnemonic1'],
         },
-      ),
-    );
-    expect(response.statusCode, HttpStatus.badRequest);
-    expect(response.data.toString(), contains('score'));
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+      fail('Expected DioException not thrown');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(
+        e.response?.data.toString(),
+        contains('Score must be non-negative'),
+      );
+    }
   });
 
-  test('update-offers-score: fails with empty offerLinks', () async {
-    final response = await dio.post(
-      '$apiEndpoint/v1/update-offers-score',
-      data: {'score': 1, 'offerLinks': []},
-      options: Options(
-        headers: {
-          Headers.contentTypeHeader: 'application/json',
-          'authorization': aliceAccessToken,
-        },
-      ),
-    );
-    expect(response.statusCode, HttpStatus.badRequest);
-    expect(response.data.toString(), contains('offerLinks'));
+  test('update-offers-score: fails with empty mnemonics', () async {
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {'score': 10, 'mnemonics': []},
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+      fail('Expected DioException not thrown');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(
+        e.response?.data.toString(),
+        contains('mnemonics must be a non-empty list'),
+      );
+    }
   });
 }

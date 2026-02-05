@@ -598,17 +598,30 @@ class ApplicationFacade {
 
   Future<List<Offer>> updateOffersScore(
     int score,
-    List<String> offerLinks,
+    List<String> mnemonics,
   ) async {
     final List<Offer> updated = [];
-    for (final link in offerLinks) {
-      Offer? offer = await _offerService.getOfferByLink(link);
-      if (offer != null) {
-        offer.score = score;
+    final Set<String> processedOfferIds = {};
+
+    for (final mnemonic in mnemonics) {
+      Offer? offer = await _offerService.queryOfferByMnemonic(
+        OfferAccessType.query,
+        mnemonic,
+      );
+
+      if (offer == null) {
+        _logger.info('Offer not found for mnemonic: $mnemonic');
+        continue;
+      }
+
+      if (!processedOfferIds.contains(offer.id)) {
+        offer.score = (offer.score ?? 0) + score;
         await _offerService.updateOffer(offer);
         updated.add(offer);
+        processedOfferIds.add(offer.id);
       }
     }
+
     return updated;
   }
 

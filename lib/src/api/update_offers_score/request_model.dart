@@ -8,7 +8,7 @@ part 'request_model.g.dart';
 
 @JsonSerializable()
 class UpdateOffersScoreRequest {
-  UpdateOffersScoreRequest({required this.score, required this.offerLinks});
+  UpdateOffersScoreRequest({required this.score, required this.mnemonics});
 
   factory UpdateOffersScoreRequest.fromRequestParams(String requestParams) {
     final params = jsonDecode(requestParams);
@@ -27,5 +27,5 @@ class UpdateOffersScoreRequest {
   Map<String, dynamic> toJson() => _$UpdateOffersScoreRequestToJson(this);
 
   final int score;
-  final List<String> offerLinks;
+  final List<String> mnemonics;
 }

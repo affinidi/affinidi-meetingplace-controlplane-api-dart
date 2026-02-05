@@ -18,7 +18,7 @@ Future<Response> updateOffersScore(
 
     final updatedOffers = await facade.updateOffersScore(
       input.score,
-      input.offerLinks,
+      input.mnemonics,
     );
 
     return Response.ok(
