@@ -2724,6 +2724,8 @@ void main() {
       final authorizedMnemonic = registerOfferResponse.data['mnemonic'];
       final unauthorizedMnemonic = 'pioneer player keen boxer mail';
 
+      await Future.delayed(Duration(seconds: 1));
+
       final response = await dio.post(
         '$apiEndpoint/v1/update-offers-score',
         data: {
