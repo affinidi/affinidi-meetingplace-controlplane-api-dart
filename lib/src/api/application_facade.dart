@@ -615,7 +615,7 @@ class ApplicationFacade {
       }
 
       if (!processedOfferIds.contains(offer.id)) {
-        offer.score = (offer.score ?? 0) + score;
+        offer.score = score;
         await _offerService.updateOffer(offer);
         updated.add(offer);
         processedOfferIds.add(offer.id);
