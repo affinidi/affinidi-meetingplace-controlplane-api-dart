@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../../../../meeting_place_control_plane_api.dart';
 import '../../../config/config.dart';
 import '../../../entity/notification_item.dart';
 import '../device_notification.dart';
@@ -21,7 +22,7 @@ class FCMPayload implements IPayload {
     badgeCount = badge;
     notificationTag = tag;
     notification = {
-      'title': Config().get('deviceNotification')['title'],
+      'title': getEnvOrNull('DEVICE_NOTIFICATION_TITLE') ?? 'Meeting Place',
       'body': body,
     };
   }
