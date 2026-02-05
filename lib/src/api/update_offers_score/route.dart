@@ -30,10 +30,7 @@ Future<Response> updateOffersScore(
       failedOffers: result.failedOffers,
     );
 
-    return Response.ok(
-      jsonEncode(response.toJson()),
-      headers: {'content-type': 'application/json'},
-    );
+    return Response.ok(jsonEncode(response.toJson()));
   } on RequestValidationException catch (e) {
     return Response.badRequest(
       body: UpdateOffersScoreErrorResponse.validationFailed(
