@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:shelf/shelf.dart';
 
 import '../../core/service/offer/offer_service.dart';
 import '../application_facade.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
+import 'response_error_model.dart';
 import 'response_model.dart';
 
 Future<Response> updateOffersScore(
@@ -27,12 +29,21 @@ Future<Response> updateOffersScore(
       jsonEncode(UpdateOffersScoreResponse(updatedOffers: updatedOffers)),
       headers: {'content-type': 'application/json'},
     );
-  } on NotAuthorizedException {
-    return Response.forbidden(jsonEncode({'error': 'Not authorized'}));
   } on RequestValidationException catch (e) {
-    return Response.badRequest(body: e.toString());
+    return Response.badRequest(
+      body: UpdateOffersScoreErrorResponse.validationFailed(
+        e.toString(),
+      ).toString(),
+    );
   } on OfferNotFound {
-    return Response.notFound(jsonEncode({'error': 'Offer not found'}));
+    return Response(
+      HttpStatus.conflict,
+      body: UpdateOffersScoreErrorResponse.notFound().toString(),
+    );
+  } on NotAuthorizedException {
+    return Response.forbidden(
+      UpdateOffersScoreErrorResponse.permissionDenied().toString(),
+    );
   } catch (e, stackTrace) {
     facade.logError(
       'Error updating score: $e',

@@ -2668,7 +2668,10 @@ void main() {
       fail('Expected DioException not thrown');
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.forbidden);
-      expect(e.response?.data.toString(), contains('Not authorized'));
+      expect(
+        e.response?.data.toString(),
+        contains('Update offers score exception: permission denied'),
+      );
     }
   });
 
