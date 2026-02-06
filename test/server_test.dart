@@ -1520,6 +1520,7 @@ void main() {
       'contactAttributes': registerOfferRequestMock.contactAttributes,
       'groupId': null,
       'groupDid': null,
+      'score': null,
     });
   });
 
@@ -2615,5 +2616,158 @@ void main() {
     },
     skip:
         '''Doesnt work on local server instance because mediator cant resolve did:web document of the server''',
+  );
+
+  test('update-offers-score: full success', () async {
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer',
+      data: getRegisterOfferRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+      ).toJson(),
+      options: Options(headers: {'Authorization': 'Bearer $aliceAccessToken'}),
+    );
+
+    final mnemonic = registerOfferResponse.data['mnemonic'];
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/update-offers-score',
+      data: {
+        'score': 10,
+        'mnemonics': [mnemonic],
+      },
+      options: Options(headers: {'Authorization': 'Bearer $aliceAccessToken'}),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    final responseData = response.data as Map<String, dynamic>;
+
+    final updatedOffers = responseData['updatedOffers'] as List;
+    expect(updatedOffers.length, 1);
+    expect(updatedOffers[0]['mnemonic'], mnemonic);
+
+    final failedOffers = responseData['failedOffers'] as List;
+    expect(failedOffers, isEmpty);
+  });
+
+  test('update-offers-score: fails with unauthorized access', () async {
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer',
+      data: getRegisterOfferRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+      ).toJson(),
+      options: Options(headers: {'Authorization': 'Bearer $aliceAccessToken'}),
+    );
+
+    final mnemonic = registerOfferResponse.data['mnemonic'];
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/update-offers-score',
+      data: {
+        'score': 10,
+        'mnemonics': [mnemonic],
+      },
+      options: Options(headers: {'Authorization': 'Bearer $bobAccessToken'}),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    final responseData = response.data as Map<String, dynamic>;
+
+    final failedOffers = responseData['failedOffers'] as List;
+    expect(failedOffers.length, 1);
+    expect(failedOffers[0]['mnemonic'], mnemonic);
+    expect(
+      failedOffers[0]['reason'],
+      'Update offers score exception: permission denied',
+    );
+  });
+
+  test('update-offers-score: fails with negative score', () async {
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {
+          'score': -1,
+          'mnemonics': ['mnemonic1'],
+        },
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+      fail('Expected DioException not thrown');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(
+        e.response?.data.toString(),
+        contains('Score must be non-negative'),
+      );
+    }
+  });
+
+  test('update-offers-score: fails with empty mnemonics', () async {
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {'score': 10, 'mnemonics': []},
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+      fail('Expected DioException not thrown');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(
+        e.response?.data.toString(),
+        contains('mnemonics must be a non-empty list'),
+      );
+    }
+  });
+
+  test(
+    'update-offers-score: partial success with unauthorized mnemonics',
+    () async {
+      final authorizedOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+
+      final authorizedMnemonic = authorizedOfferResponse.data['mnemonic'];
+
+      final unauthorizedOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+        ).toJson(),
+        options: Options(headers: {'authorization': bobAccessToken}),
+      );
+
+      final unauthorizedMnemonic = unauthorizedOfferResponse.data['mnemonic'];
+
+      final response = await dio.post(
+        '$apiEndpoint/v1/update-offers-score',
+        data: {
+          'score': 10,
+          'mnemonics': [authorizedMnemonic, unauthorizedMnemonic],
+        },
+        options: Options(headers: {'authorization': aliceAccessToken}),
+      );
+
+      expect(response.statusCode, HttpStatus.ok);
+      final responseData = response.data as Map<String, dynamic>;
+
+      final updatedOffers = responseData['updatedOffers'] as List;
+      expect(updatedOffers.length, 1);
+      expect(updatedOffers[0]['mnemonic'], authorizedMnemonic);
+
+      final failedOffers = responseData['failedOffers'] as List;
+      expect(failedOffers.length, 1);
+      expect(failedOffers[0]['mnemonic'], unauthorizedMnemonic);
+      expect(
+        failedOffers[0]['reason'],
+        'Update offers score exception: permission denied',
+      );
+    },
   );
 }

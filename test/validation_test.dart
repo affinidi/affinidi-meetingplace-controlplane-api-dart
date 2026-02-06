@@ -16,6 +16,8 @@ import 'package:meeting_place_control_plane_api/src/api/register_offer/request_m
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_validator.dart';
+import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:test/test.dart';
 
@@ -681,6 +683,49 @@ void main() {
       final result = GroupSendMessageValidator().validate(request.toJson());
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'expiresTime'), true);
+    });
+  });
+
+  group('UpdateOffersScoreRequestValidator', () {
+    test('validates valid request', () {
+      final request = UpdateOffersScoreRequest(
+        score: 5,
+        mnemonics: ['mnemonic1', 'mnemonic2'],
+      );
+      final result = UpdateOffersScoreRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, true);
+    });
+
+    test('fails when score is negative', () {
+      final request = UpdateOffersScoreRequest(
+        score: -1,
+        mnemonics: ['mnemonic1'],
+      );
+      final result = UpdateOffersScoreRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'score'), true);
+    });
+
+    test('fails when mnemonics is empty', () {
+      final request = UpdateOffersScoreRequest(score: 1, mnemonics: []);
+      final result = UpdateOffersScoreRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'mnemonics'), true);
+    });
+
+    test('fails when mnemonics is null', () {
+      final result = UpdateOffersScoreRequestValidator().validate({
+        'score': 1,
+        'mnemonics': null,
+      });
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'mnemonics'), true);
     });
   });
 }

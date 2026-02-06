@@ -57,10 +57,14 @@ import '../core/entity/device_token_mapping.dart';
 import '../core/service/device_mapping/device_token_mapping_service.dart';
 import '../core/entity/notification_channel.dart';
 import '../core/entity/notification_item.dart';
-import '../core/service/notification/notification_service.dart';
+import '../core/service/notification/notification_service.dart'
+    hide NotAuthorizedException;
 import '../core/service/offer/register_offer_input.dart';
 import '../core/service/oob/create_oob_input.dart';
 import '../core/service/oob/oob_service.dart';
+import 'update_offers_score/response_error_model.dart';
+import 'update_offers_score/response_model.dart';
+import 'update_offers_score/update_offers_score_result.dart';
 
 class GroupCountLimitExceeded implements Exception {}
 
@@ -593,6 +597,56 @@ class ApplicationFacade {
     return _notificationService.notifyOutreach(
       NotifyOutreachInput(offer: offer, senderInfo: request.senderInfo),
       authDid,
+    );
+  }
+
+  Future<UpdateOffersScoreResult> updateOffersScore(
+    int score,
+    List<String> mnemonics,
+    String authDid,
+  ) async {
+    final List<Offer> updated = [];
+    final List<FailedOffer> failedOffers = [];
+    final Set<String> processedOfferIds = {};
+
+    for (final mnemonic in mnemonics) {
+      Offer? offer = await _offerService.queryOfferByMnemonic(
+        OfferAccessType.queryNoLimits,
+        mnemonic,
+      );
+
+      if (offer == null) {
+        failedOffers.add(
+          FailedOffer(
+            mnemonic: mnemonic,
+            reason: UpdateOffersScoreErrorResponse.notFound().errorMessage,
+          ),
+        );
+        continue;
+      }
+
+      if (offer.createdBy != authDid) {
+        failedOffers.add(
+          FailedOffer(
+            mnemonic: mnemonic,
+            reason:
+                UpdateOffersScoreErrorResponse.permissionDenied().errorMessage,
+          ),
+        );
+        continue;
+      }
+
+      if (!processedOfferIds.contains(offer.id)) {
+        offer.score = score;
+        await _offerService.updateOffer(offer);
+        updated.add(offer);
+        processedOfferIds.add(offer.id);
+      }
+    }
+
+    return UpdateOffersScoreResult(
+      updatedOffers: updated,
+      failedOffers: failedOffers,
     );
   }
 

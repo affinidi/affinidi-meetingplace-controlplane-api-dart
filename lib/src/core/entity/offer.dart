@@ -63,6 +63,7 @@ class Offer extends Entity {
     this.metadata,
     this.groupId,
     this.groupDid,
+    this.score,
   }) {
     createdAt = DateTime.now().toIso8601String();
     modifiedAt = DateTime.now().toIso8601String();
@@ -87,6 +88,7 @@ class Offer extends Entity {
   final String? customPhrase;
   final String? metadata;
 
+  int? score;
   String? groupId;
   String? groupDid;
 

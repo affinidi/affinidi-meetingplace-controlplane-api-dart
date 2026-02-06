@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: Meeting Place Controle API for managing connection offers and notifications.
   contact:
-    name: Affinidi 
+    name: Affinidi
     email: info@affinidi.com
 servers:
   - url: /
@@ -30,383 +30,383 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterDeviceInput'
+            $ref: "#/components/schemas/RegisterDeviceInput"
     FinaliseOfferInput:
       description: List of required and optional parameters to finalise the acceptance of an offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/FinaliseOfferInput'
+            $ref: "#/components/schemas/FinaliseOfferInput"
     DeletePendingNotificationsInput:
       description: List of required and optional parameters to delete the given list of pending notifications.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeletePendingNotificationsInput'
+            $ref: "#/components/schemas/DeletePendingNotificationsInput"
     GetPendingNotificationsInput:
       description: List of required and optional parameters to retrieve pending notifications.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetPendingNotificationsInput'
+            $ref: "#/components/schemas/GetPendingNotificationsInput"
     AcceptOfferGroupInput:
       description: List of required and optional parameters to accept group chat offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AcceptOfferGroupInput'
+            $ref: "#/components/schemas/AcceptOfferGroupInput"
     AcceptOfferInput:
       description: List of required and optional parameters to accept an offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AcceptOfferInput'
+            $ref: "#/components/schemas/AcceptOfferInput"
     NotifyAcceptOfferInput:
       description: List of required and optional parameters for notifying the user of offer acceptance.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyAcceptOfferInput'
+            $ref: "#/components/schemas/NotifyAcceptOfferInput"
     NotifyAcceptOfferGroupInput:
       description: List of required and optional parameters for notifying the user of group chat offer acceptance.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyAcceptOfferGroupInput'
+            $ref: "#/components/schemas/NotifyAcceptOfferGroupInput"
     QueryOfferInput:
       description: List of required and optional parameters to find an offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/QueryOfferInput'
+            $ref: "#/components/schemas/QueryOfferInput"
     RegisterOfferInput:
       description: List of required and optional parameters to register a connection offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterOfferInput'
+            $ref: "#/components/schemas/RegisterOfferInput"
     GroupAddMemberInput:
       description: List of required and optional parameters to add a member to the group chat.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupAddMemberInput'
+            $ref: "#/components/schemas/GroupAddMemberInput"
     RegisterOfferGroupInput:
       description: List of required and optional parameters to register a connection offer for group chat.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterOfferGroupInput'
+            $ref: "#/components/schemas/RegisterOfferGroupInput"
     DeregisterOfferInput:
       description: List of required and optional parameters to deregister a connection offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeregisterOfferInput'
+            $ref: "#/components/schemas/DeregisterOfferInput"
     AdminDeregisterOfferInput:
       description: List of required and optional parameters to deregister a connection offer as admin.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AdminDeregisterOfferInput'
+            $ref: "#/components/schemas/AdminDeregisterOfferInput"
     CreateOobInput:
       description: List of required and optional parameters to create an Out-of-Band (OOB) offer.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CreateOobInput'
+            $ref: "#/components/schemas/CreateOobInput"
     RegisterNotificationInput:
       description: List of required and optional parameters to register a notification.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterNotificationInput'
+            $ref: "#/components/schemas/RegisterNotificationInput"
     CheckOfferPhraseInput:
       description: List of required parameters to check the availability of the phrase.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CheckOfferPhraseInput'
+            $ref: "#/components/schemas/CheckOfferPhraseInput"
     DeregisterNotificationInput:
       description: List of required and optional parameters to deregister a notification.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeregisterNotificationInput'
+            $ref: "#/components/schemas/DeregisterNotificationInput"
     NotifyChannelInput:
       description: List of required and optional parameters to send notification using a channel.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyChannelInput'
+            $ref: "#/components/schemas/NotifyChannelInput"
     NotifyOutreachInput:
       description: List of required and optional parameters to send outreach notification.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyOutreachInput'
+            $ref: "#/components/schemas/NotifyOutreachInput"
     DidAuthenticate:
       description: List of required parameters to authenticate the user.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DidAuthenticate'
+            $ref: "#/components/schemas/DidAuthenticate"
     DidChallenge:
       description: List of required parameters to initiate authentication process.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DidChallenge'
+            $ref: "#/components/schemas/DidChallenge"
     GroupSendMessage:
       description: List of required and optional parameters to send a group chat message.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupSendMessage'
+            $ref: "#/components/schemas/GroupSendMessage"
     GroupMemberDeregisterInput:
       description: List of required and optional parameters to remove a member from the group chat.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupDeregisterMemberInput'
+            $ref: "#/components/schemas/GroupDeregisterMemberInput"
     GroupDeleteInput:
       description: List of required parameters to delete a group chat.
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupDeleteInput'
+            $ref: "#/components/schemas/GroupDeleteInput"
   responses:
     RegisterOfferOK:
       description: RegisterOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterOfferOK'
+            $ref: "#/components/schemas/RegisterOfferOK"
     GroupAddMemberOK:
       description: GroupAddMemberOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupAddMemberOK'
+            $ref: "#/components/schemas/GroupAddMemberOK"
     RegisterOfferGroupOK:
       description: RegisterOfferGroupOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterOfferGroupOK'
+            $ref: "#/components/schemas/RegisterOfferGroupOK"
     DeregisterOfferOK:
       description: DeregisterOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeregisterOfferOK'
+            $ref: "#/components/schemas/DeregisterOfferOK"
     AdminDeregisterOfferOK:
-      description: DeregisterOfferOK
+      description: AdminDeregisterOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AdminDeregisterOfferOK'
+            $ref: "#/components/schemas/AdminDeregisterOfferOK"
     FinaliseOfferOK:
       description: FinaliseOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/FinaliseOfferOK'
+            $ref: "#/components/schemas/FinaliseOfferOK"
     AcceptOfferGroupOK:
       description: AcceptOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AcceptOfferGroupOK'
+            $ref: "#/components/schemas/AcceptOfferGroupOK"
     AcceptOfferOK:
       description: AcceptOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AcceptOfferOK'
+            $ref: "#/components/schemas/AcceptOfferOK"
     NotifyAcceptOfferOK:
       description: NotifyAcceptOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyAcceptOfferOK'
+            $ref: "#/components/schemas/NotifyAcceptOfferOK"
     NotifyAcceptOfferGroupOK:
       description: NotifyAcceptOfferGroupOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyAcceptOfferGroupOK'
+            $ref: "#/components/schemas/NotifyAcceptOfferGroupOK"
     QueryOfferOK:
       description: QueryOfferOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/QueryOfferOK'
+            $ref: "#/components/schemas/QueryOfferOK"
     RegisterDeviceOK:
       description: RegisterDeviceOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterDeviceOK'
+            $ref: "#/components/schemas/RegisterDeviceOK"
     GetPendingNotificationsOK:
       description: GetPendingNotificationsOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetPendingNotificationsOK'
+            $ref: "#/components/schemas/GetPendingNotificationsOK"
     DeletePendingNotificationsOK:
       description: DeletePendingNotificationsOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeletePendingNotificationsOK'
+            $ref: "#/components/schemas/DeletePendingNotificationsOK"
     GetOobOK:
       description: GetOobOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetOobOK'
+            $ref: "#/components/schemas/GetOobOK"
     CreateOobOK:
       description: CreateOobOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CreateOobOK'
+            $ref: "#/components/schemas/CreateOobOK"
     RegisterNotificationOK:
       description: RegisterNotificationOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/RegisterNotificationOK'
+            $ref: "#/components/schemas/RegisterNotificationOK"
     NotifyChannelOK:
       description: NotifyChannelOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyChannelOK'
+            $ref: "#/components/schemas/NotifyChannelOK"
     NotifyOutreachOK:
       description: NotifyOutreachOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotifyOutreachOK'
+            $ref: "#/components/schemas/NotifyOutreachOK"
     CheckOfferPhraseOK:
       description: CheckOfferPhraseOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CheckOfferPhraseOK'
+            $ref: "#/components/schemas/CheckOfferPhraseOK"
     DeregisterNotificationOK:
       description: DeregisterNotificationOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeregisterNotificationOK'
+            $ref: "#/components/schemas/DeregisterNotificationOK"
     DidAuthenticateOK:
       description: DidAuthenticateOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DidAuthenticateOK'
+            $ref: "#/components/schemas/DidAuthenticateOK"
     GroupDeleteOK:
       description: GroupDeleteOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupDeleteOK'
+            $ref: "#/components/schemas/GroupDeleteOK"
     GroupMemberDeregisterOK:
       description: GroupMemberDeregisterOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupMemberDeregisterOK'
+            $ref: "#/components/schemas/GroupMemberDeregisterOK"
     GroupSendMessageOK:
       description: GroupSendMessageOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GroupSendMessageOK'
+            $ref: "#/components/schemas/GroupSendMessageOK"
     DidChallengeOK:
       description: DidChallengeOK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DidChallengeOK'
+            $ref: "#/components/schemas/DidChallengeOK"
     RegisterOfferToConnectConflictError:
       description: ConflictError
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/OfferPhraseInUseError'
+            $ref: "#/components/schemas/OfferPhraseInUseError"
     RegisterOfferToConnectGroupConflictError:
       description: ConflictError
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/OfferPhraseInUseError'
+            $ref: "#/components/schemas/OfferPhraseInUseError"
     AcceptOfferToConnectNotFoundError:
       description: NotFoundError
       content:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/InvalidOfferError'
-              - $ref: '#/components/schemas/OfferLimitExceededError'
-              - $ref: '#/components/schemas/InvalidAcceptanceError'
+              - $ref: "#/components/schemas/InvalidOfferError"
+              - $ref: "#/components/schemas/OfferLimitExceededError"
+              - $ref: "#/components/schemas/InvalidAcceptanceError"
     FinaliseOfferAcceptanceNotFoundError:
       description: NotFoundError
       content:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/InvalidAcceptanceError'
-              - $ref: '#/components/schemas/ExpiredAcceptanceError'
+              - $ref: "#/components/schemas/InvalidAcceptanceError"
+              - $ref: "#/components/schemas/ExpiredAcceptanceError"
     QueryOfferUnProcessableEntityError:
       description: Offer is either expired or the limit has been exceeded.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/OfferUnprocessableEntityError'
+            $ref: "#/components/schemas/OfferUnprocessableEntityError"
     QueryOfferNotFoundError:
       description: NotFoundError
       content:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/InvalidOfferError'
-              - $ref: '#/components/schemas/OfferLimitExceededError'
-              - $ref: '#/components/schemas/InvalidAcceptanceError'
-              - $ref: '#/components/schemas/ExpiredAcceptanceError'
+              - $ref: "#/components/schemas/InvalidOfferError"
+              - $ref: "#/components/schemas/OfferLimitExceededError"
+              - $ref: "#/components/schemas/InvalidAcceptanceError"
+              - $ref: "#/components/schemas/ExpiredAcceptanceError"
     GetOobNotFoundError:
       description: NotFoundError
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetOobNotFoundError'
+            $ref: "#/components/schemas/GetOobNotFoundError"
   schemas:
     QueryOfferInput:
       description: List of required and optional parameters to find an offer.
@@ -790,7 +790,7 @@ components:
             - 2
             - 3
             - 4
-          description: >- 
+          description: >-
             Specifies the type of the offer: 1-Chat, 2-Poll, 3-Group Chat, and 4-Outreach.
         didcommMessage:
           type: string
@@ -1227,7 +1227,7 @@ components:
         message:
           type: string
           enum:
-            - 'Not found: ${param}.'
+            - "Not found: ${param}."
         httpStatusCode:
           type: number
           enum:
@@ -1729,7 +1729,7 @@ components:
       additionalProperties: false
       properties:
         did:
-          description: >- 
+          description: >-
             Decentralised Identifier (DID) of the user to initialise the 
             authentication process and generate the challenge token.
           type: string
@@ -1823,10 +1823,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/RegisterDeviceInput'
+        $ref: "#/components/requestBodies/RegisterDeviceInput"
       responses:
-        '200':
-          $ref: '#/components/responses/RegisterDeviceOK'
+        "200":
+          $ref: "#/components/responses/RegisterDeviceOK"
   /v1/register-offer:
     post:
       operationId: registerOfferToConnect
@@ -1837,12 +1837,12 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/RegisterOfferInput'
+        $ref: "#/components/requestBodies/RegisterOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/RegisterOfferOK'
-        '409':
-          $ref: '#/components/responses/RegisterOfferToConnectConflictError'
+        "200":
+          $ref: "#/components/responses/RegisterOfferOK"
+        "409":
+          $ref: "#/components/responses/RegisterOfferToConnectConflictError"
   /v1/register-offer-group:
     post:
       operationId: registerOfferToConnectGroup
@@ -1851,12 +1851,12 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/RegisterOfferGroupInput'
+        $ref: "#/components/requestBodies/RegisterOfferGroupInput"
       responses:
-        '200':
-          $ref: '#/components/responses/RegisterOfferGroupOK'
-        '409':
-          $ref: '#/components/responses/RegisterOfferToConnectGroupConflictError'
+        "200":
+          $ref: "#/components/responses/RegisterOfferGroupOK"
+        "409":
+          $ref: "#/components/responses/RegisterOfferToConnectGroupConflictError"
   /v1/group-add-member:
     post:
       operationId: groupAddMember
@@ -1865,10 +1865,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/GroupAddMemberInput'
+        $ref: "#/components/requestBodies/GroupAddMemberInput"
       responses:
-        '200':
-          $ref: '#/components/responses/GroupAddMemberOK'
+        "200":
+          $ref: "#/components/responses/GroupAddMemberOK"
   /v1/deregister-offer:
     post:
       operationId: deregisterOfferToConnect
@@ -1877,10 +1877,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/DeregisterOfferInput'
+        $ref: "#/components/requestBodies/DeregisterOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/DeregisterOfferOK'
+        "200":
+          $ref: "#/components/responses/DeregisterOfferOK"
   /v1/admin/deregister-offer:
     post:
       operationId: adminDeregisterOfferToConnect
@@ -1889,10 +1889,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/AdminDeregisterOfferInput'
+        $ref: "#/components/requestBodies/AdminDeregisterOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/AdminDeregisterOfferOK'
+        "200":
+          $ref: "#/components/responses/AdminDeregisterOfferOK"
   /v1/accept-offer:
     post:
       operationId: acceptOfferToConnect
@@ -1901,12 +1901,12 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/AcceptOfferInput'
+        $ref: "#/components/requestBodies/AcceptOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/AcceptOfferOK'
-        '404':
-          $ref: '#/components/responses/AcceptOfferToConnectNotFoundError'
+        "200":
+          $ref: "#/components/responses/AcceptOfferOK"
+        "404":
+          $ref: "#/components/responses/AcceptOfferToConnectNotFoundError"
   /v1/accept-offer-group:
     post:
       operationId: acceptOfferToConnectGroup
@@ -1915,10 +1915,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/AcceptOfferGroupInput'
+        $ref: "#/components/requestBodies/AcceptOfferGroupInput"
       responses:
-        '200':
-          $ref: '#/components/responses/AcceptOfferGroupOK'
+        "200":
+          $ref: "#/components/responses/AcceptOfferGroupOK"
   /v1/notify-acceptance:
     post:
       operationId: notifyAcceptance
@@ -1927,10 +1927,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/NotifyAcceptOfferInput'
+        $ref: "#/components/requestBodies/NotifyAcceptOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/NotifyAcceptOfferOK'
+        "200":
+          $ref: "#/components/responses/NotifyAcceptOfferOK"
   /v1/notify-acceptance-group:
     post:
       operationId: notifyAcceptanceGroup
@@ -1939,10 +1939,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/NotifyAcceptOfferGroupInput'
+        $ref: "#/components/requestBodies/NotifyAcceptOfferGroupInput"
       responses:
-        '200':
-          $ref: '#/components/responses/NotifyAcceptOfferGroupOK'
+        "200":
+          $ref: "#/components/responses/NotifyAcceptOfferGroupOK"
   /v1/finalise-acceptance:
     post:
       operationId: finaliseOfferAcceptance
@@ -1951,12 +1951,12 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/FinaliseOfferInput'
+        $ref: "#/components/requestBodies/FinaliseOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/FinaliseOfferOK'
-        '404':
-          $ref: '#/components/responses/FinaliseOfferAcceptanceNotFoundError'
+        "200":
+          $ref: "#/components/responses/FinaliseOfferOK"
+        "404":
+          $ref: "#/components/responses/FinaliseOfferAcceptanceNotFoundError"
   /v1/query-offer:
     post:
       operationId: queryOffer
@@ -1965,14 +1965,14 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/QueryOfferInput'
+        $ref: "#/components/requestBodies/QueryOfferInput"
       responses:
-        '200':
-          $ref: '#/components/responses/QueryOfferOK'
-        '404':
-          $ref: '#/components/responses/QueryOfferNotFoundError'
-        '422':
-          $ref: '#/components/responses/QueryOfferUnProcessableEntityError'
+        "200":
+          $ref: "#/components/responses/QueryOfferOK"
+        "404":
+          $ref: "#/components/responses/QueryOfferNotFoundError"
+        "422":
+          $ref: "#/components/responses/QueryOfferUnProcessableEntityError"
   /v1/notifications:
     post:
       operationId: getPendingNotifications
@@ -1981,10 +1981,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/GetPendingNotificationsInput'
+        $ref: "#/components/requestBodies/GetPendingNotificationsInput"
       responses:
-        '200':
-          $ref: '#/components/responses/GetPendingNotificationsOK'
+        "200":
+          $ref: "#/components/responses/GetPendingNotificationsOK"
   /v1/delete-notifications:
     post:
       operationId: deletePendingNotifications
@@ -1993,10 +1993,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/DeletePendingNotificationsInput'
+        $ref: "#/components/requestBodies/DeletePendingNotificationsInput"
       responses:
-        '200':
-          $ref: '#/components/responses/DeletePendingNotificationsOK'
+        "200":
+          $ref: "#/components/responses/DeletePendingNotificationsOK"
   /v1/create-oob:
     post:
       operationId: createOOB
@@ -2005,10 +2005,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/CreateOobInput'
+        $ref: "#/components/requestBodies/CreateOobInput"
       responses:
-        '200':
-          $ref: '#/components/responses/CreateOobOK'
+        "200":
+          $ref: "#/components/responses/CreateOobOK"
   /v1/oob/{oobId}:
     get:
       operationId: getOOB
@@ -2023,10 +2023,10 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          $ref: '#/components/responses/GetOobOK'
-        '404':
-          $ref: '#/components/responses/GetOobNotFoundError'
+        "200":
+          $ref: "#/components/responses/GetOobOK"
+        "404":
+          $ref: "#/components/responses/GetOobNotFoundError"
   /v1/register-notification:
     post:
       operationId: registerNotification
@@ -2035,10 +2035,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/RegisterNotificationInput'
+        $ref: "#/components/requestBodies/RegisterNotificationInput"
       responses:
-        '200':
-          $ref: '#/components/responses/RegisterNotificationOK'
+        "200":
+          $ref: "#/components/responses/RegisterNotificationOK"
   /v1/notify-channel:
     post:
       operationId: notifyChannel
@@ -2047,10 +2047,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/NotifyChannelInput'
+        $ref: "#/components/requestBodies/NotifyChannelInput"
       responses:
-        '200':
-          $ref: '#/components/responses/NotifyChannelOK'
+        "200":
+          $ref: "#/components/responses/NotifyChannelOK"
   /v1/notify-outreach:
     post:
       operationId: notifyOutreach
@@ -2059,10 +2059,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/NotifyOutreachInput'
+        $ref: "#/components/requestBodies/NotifyOutreachInput"
       responses:
-        '200':
-          $ref: '#/components/responses/NotifyOutreachOK'
+        "200":
+          $ref: "#/components/responses/NotifyOutreachOK"
   /v1/deregister-notification:
     post:
       operationId: deregisterNotification
@@ -2071,10 +2071,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/DeregisterNotificationInput'
+        $ref: "#/components/requestBodies/DeregisterNotificationInput"
       responses:
-        '200':
-          $ref: '#/components/responses/DeregisterNotificationOK'
+        "200":
+          $ref: "#/components/responses/DeregisterNotificationOK"
   /v1/check-offer-phrase:
     post:
       operationId: checkOfferPhrase
@@ -2083,10 +2083,44 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/CheckOfferPhraseInput'
+        $ref: "#/components/requestBodies/CheckOfferPhraseInput"
       responses:
-        '200':
-          $ref: '#/components/responses/CheckOfferPhraseOK'
+        "200":
+          $ref: "#/components/responses/CheckOfferPhraseOK"
+  /v1/update-offers-score:
+  post:
+    operationId: updateOffersScore
+    description: Batch update the score for multiple offers.
+    security:
+      - DidCommTokenAuth: []
+    parameters: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              score:
+                type: integer
+                description: Latest score to set.
+              offerLinks:
+                type: array
+                items:
+                  type: string
+                description: List of offerLinks or mnemonics to update.
+    responses:
+      "200":
+        description: Offers updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updatedOffers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Offer"
   /v1/authenticate:
     post:
       operationId: didAuthenticate
@@ -2094,10 +2128,10 @@ paths:
       security: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/DidAuthenticate'
+        $ref: "#/components/requestBodies/DidAuthenticate"
       responses:
-        '200':
-          $ref: '#/components/responses/DidAuthenticateOK'
+        "200":
+          $ref: "#/components/responses/DidAuthenticateOK"
   /v1/authenticate/challenge:
     post:
       operationId: didChallenge
@@ -2105,10 +2139,10 @@ paths:
       security: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/DidChallenge'
+        $ref: "#/components/requestBodies/DidChallenge"
       responses:
-        '200':
-          $ref: '#/components/responses/DidChallengeOK'
+        "200":
+          $ref: "#/components/responses/DidChallengeOK"
   /v1/group-send-message:
     post:
       operationId: groupSendMessage
@@ -2117,10 +2151,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/GroupSendMessage'
+        $ref: "#/components/requestBodies/GroupSendMessage"
       responses:
-        '200':
-          $ref: '#/components/responses/GroupSendMessageOK'
+        "200":
+          $ref: "#/components/responses/GroupSendMessageOK"
   /v1/group-delete:
     post:
       operationId: groupDelete
@@ -2129,10 +2163,10 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/GroupDeleteInput'
+        $ref: "#/components/requestBodies/GroupDeleteInput"
       responses:
-        '200':
-          $ref: '#/components/responses/GroupDeleteOK'
+        "200":
+          $ref: "#/components/responses/GroupDeleteOK"
   /v1/group-member-deregister:
     post:
       operationId: groupMemberDeregister
@@ -2141,7 +2175,7 @@ paths:
         - DidCommTokenAuth: []
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/GroupMemberDeregisterInput'
+        $ref: "#/components/requestBodies/GroupMemberDeregisterInput"
       responses:
-        '200':
-          $ref: '#/components/responses/GroupMemberDeregisterOK'
+        "200":
+          $ref: "#/components/responses/GroupMemberDeregisterOK"

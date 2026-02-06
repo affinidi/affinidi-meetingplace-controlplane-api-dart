@@ -21,6 +21,7 @@ class QueryOfferResponse {
     required this.contactAttributes,
     required this.groupId,
     required this.groupDid,
+    this.score,
   });
 
   factory QueryOfferResponse.fromOffer(Offer offer) {
@@ -39,8 +40,10 @@ class QueryOfferResponse {
       contactAttributes: offer.contactAttributes,
       groupId: offer.groupId,
       groupDid: offer.groupDid,
+      score: offer.score,
     );
   }
+
   final String offerLink;
   final String name;
   final String description;
@@ -55,6 +58,7 @@ class QueryOfferResponse {
   final int? maximumUsage;
   final String? groupId;
   final String? groupDid;
+  final int? score;
 
   @override
   String toString() => jsonEncode(_$QueryOfferResponseToJson(this));
