@@ -605,7 +605,7 @@ class ApplicationFacade {
     List<String> mnemonics,
     String authDid,
   ) async {
-    final List<Offer> updated = [];
+    final List<String> updated = [];
     final List<FailedOffer> failedOffers = [];
     final Set<String> processedOfferIds = {};
 
@@ -639,7 +639,7 @@ class ApplicationFacade {
       if (!processedOfferIds.contains(offer.id)) {
         offer.score = score;
         await _offerService.updateOffer(offer);
-        updated.add(offer);
+        updated.add(offer.mnemonic);
         processedOfferIds.add(offer.id);
       }
     }

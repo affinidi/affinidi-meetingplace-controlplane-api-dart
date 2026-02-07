@@ -1,4 +1,3 @@
-import '../../core/entity/offer.dart';
 import 'response_model.dart';
 
 class UpdateOffersScoreResult {
@@ -7,6 +6,6 @@ class UpdateOffersScoreResult {
     required this.failedOffers,
   });
 
-  final List<Offer> updatedOffers;
+  final List<String> updatedOffers;
   final List<FailedOffer> failedOffers;
 }

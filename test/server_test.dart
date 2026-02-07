@@ -2644,7 +2644,7 @@ void main() {
 
     final updatedOffers = responseData['updatedOffers'] as List;
     expect(updatedOffers.length, 1);
-    expect(updatedOffers[0]['mnemonic'], mnemonic);
+    expect(updatedOffers[0], mnemonic);
 
     final failedOffers = responseData['failedOffers'] as List;
     expect(failedOffers, isEmpty);
@@ -2759,7 +2759,7 @@ void main() {
 
       final updatedOffers = responseData['updatedOffers'] as List;
       expect(updatedOffers.length, 1);
-      expect(updatedOffers[0]['mnemonic'], authorizedMnemonic);
+      expect(updatedOffers[0], authorizedMnemonic);
 
       final failedOffers = responseData['failedOffers'] as List;
       expect(failedOffers.length, 1);
