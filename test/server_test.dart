@@ -1785,6 +1785,7 @@ void main() {
         maximumUsage: 5,
         customPhrase: offerPhrase,
         validUntil: validUntil,
+        score: 42,
       ).toJson(),
       options: Options(
         headers: {
@@ -1799,6 +1800,7 @@ void main() {
     expect(response.data['mnemonic'], offerPhrase);
     expect(response.data['validUntil'], validUntil);
     expect(response.data['maximumUsage'], 5);
+    expect(response.data['score'], 42);
   });
 
   test('#register-offer: unlimited valid until and maximum usage', () async {

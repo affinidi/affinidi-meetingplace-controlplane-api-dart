@@ -35,6 +35,7 @@ void main() {
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
+        score: 10,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -243,6 +244,26 @@ void main() {
       final result = RegisterOfferRequestValidator().validate(request.toJson());
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'validUntil'), true);
+    });
+
+    test('fails when score is negative', () {
+      final request = RegisterOfferRequest(
+        offerName: 'test',
+        offerDescription: 'description',
+        didcommMessage: 'message',
+        contactCard: 'contactCard',
+        deviceToken: 'token',
+        platformType: PlatformType.PUSH_NOTIFICATION,
+        mediatorDid: 'did:example:123',
+        mediatorEndpoint: 'https://mediator.example.com',
+        mediatorWSSEndpoint: 'wss://mediator.example.com',
+        contactAttributes: 1,
+        score: -1,
+      );
+
+      final result = RegisterOfferRequestValidator().validate(request.toJson());
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'score'), true);
     });
   });
 

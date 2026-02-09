@@ -81,5 +81,11 @@ class RegisterOfferRequestValidator extends LucidValidator {
       'validUntil must be in ISO8601 UTC format and not in the past',
       'invalidValidUntil',
     );
+
+    ruleFor((request) => request['score'] as int?, key: 'score').must(
+      (value) => value == null || value >= 0,
+      'score must be a positive integer',
+      'invalidScore',
+    );
   }
 }

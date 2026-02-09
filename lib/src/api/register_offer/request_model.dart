@@ -23,6 +23,7 @@ class RegisterOfferRequest {
     this.validUntil,
     this.maximumUsage,
     customPhrase,
+    this.score,
   }) : customPhrase = customPhrase == '' ? null : customPhrase;
 
   factory RegisterOfferRequest.fromRequestParams(String requestParams) {
@@ -50,6 +51,7 @@ class RegisterOfferRequest {
   final int? maximumUsage;
   final String? validUntil;
   final String? customPhrase;
+  final int? score;
 
   toJson() => _$RegisterOfferRequestToJson(this);
 }

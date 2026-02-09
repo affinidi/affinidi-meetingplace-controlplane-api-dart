@@ -13,6 +13,7 @@ RegisterOfferResponse _$RegisterOfferResponseFromJson(
   mnemonic: json['mnemonic'] as String,
   validUntil: json['validUntil'] as String?,
   maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
+  score: (json['score'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$RegisterOfferResponseToJson(
@@ -22,4 +23,5 @@ Map<String, dynamic> _$RegisterOfferResponseToJson(
   'mnemonic': instance.mnemonic,
   'validUntil': instance.validUntil,
   'maximumUsage': instance.maximumUsage,
+  'score': instance.score,
 };

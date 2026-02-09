@@ -7,6 +7,7 @@ RegisterOfferRequest getRegisterOfferRequestMock({
   String? validUntil,
   int? maximumUsage,
   String? customPhrase,
+  int? score,
 }) => RegisterOfferRequest(
   offerName: 'test offer',
   offerDescription: 'offer used in tests',
@@ -21,4 +22,5 @@ RegisterOfferRequest getRegisterOfferRequestMock({
   mediatorWSSEndpoint: 'ws://mediator.yourdomain.com',
   contactAttributes: 1,
   customPhrase: customPhrase,
+  score: score,
 );
