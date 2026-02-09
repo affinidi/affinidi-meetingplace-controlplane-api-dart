@@ -1199,6 +1199,9 @@ components:
           type: string
         groupDid:
           type: string
+        score:
+          type: number
+          description: The VRC score
       required:
         - didcommMessage
         - offerLink
