@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import '../../core/entity/offer.dart';
 
 part 'response_model.g.dart';
 
@@ -15,7 +14,7 @@ class UpdateOffersScoreResponse {
 
   Map<String, dynamic> toJson() => _$UpdateOffersScoreResponseToJson(this);
 
-  final List<Offer> updatedOffers;
+  final List<String> updatedOffers;
   final List<FailedOffer> failedOffers;
 }
 

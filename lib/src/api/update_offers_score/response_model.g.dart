@@ -10,7 +10,7 @@ UpdateOffersScoreResponse _$UpdateOffersScoreResponseFromJson(
   Map<String, dynamic> json,
 ) => UpdateOffersScoreResponse(
   updatedOffers: (json['updatedOffers'] as List<dynamic>)
-      .map((e) => Offer.fromJson(e as Map<String, dynamic>))
+      .map((e) => e as String)
       .toList(),
   failedOffers: (json['failedOffers'] as List<dynamic>)
       .map((e) => FailedOffer.fromJson(e as Map<String, dynamic>))

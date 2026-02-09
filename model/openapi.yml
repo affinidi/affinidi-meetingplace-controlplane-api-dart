@@ -199,6 +199,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GroupDeleteInput"
+    UpdateOffersScoreInput:
+      description: List of required parameters to update offers score.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UpdateOffersScoreInput"
   responses:
     RegisterOfferOK:
       description: RegisterOfferOK
@@ -407,6 +414,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GetOobNotFoundError"
+    UpdateOffersScoreOK:
+      description: UpdateOffersScoreOK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UpdateOffersScoreOK"
+    UpdateOffersScoreError:
+      description: UpdateOffersScoreError
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UpdateOffersScoreError"
   schemas:
     QueryOfferInput:
       description: List of required and optional parameters to find an offer.
@@ -673,6 +692,21 @@ components:
           description: The offer phrase for checking the availability.
       required:
         - offerPhrase
+    UpdateOffersScoreInput:
+      type: object
+      additionalProperties: false
+      properties:
+        score:
+          type: integer
+          description: Latest score to set.
+        mnemonics:
+          type: array
+          items:
+            type: string
+          description: List of mnemonics to update.
+      required:
+        - score
+        - mnemonics
     DeregisterNotificationInput:
       type: object
       additionalProperties: false
@@ -1549,6 +1583,26 @@ components:
           description: Whether the offer phrase is already in use
       required:
         - isInUse
+    UpdateOffersScoreOK:
+      type: object
+      additionalProperties: false
+      properties:
+        updatedOffers:
+          type: array
+          items:
+            type: string
+        failedOffers:
+          type: array
+          items:
+            type: object
+            properties:
+              mnemonic:
+                type: string
+              reason:
+                type: string
+      required:
+        - updatedOffers
+        - failedOffers
     DeregisterNotificationOK:
       type: object
       additionalProperties: false
@@ -1813,6 +1867,17 @@ components:
         - message
         - httpStatusCode
         - traceId
+    UpdateOffersScoreError:
+      type: object
+      additionalProperties: false
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
+      required:
+        - errorCode
+        - errorMessage
   examples: {}
 paths:
   /v1/register-device:
@@ -2088,39 +2153,19 @@ paths:
         "200":
           $ref: "#/components/responses/CheckOfferPhraseOK"
   /v1/update-offers-score:
-  post:
-    operationId: updateOffersScore
-    description: Batch update the score for multiple offers.
-    security:
-      - DidCommTokenAuth: []
-    parameters: []
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              score:
-                type: integer
-                description: Latest score to set.
-              offerLinks:
-                type: array
-                items:
-                  type: string
-                description: List of offerLinks or mnemonics to update.
-    responses:
-      "200":
-        description: Offers updated successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                updatedOffers:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Offer"
+    post:
+      operationId: updateOffersScore
+      description: Batch update the score for multiple offers.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: "#/components/requestBodies/UpdateOffersScoreInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UpdateOffersScoreOK"
+        "400":
+          $ref: "#/components/responses/UpdateOffersScoreError"
   /v1/authenticate:
     post:
       operationId: didAuthenticate
