@@ -1885,6 +1885,7 @@ void main() {
         'mnemonic': '',
         'validUntil': null,
         'maximumUsage': null,
+        'score': null,
       });
     }
   });
