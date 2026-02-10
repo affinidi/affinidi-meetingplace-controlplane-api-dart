@@ -22,6 +22,7 @@ class RegisterOfferInput {
     this.maximumUsage,
     this.customPhrase,
     this.metadata,
+    this.score,
   });
 
   factory RegisterOfferInput.fromJson(Map<String, dynamic> json) =>
@@ -42,4 +43,5 @@ class RegisterOfferInput {
   final int? maximumUsage;
   final String? customPhrase;
   final String? metadata;
+  final int? score;
 }

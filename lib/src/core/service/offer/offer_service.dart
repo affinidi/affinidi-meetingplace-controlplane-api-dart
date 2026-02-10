@@ -117,6 +117,7 @@ class OfferService {
       metadata: input.metadata,
       createdBy: authDid,
       ttl: ttl,
+      score: input.score,
     );
 
     try {

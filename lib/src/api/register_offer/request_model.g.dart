@@ -22,6 +22,7 @@ RegisterOfferRequest _$RegisterOfferRequestFromJson(
   validUntil: json['validUntil'] as String?,
   maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
   customPhrase: json['customPhrase'],
+  score: (json['score'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$RegisterOfferRequestToJson(
@@ -40,6 +41,7 @@ Map<String, dynamic> _$RegisterOfferRequestToJson(
   'maximumUsage': instance.maximumUsage,
   'validUntil': instance.validUntil,
   'customPhrase': instance.customPhrase,
+  'score': instance.score,
 };
 
 const _$PlatformTypeEnumMap = {

@@ -169,6 +169,7 @@ class ApplicationFacade {
         mediatorWSSEndpoint: request.mediatorWSSEndpoint,
         contactAttributes: request.contactAttributes,
         customPhrase: request.customPhrase,
+        score: request.score,
       ),
       authDid,
     );

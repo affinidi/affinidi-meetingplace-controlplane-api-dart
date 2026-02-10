@@ -11,6 +11,7 @@ class RegisterOfferResponse {
     required this.mnemonic,
     this.validUntil,
     this.maximumUsage,
+    this.score,
   });
 
   factory RegisterOfferResponse.fromOffer(Offer offer) {
@@ -19,6 +20,7 @@ class RegisterOfferResponse {
       mnemonic: offer.mnemonic,
       validUntil: offer.validUntil,
       maximumUsage: offer.maximumClaims,
+      score: offer.score,
     );
   }
 
@@ -28,12 +30,14 @@ class RegisterOfferResponse {
       mnemonic: '',
       validUntil: null,
       maximumUsage: null,
+      score: null,
     );
   }
   final String offerLink;
   final String mnemonic;
   final String? validUntil;
   final int? maximumUsage;
+  final int? score;
 
   @override
   String toString() =>

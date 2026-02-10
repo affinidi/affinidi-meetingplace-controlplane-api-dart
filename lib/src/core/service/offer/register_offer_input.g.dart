@@ -23,6 +23,7 @@ RegisterOfferInput _$RegisterOfferInputFromJson(Map<String, dynamic> json) =>
       maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
       customPhrase: json['customPhrase'] as String?,
       metadata: json['metadata'] as String?,
+      score: (json['score'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$RegisterOfferInputToJson(RegisterOfferInput instance) =>
@@ -42,6 +43,7 @@ Map<String, dynamic> _$RegisterOfferInputToJson(RegisterOfferInput instance) =>
       'maximumUsage': instance.maximumUsage,
       'customPhrase': instance.customPhrase,
       'metadata': instance.metadata,
+      'score': instance.score,
     };
 
 const _$OfferTypeEnumMap = {

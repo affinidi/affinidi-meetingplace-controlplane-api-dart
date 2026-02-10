@@ -875,12 +875,16 @@ components:
         metadata:
           type: string
           description: Metadata containing additional information about the offer.
+        score:
+          type: integer
+          description: VRC score of the offer owner
       required:
         - offerName
+        - offerDescription
         - didcommMessage
+        - contactCard
         - deviceToken
         - platformType
-        - contactCard
         - mediatorDid
         - mediatorEndpoint
         - mediatorWSSEndpoint
@@ -1025,6 +1029,8 @@ components:
           type: number
         offerLink:
           type: string
+        score:
+          type: integer
       required:
         - mnemonic
         - offerLink
@@ -1233,17 +1239,20 @@ components:
           type: string
         groupDid:
           type: string
+        score:
+          type: integer
+          description: VRC score of the offer owner
       required:
-        - didcommMessage
         - offerLink
         - name
-        - status
         - description
         - contactCard
-        - contactAttributes
         - mediatorDid
         - mediatorEndpoint
         - mediatorWSSEndpoint
+        - didcommMessage
+        - status
+        - contactAttributes
     CorsRegisterDeviceOK:
       type: object
       additionalProperties: false
