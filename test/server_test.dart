@@ -27,7 +27,7 @@ import 'package:meeting_place_control_plane_api/src/api/query_offer/response_err
 import 'package:meeting_place_control_plane_api/src/api/register_device/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_notification/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
-import 'package:meeting_place_control_plane_api/src/service/did_resolver/cached_did_resolver.dart';
+import 'package:meeting_place_control_plane_api/src/service/did_resolver/custom_did_resolver.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/offer.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:didcomm/didcomm.dart';
@@ -1423,7 +1423,7 @@ void main() {
 
     final sdk = MeetingPlaceMediatorSDK(
       mediatorDid: mediatorDid,
-      didResolver: CachedDidResolver(),
+      didResolver: CustomDidResolver(),
     );
 
     await sdk.updateAcl(
@@ -1960,7 +1960,7 @@ void main() {
 
     final sdk = MeetingPlaceMediatorSDK(
       mediatorDid: mediatorDid,
-      didResolver: CachedDidResolver(),
+      didResolver: CustomDidResolver(),
     );
 
     await sdk.updateAcl(
@@ -2525,7 +2525,7 @@ void main() {
 
       final sdk = MeetingPlaceMediatorSDK(
         mediatorDid: mediatorDid,
-        didResolver: CachedDidResolver(),
+        didResolver: CustomDidResolver(),
       );
 
       await sdk.updateAcl(

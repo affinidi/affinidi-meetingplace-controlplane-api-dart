@@ -4,7 +4,7 @@ import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../../meeting_place_control_plane_api.dart';
-import '../../../../service/did_resolver/cached_did_resolver.dart';
+import '../../../../service/did_resolver/custom_did_resolver.dart';
 import '../../../logger/logger.dart';
 import '../../auth/auth_did_manager.dart';
 import '../../auth/didcomm_auth_builder.dart';
@@ -116,7 +116,7 @@ class DidComm extends Platform implements IPlatform {
     );
     final senderDidDoc = await authDidManager.didManager.getDidDocument();
 
-    final recipientDidDoc = await CachedDidResolver().resolveDid(recipientDid);
+    final recipientDidDoc = await CustomDidResolver().resolveDid(recipientDid);
     await _mediatorSDK.sendMessage(
       PlainTextMessage.fromJson({
         ...jsonDecode(payload.build()),

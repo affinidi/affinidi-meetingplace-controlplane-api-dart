@@ -30,7 +30,7 @@ void main(List<String> args) async {
     ),
     pushNotificationProvider: await SNSProvider.init(logger: logger),
     didDocumentManager: await AwsSsmDidDocumentManager.init(),
-    didResolver: CachedDidResolver(),
+    didResolver: CustomDidResolver(),
     logger: logger,
   );
 
