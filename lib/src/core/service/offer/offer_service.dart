@@ -187,13 +187,26 @@ class OfferService {
 
     try {
       _logger.info('Query offer by id: $offerId and access type: $accessType');
-      offer = await _storage.updateWithCondition<Offer>(
+      offer = await _storage.findOneById<Offer>(
         Offer.entityName,
         offerId,
         Offer.fromJson,
-        updateFn: _getUpdateActionByAccessType(accessType),
-        conditionFn: _getUpdateConditionByAccessType(accessType),
       );
+
+      if (offer == null) {
+        return null;
+      }
+
+      // Only update if maximum is set
+      if (offer.maximumClaims != null || offer.maximumQueries != null) {
+        offer = await _storage.updateWithCondition<Offer>(
+          Offer.entityName,
+          offerId,
+          Offer.fromJson,
+          updateFn: _getUpdateActionByAccessType(accessType),
+          conditionFn: _getUpdateConditionByAccessType(accessType),
+        );
+      }
     } on ConditionalUpdateFailed {
       _logger.info('Conditional offer update failed.');
       throw OfferQueryLimitExceeded();
