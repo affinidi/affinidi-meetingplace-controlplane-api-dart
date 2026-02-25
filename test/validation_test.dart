@@ -18,6 +18,7 @@ import 'package:meeting_place_control_plane_api/src/api/register_offer_group/req
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_validator.dart';
+import 'package:meeting_place_control_plane_api/src/utils/date_time.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:test/test.dart';
 
@@ -158,10 +159,7 @@ void main() {
     });
 
     test('validates valid ISO8601 UTC date for validUntil', () {
-      final futureDate = DateTime.now()
-          .toUtc()
-          .add(Duration(days: 1))
-          .toIso8601String();
+      final futureDate = nowUtc().add(Duration(days: 1)).toIso8601String();
 
       final request = RegisterOfferRequest(
         offerName: 'test',
@@ -182,10 +180,7 @@ void main() {
     });
 
     test('fails when validUntil is in the past', () {
-      final pastDate = DateTime.now()
-          .toUtc()
-          .subtract(Duration(days: 1))
-          .toIso8601String();
+      final pastDate = nowUtc().subtract(Duration(days: 1)).toIso8601String();
 
       final request = RegisterOfferRequest(
         offerName: 'test',
@@ -319,10 +314,7 @@ void main() {
     });
 
     test('validates valid ISO8601 UTC date for validUntil', () {
-      final futureDate = DateTime.now()
-          .toUtc()
-          .add(Duration(days: 1))
-          .toIso8601String();
+      final futureDate = nowUtc().add(Duration(days: 1)).toIso8601String();
 
       final request = RegisterOfferGroupRequest(
         offerName: 'test',
@@ -348,10 +340,7 @@ void main() {
     });
 
     test('fails when validUntil is in the past', () {
-      final pastDate = DateTime.now()
-          .toUtc()
-          .subtract(Duration(days: 1))
-          .toIso8601String();
+      final pastDate = nowUtc().subtract(Duration(days: 1)).toIso8601String();
 
       final request = RegisterOfferGroupRequest(
         offerName: 'test',

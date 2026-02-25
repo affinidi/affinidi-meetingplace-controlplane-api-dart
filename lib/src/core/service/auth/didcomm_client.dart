@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../../utils/date_time.dart';
 import 'auth_response.dart';
 import 'dart:typed_data';
 import 'auth_did_manager.dart';
@@ -69,7 +70,7 @@ class AuthClient {
 
   bool _isDidcommMessageExpired(PlainTextMessage message) {
     return message.expiresTime == null ||
-        message.expiresTime!.isBefore(DateTime.now().toUtc());
+        message.expiresTime!.isBefore(nowUtc());
   }
 
   static Uint8List decodeBase64Url(String input) {

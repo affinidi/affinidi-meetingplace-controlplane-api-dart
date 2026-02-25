@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../../../utils/admin_whitelist.dart';
+import '../../../utils/date_time.dart';
 import '../../config/config.dart';
 import '../../logger/logger.dart';
 import '../../storage/exception/already_exists_exception.dart';
@@ -264,7 +265,7 @@ class OfferService {
 
     try {
       if (DateTime.parse(offer.validUntil!).millisecondsSinceEpoch >
-          DateTime.now().millisecondsSinceEpoch) {
+          nowUtc().millisecondsSinceEpoch) {
         return false;
       }
     } on FormatException {

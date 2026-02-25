@@ -9,6 +9,7 @@ import '../../core/logger/logger.dart';
 import '../../core/config/env_config.dart';
 import '../../core/storage/storage.dart';
 import '../../core/entity/entity.dart';
+import '../../utils/date_time.dart';
 
 Mutex mutex = Mutex();
 
@@ -185,7 +186,7 @@ class Redis implements Storage {
     await command.send_object([
       'EXPIRE',
       key,
-      ttl.difference(DateTime.now().toUtc()).inSeconds,
+      ttl.difference(nowUtc()).inSeconds,
     ]);
   }
 }

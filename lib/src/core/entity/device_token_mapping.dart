@@ -1,5 +1,6 @@
 import 'entity.dart';
 import '../../utils/platform_type.dart';
+import '../../utils/date_time.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'device_token_mapping.g.dart';
@@ -25,8 +26,8 @@ class DeviceTokenMapping extends Entity {
     required this.platformType,
     required this.platformEndpointArn,
     this.createdBy,
-  }) : createdAt = DateTime.now().toIso8601String(),
-       modifiedAt = DateTime.now().toIso8601String(),
+  }) : createdAt = nowUtc().toIso8601String(),
+       modifiedAt = nowUtc().toIso8601String(),
        modifiedBy = createdBy;
   static String entityName = 'DeviceTokenMapping';
 

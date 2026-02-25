@@ -1,6 +1,7 @@
 import '../../config/config.dart';
 import '../../entity/oob.dart';
 import '../../logger/logger.dart';
+import '../../../utils/date_time.dart';
 import 'create_oob_input.dart';
 import '../../storage/storage.dart';
 import '../../../utils/ttl.dart';
@@ -18,10 +19,7 @@ class OobService {
     final oobId = _generateId();
     _logger.info('generated oob id: $oobId');
 
-    final ttl = addMinutesToDate(
-      DateTime.now().toUtc(),
-      Config().get('oob')['ttlInMinutes'],
-    );
+    final ttl = addMinutesToDate(nowUtc(), Config().get('oob')['ttlInMinutes']);
     _logger.info('ttl for oob: $ttl');
 
     return _storage.create(

@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import '../../../../utils/date_time.dart';
 import 'package:meeting_place_core/meeting_place_core.dart';
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
@@ -77,7 +79,7 @@ class DidCommPayload implements IPayload {
     final didcommMessage = PlainTextMessage(
       id: Uuid().v4(),
       type: Uri.parse(didCommMessageTypeForNotificationType(type).value),
-      createdTime: DateTime.now().toUtc(),
+      createdTime: nowUtc(),
       body: {...data.toJson(), 'text': body},
     );
     return jsonEncode(didcommMessage.toJson());

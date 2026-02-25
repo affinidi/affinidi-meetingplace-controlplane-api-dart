@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_aws_api/shared.dart' as shared;
 
 import '../../core/config/env_config.dart';
+import '../../utils/date_time.dart';
 
 class AwsCredentialsManager {
   static Future<shared.AwsClientCredentials> getCredentials() {
@@ -62,7 +63,7 @@ class AwsCredentialsManager {
       accessKey: getEnv('AWS_ACCESS_KEY'),
       secretKey: getEnv('AWS_SECRET_KEY'),
       sessionToken: getEnv('AWS_SESSION_TOKEN'),
-      expiration: DateTime.now().add(const Duration(hours: 1)),
+      expiration: nowUtc().add(const Duration(hours: 1)),
     );
   }
 
@@ -95,7 +96,7 @@ class AwsCredentialsManager {
       sessionToken: data['SessionToken'],
       expiration: data['Expiration'] != null
           ? DateTime.parse(data['Expiration'])
-          : DateTime.now().add(const Duration(hours: 1)),
+          : nowUtc().add(const Duration(hours: 1)),
     );
   }
 
@@ -104,7 +105,7 @@ class AwsCredentialsManager {
   ) async {
     if (credentials == null ||
         (credentials.expiration != null &&
-            DateTime.now().isAfter(
+            nowUtc().isAfter(
               credentials.expiration!.subtract(Duration(seconds: 60)),
             ))) {
       return await getCredentials();

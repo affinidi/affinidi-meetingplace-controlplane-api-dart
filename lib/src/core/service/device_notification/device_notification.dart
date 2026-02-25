@@ -1,4 +1,5 @@
 import '../../entity/notification_item.dart';
+import '../../../utils/date_time.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'device_notification.g.dart';
@@ -6,7 +7,7 @@ part 'device_notification.g.dart';
 @JsonSerializable()
 class DeviceNotificationData {
   DeviceNotificationData({required this.id, required this.pendingCount}) {
-    notificationDate = DateTime.now().toIso8601String();
+    notificationDate = nowUtc().toIso8601String();
   }
   final String id;
   final int pendingCount;
@@ -26,7 +27,7 @@ class DeviceNotification {
   }) {
     _subtitle = subtitle;
     _body = body;
-    notificationDate = DateTime.now().toIso8601String();
+    notificationDate = nowUtc().toIso8601String();
   }
   final NotificationItemType notificationType;
   final DeviceNotificationData data;
