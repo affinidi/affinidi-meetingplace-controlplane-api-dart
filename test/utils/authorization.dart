@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:base_codecs/base_codecs.dart';
 import 'package:meeting_place_control_plane_api/meeting_place_control_plane_api.dart';
+import 'package:meeting_place_control_plane_api/src/utils/date_time.dart';
 
 import 'package:didcomm/didcomm.dart';
 import 'package:dio/dio.dart';
@@ -15,7 +16,7 @@ PlainTextMessage buildPlaintextMessage({
   required String challengeToken,
   required String did,
 }) {
-  final DateTime createdTime = DateTime.now().toUtc();
+  final DateTime createdTime = nowUtc();
   final DateTime expiresTime = createdTime.add(const Duration(seconds: 60));
 
   return PlainTextMessage(

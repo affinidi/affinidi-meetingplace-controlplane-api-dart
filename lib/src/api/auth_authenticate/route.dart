@@ -8,6 +8,7 @@ import '../application_facade.dart';
 import '../../core/config/config.dart';
 import '../../core/service/auth/auth_response.dart';
 import '../../core/service/auth/didcomm_auth.dart';
+import '../../utils/date_time.dart';
 
 Future<Response> authAuthenticate(
   Request request,
@@ -55,18 +56,18 @@ Future<Response> authAuthenticate(
       authConfig['accessTokenExpiryInMinutes'],
     );
 
-    final DateTime accessExpiresAt = DateTime.now()
-        .add(Duration(minutes: authConfig['accessTokenExpiryInMinutes']))
-        .toUtc();
+    final DateTime accessExpiresAt = nowUtc().add(
+      Duration(minutes: authConfig['accessTokenExpiryInMinutes']),
+    );
 
     final String refreshToken = authorizer.getAuthRefreshToken(
       authResponse.did,
       authConfig['refreshTokenExpiryInMinutes'],
     );
 
-    final DateTime refreshExpiresAt = DateTime.now()
-        .add(Duration(minutes: authConfig['refreshTokenExpiryInMinutes']))
-        .toUtc();
+    final DateTime refreshExpiresAt = nowUtc().add(
+      Duration(minutes: authConfig['refreshTokenExpiryInMinutes']),
+    );
 
     return Response.ok(
       AuthAuthenticateResponse(

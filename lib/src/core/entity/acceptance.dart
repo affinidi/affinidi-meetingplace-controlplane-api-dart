@@ -1,6 +1,7 @@
 import '../config/config.dart';
 import 'entity.dart';
 import '../../utils/platform_type.dart';
+import '../../utils/date_time.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'acceptance.g.dart';
@@ -32,8 +33,8 @@ class Acceptance extends Entity {
     required this.mediatorWSSEndpoint,
     required this.createdBy,
   }) {
-    createdAt = DateTime.now().toIso8601String();
-    modifiedAt = DateTime.now().toIso8601String();
+    createdAt = nowUtc().toIso8601String();
+    modifiedAt = nowUtc().toIso8601String();
     modifiedBy = createdBy;
   }
 

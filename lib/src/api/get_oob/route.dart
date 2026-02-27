@@ -1,5 +1,6 @@
 import '../application_facade.dart';
 import '../request_validation_exception.dart';
+import '../../utils/date_time.dart';
 import 'request_model.dart';
 import 'response_model.dart';
 import 'package:shelf/shelf.dart';
@@ -17,7 +18,7 @@ Future<Response> getOob(Request request, ApplicationFacade facade) async {
     }
 
     final ttl = oob.ttl;
-    if (ttl != null && ttl.compareTo(DateTime.now().toUtc()).isNegative) {
+    if (ttl != null && ttl.compareTo(nowUtc()).isNegative) {
       return Response.notFound('');
     }
 

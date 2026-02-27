@@ -29,6 +29,7 @@ import 'package:meeting_place_control_plane_api/src/api/register_notification/re
 import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
 import 'package:meeting_place_control_plane_api/src/service/did_resolver/cached_did_resolver.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/offer.dart';
+import 'package:meeting_place_control_plane_api/src/utils/date_time.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:didcomm/didcomm.dart';
 import 'package:dio/dio.dart';
@@ -141,10 +142,7 @@ void main() {
       platformType: AliceDevice.platformType,
       wallet: aliceWallet,
       maximumUsage: 100,
-      validUntil: DateTime.now()
-          .toUtc()
-          .add(const Duration(seconds: 300))
-          .toIso8601String(),
+      validUntil: nowUtc().add(const Duration(seconds: 300)).toIso8601String(),
     );
 
     final response = await dio.post(
@@ -290,10 +288,7 @@ void main() {
     final registerOfferRequest = getRegisterOfferRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
-      validUntil: DateTime.now()
-          .toUtc()
-          .add(Duration(seconds: 1))
-          .toIso8601String(),
+      validUntil: nowUtc().add(Duration(seconds: 1)).toIso8601String(),
     );
 
     final registerOfferResponse = await dio.post(
@@ -1586,10 +1581,7 @@ void main() {
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
       maximumUsage: 1,
-      validUntil: DateTime.now()
-          .toUtc()
-          .add(Duration(milliseconds: 500))
-          .toIso8601String(),
+      validUntil: nowUtc().add(Duration(milliseconds: 500)).toIso8601String(),
     );
 
     final registerOfferResponse = await dio.post(
@@ -1773,10 +1765,7 @@ void main() {
     final offerPhrase =
         'random ${Random().nextInt(26)}${Random().nextInt(26)}${Random().nextInt(26)} phrase';
 
-    final validUntil = DateTime.now()
-        .toUtc()
-        .add(Duration(seconds: 300))
-        .toIso8601String();
+    final validUntil = nowUtc().add(Duration(seconds: 300)).toIso8601String();
     final response = await dio.post(
       '$apiEndpoint/v1/register-offer',
       data: getRegisterOfferRequestMock(
@@ -2032,8 +2021,7 @@ void main() {
           ),
         ),
         ephemeral: false,
-        expiresTime: DateTime.now()
-            .toUtc()
+        expiresTime: nowUtc()
             .add(const Duration(seconds: 60))
             .toIso8601String(),
         notify: false,

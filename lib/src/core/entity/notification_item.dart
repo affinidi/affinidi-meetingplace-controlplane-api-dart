@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'entity.dart';
 import '../service/device_notification/device_notification.dart';
+import '../../utils/date_time.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -154,7 +155,7 @@ class NotificationItem extends Entity {
     this.offerLink,
     this.acceptChannelDid,
   }) {
-    createdAt = DateTime.now().toIso8601String();
+    createdAt = nowUtc().toIso8601String();
   }
 
   factory NotificationItem.invitationAccept({

@@ -1,3 +1,5 @@
+import '../utils/date_time.dart';
+
 class RequestValidation {
   static bool isValidUri(String uri) {
     return Uri.tryParse(uri) != null;
@@ -12,7 +14,7 @@ class RequestValidation {
     try {
       final parsedDate = DateTime.parse(value);
       if (!parsedDate.isUtc) return false;
-      if (parsedDate.isBefore(DateTime.now().toUtc())) return false;
+      if (parsedDate.isBefore(nowUtc())) return false;
       return true;
     } catch (e) {
       return false;

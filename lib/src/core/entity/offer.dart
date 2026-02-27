@@ -1,5 +1,6 @@
 import 'entity.dart';
 import '../../utils/platform_type.dart';
+import '../../utils/date_time.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'offer.g.dart';
@@ -65,8 +66,8 @@ class Offer extends Entity {
     this.groupDid,
     this.score,
   }) {
-    createdAt = DateTime.now().toIso8601String();
-    modifiedAt = DateTime.now().toIso8601String();
+    createdAt = nowUtc().toIso8601String();
+    modifiedAt = nowUtc().toIso8601String();
     modifiedBy = createdBy;
   }
 
