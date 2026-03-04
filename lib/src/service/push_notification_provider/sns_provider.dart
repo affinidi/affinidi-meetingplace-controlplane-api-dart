@@ -5,6 +5,7 @@ import '../../core/config/env_config.dart';
 import '../../core/service/device_notification/push_notification_provider.dart';
 
 import 'package:aws_sns_api/sns-2010-03-31.dart' as sns;
+import 'package:retry/retry.dart';
 
 class SNSProvider implements PushNotificationProvider {
   SNSProvider._({
@@ -36,21 +37,32 @@ class SNSProvider implements PushNotificationProvider {
     required String deviceToken,
     String? metadata,
   }) async {
+    final r = RetryOptions(maxAttempts: 3);
     try {
-      final client = await _getClient();
-      final sns.CreateEndpointResponse(:endpointArn) = await client
-          .createPlatformEndpoint(
-            platformApplicationArn: getEnv('AWS_PLATFORM_APPLICATION_ARN'),
-            token: deviceToken,
-            customUserData: metadata,
-          );
+      return await r.retry(
+        () async {
+          final client = await _getClient();
+          final sns.CreateEndpointResponse(:endpointArn) = await client
+              .createPlatformEndpoint(
+                platformApplicationArn: getEnv('AWS_PLATFORM_APPLICATION_ARN'),
+                token: deviceToken,
+                customUserData: metadata,
+              );
 
-      if (endpointArn == null) {
-        throw Exception('Received endpoint arn is empty');
-      }
-      return endpointArn;
+          if (endpointArn == null) {
+            throw Exception('Received endpoint arn is empty');
+          }
+
+          return endpointArn;
+        },
+        retryIf: (e) {
+          _logger.error('Platform endpoint creation failed: $e');
+          return true;
+        },
+        onRetry: (e) =>
+            _logger.debug('Retrying platform endpoint creation due to: $e'),
+      );
     } catch (e) {
-      _logger.error('Platform endpoint creation failed: $e');
       throw PlatformEndpointCreationFailed(e);
     }
   }
