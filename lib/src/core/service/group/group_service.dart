@@ -240,6 +240,10 @@ class GroupService {
 
     final groupMembers = await _getGroupMembers(groupId);
 
+    final payload = jsonDecode(
+      utf8.decode(base64.decode(input.messagePayload)),
+    );
+
     await Future.wait(
       groupMembers.map((groupMember) async {
         // Skip sender
@@ -249,10 +253,6 @@ class GroupService {
 
         final recipientDidDoc = await _didResolver.resolveDid(
           groupMember.memberDid,
-        );
-
-        final payload = jsonDecode(
-          utf8.decode(base64.decode(input.messagePayload)),
         );
 
         final messageToSend = GroupMessage.create(
