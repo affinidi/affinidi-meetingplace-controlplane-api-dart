@@ -63,6 +63,7 @@ class SNSProvider implements PushNotificationProvider {
             _logger.debug('Retrying platform endpoint creation due to: $e'),
       );
     } catch (e) {
+      _logger.error('Platform endpoint creation failed: $e');
       throw PlatformEndpointCreationFailed(e);
     }
   }
