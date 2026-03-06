@@ -40,7 +40,7 @@ class OfferExists implements Exception {}
 
 class AccessTypeNotSupported implements Exception {}
 
-class OfferQueryLimitExceeded implements Exception {}
+class OfferLimitExceeded implements Exception {}
 
 class OfferUpdateFailed implements Exception {
   OfferUpdateFailed(this.message);
@@ -210,7 +210,7 @@ class OfferService {
       }
     } on ConditionalUpdateFailed {
       _logger.info('Conditional offer update failed.');
-      throw OfferQueryLimitExceeded();
+      throw OfferLimitExceeded();
     } catch (e, stackTrace) {
       _logger.error(
         'Offer update failed: $e',

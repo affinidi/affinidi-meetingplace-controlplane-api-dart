@@ -6,7 +6,8 @@ part 'response_error_model.g.dart';
 
 enum AcceptOfferErrorCodes {
   notFound('NOT_FOUND'),
-  invalid('INVALID_OFFER');
+  invalid('INVALID_OFFER'),
+  claimLimitExceeded('CLAIM_LIMIT_EXCEEDED');
 
   const AcceptOfferErrorCodes(this.value);
 
@@ -15,6 +16,13 @@ enum AcceptOfferErrorCodes {
 
 @JsonSerializable()
 class AcceptOfferErrorResponse {
+  factory AcceptOfferErrorResponse.claimLimitExceeded() {
+    return AcceptOfferErrorResponse(
+      errorCode: AcceptOfferErrorCodes.claimLimitExceeded.value,
+      errorMessage: 'Offer claim limit exceeded',
+    );
+  }
+
   AcceptOfferErrorResponse({
     required this.errorCode,
     required this.errorMessage,
@@ -33,6 +41,7 @@ class AcceptOfferErrorResponse {
       errorMessage: 'Offer is no longer valid',
     );
   }
+
   final String errorCode;
   final String errorMessage;
 

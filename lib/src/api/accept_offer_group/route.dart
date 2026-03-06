@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import '../accept_offer/response_error_model.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
+import 'response_error_model.dart';
 import 'response_model.dart';
 import '../../core/service/offer/offer_service.dart';
 import '../../server/utils.dart';
@@ -33,6 +36,12 @@ Future<Response> acceptOfferGroup(
     facade.logInfo('Invalid offer with mnemonic: ${e.mnemonic}');
     return Response.badRequest(
       body: AcceptOfferErrorResponse.offerInvalid().toString(),
+    );
+  } on OfferLimitExceeded {
+    facade.logInfo('Offer claim limit exceeded');
+    return Response(
+      HttpStatus.unprocessableEntity,
+      body: AcceptOfferGroupErrorResponse.claimLimitExceeded().toString(),
     );
   } catch (e, stackTrace) {
     facade.logError(
