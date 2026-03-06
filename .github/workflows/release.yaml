@@ -4,8 +4,31 @@ on:
     branches:
       - main
 jobs:
-  dart-pipeline:
-    uses: affinidi/pipeline-dart/.github/workflows/release.yaml@main
-    secrets: inherit
-    with:
-      flutter-version: '3.35.3'
+  release:
+    runs-on: ubuntu-24.04
+    environment: 'main'
+    steps:
+      # https://github.com/actions/create-github-app-token
+      - name: Generate token from app token #https://github.com/tibdex/github-app-token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PKEY }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate_token.outputs.token }}
+      - name: configure git
+        run: |
+          echo "GITHUB_ACTOR=${GITHUB_ACTOR}"
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
