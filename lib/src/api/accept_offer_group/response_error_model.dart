@@ -6,7 +6,8 @@ part 'response_error_model.g.dart';
 
 enum AcceptOfferGroupErrorCodes {
   notFound('NOT_FOUND'),
-  invalid('INVALID_OFFER');
+  invalid('INVALID_OFFER'),
+  claimLimitExceeded('CLAIM_LIMIT_EXCEEDED');
 
   const AcceptOfferGroupErrorCodes(this.value);
 
@@ -33,6 +34,14 @@ class AcceptOfferGroupErrorResponse {
       errorMessage: 'Offer is no longer valid',
     );
   }
+
+  factory AcceptOfferGroupErrorResponse.claimLimitExceeded() {
+    return AcceptOfferGroupErrorResponse(
+      errorCode: AcceptOfferGroupErrorCodes.claimLimitExceeded.value,
+      errorMessage: 'Offer claim limit exceeded',
+    );
+  }
+
   final String errorCode;
   final String errorMessage;
 

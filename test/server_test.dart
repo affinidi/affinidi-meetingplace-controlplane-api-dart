@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:meeting_place_control_plane_api/src/api/accept_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/accept_offer/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/accept_offer_group/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/admin/deregister_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/check_offer_phrase/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/create_oob/request_model.dart';
@@ -384,6 +386,69 @@ void main() {
     }
   });
 
+  test('accept-offer: return 422 if offer claim limit exceeded', () async {
+    final registerOfferRequestMock = getRegisterOfferRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      maximumUsage: 1,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer',
+      data: registerOfferRequestMock.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    Future<Response<dynamic>> acceptOffer() => dio.post(
+      '$apiEndpoint/v1/accept-offer',
+      data: getAcceptOfferRequest(
+        did: BobDevice.offerAcceptanceDid,
+        deviceToken: BobDevice.deviceToken,
+        platformType: BobDevice.platformType,
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await dio.post(
+      '$apiEndpoint/v1/query-offer',
+      data: QueryOfferRequest(
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    await acceptOffer();
+
+    expect(
+      () => acceptOffer(),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.unprocessableEntity &&
+              e.response?.data['errorCode'] ==
+                  AcceptOfferErrorCodes.claimLimitExceeded.value &&
+              e.response?.data['errorMessage'] == 'Offer claim limit exceeded';
+        }),
+      ),
+    );
+  });
+
   test('#accept-offer-group: success', () async {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
@@ -453,6 +518,57 @@ void main() {
     expect(
       acceptOfferResponse.data['mediatorWSSEndpoint'],
       registerOfferRequest.mediatorWSSEndpoint,
+    );
+  });
+
+  test('#accept-offer-group: returns 422 if claim limit exceeded', () async {
+    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+      maximumUsage: 1,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    Future<Response<dynamic>> acceptOfferGroup() => dio.post(
+      '$apiEndpoint/v1/accept-offer-group',
+      data: getAcceptOfferGroupRequest(
+        did: BobDevice.offerAcceptanceDid,
+        deviceToken: BobDevice.deviceToken,
+        platformType: BobDevice.platformType,
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await acceptOfferGroup();
+
+    expect(
+      () => acceptOfferGroup(),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.unprocessableEntity &&
+              e.response?.data['errorCode'] ==
+                  AcceptOfferGroupErrorCodes.claimLimitExceeded.value &&
+              e.response?.data['errorMessage'] == 'Offer claim limit exceeded';
+        }),
+      ),
     );
   });
 

@@ -27,7 +27,7 @@ Future<Response> queryOffer(Request request, ApplicationFacade facade) async {
     return Response.ok(QueryOfferResponse.fromOffer(offer).toString());
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
-  } on OfferQueryLimitExceeded {
+  } on OfferLimitExceeded {
     return Response(
       HttpStatus.unprocessableEntity,
       body: QueryOfferErrorResponse.limitExceeded().toString(),
