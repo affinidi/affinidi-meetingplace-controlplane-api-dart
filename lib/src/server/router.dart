@@ -33,6 +33,7 @@ import '../api/auth_authenticate/route.dart';
 import '../api/auth_challenge/route.dart';
 import '../api/get_pending_notifications/route.dart';
 import '../api/notify_channel/route.dart';
+import '../api/notify_channel_group/route.dart';
 import '../api/register_notification/route.dart';
 import '../api/deregister_offer/route.dart';
 import '../api/query_offer/route.dart';
@@ -107,6 +108,10 @@ Router createRouter(ApplicationFacade facade) {
       privatePipeline(registerNotification, facade),
     )
     ..post('/v1/notify-channel', privatePipeline(notifyChannel, facade))
+    ..post(
+      '/v1/notify-channel-group',
+      privatePipeline(notifyChannelGroup, facade),
+    )
     ..post('/v1/notify-acceptance', privatePipeline(notifyAcceptance, facade))
     ..post(
       '/v1/notify-acceptance-group',

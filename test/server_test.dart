@@ -23,6 +23,7 @@ import 'package:meeting_place_control_plane_api/src/api/group_member_deregister/
 import 'package:meeting_place_control_plane_api/src/api/group_send_message/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/notify_acceptance/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/notify_channel/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/notify_channel_group/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/notify_outreach/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/query_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/query_offer/response_error_model.dart';
@@ -2555,6 +2556,164 @@ void main() {
 
     fail('Expected exception not thrown');
   });
+
+  test('#notify-channel-group: success', () async {
+    // register-offer-group automatically adds Alice as a group member.
+    // We then accept as Bob and add him, so the notification goes to 2 members.
+    final registerOfferGroupRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferGroupRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    // Bob accepts the group offer to create an acceptance record
+    await dio.post(
+      '$apiEndpoint/v1/accept-offer-group',
+      data: getAcceptOfferGroupRequest(
+        did: BobDevice.offerAcceptanceDid,
+        deviceToken: BobDevice.deviceToken,
+        platformType: BobDevice.platformType,
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    final bobKeyPair = await bobWallet.generateKey(
+      keyId: "m/44'/60'/0'/notify-channel-group",
+    );
+    final bobDidManager = DidKeyManager(
+      store: InMemoryDidStore(),
+      wallet: bobWallet,
+    );
+    await bobDidManager.addVerificationMethod(bobKeyPair.id);
+    final bobDidDoc = await bobDidManager.getDidDocument();
+
+    final reencryptKeyPair = generateMemberRecryptKeyPair();
+    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
+
+    // Add Bob as a group member (Alice is already a member from registration)
+    await dio.post(
+      '$apiEndpoint/v1/group-add-member',
+      data: GroupAddMemberRequest(
+        offerLink: registerOfferResponse.data['offerLink'],
+        mnemonic: registerOfferResponse.data['mnemonic'],
+        groupId: registerOfferResponse.data['groupId'],
+        memberDid: bobDidDoc.id,
+        acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+        reencryptionKey: reencryptionKey.toBase64(),
+        publicKey: reencryptKeyPair.publicKeyToBase64(),
+        contactCard: '',
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/notify-channel-group',
+      data: {
+        'groupId': registerOfferResponse.data['groupId'],
+        'type': 'chat-activity',
+      },
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    expect(response.data['notifiedCount'], 2);
+  });
+
+  test('#notify-channel-group: fails if group not found', () async {
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/notify-channel-group',
+        data: {'groupId': 'non-existent-group', 'type': 'chat-activity'},
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.notFound);
+      expect(
+        e.response?.data['errorCode'],
+        NotifyChannelGroupErrorCodes.groupNotFound.value,
+      );
+      return;
+    }
+    fail('Expected exception not thrown');
+  });
+
+  test(
+    '#notify-channel-group: fails if caller is not a group member',
+    () async {
+      final registerOfferGroupRequest = await getRegisterOfferGroupRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+        wallet: aliceWallet,
+      );
+
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer-group',
+        data: registerOfferGroupRequest.toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      try {
+        await dio.post(
+          '$apiEndpoint/v1/notify-channel-group',
+          data: {
+            'groupId': registerOfferResponse.data['groupId'],
+            'type': 'chat-activity',
+          },
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        );
+      } on DioException catch (e) {
+        expect(e.response?.statusCode, HttpStatus.forbidden);
+        expect(
+          e.response?.data['errorCode'],
+          NotifyChannelGroupErrorCodes.notInGroup.value,
+        );
+        return;
+      }
+      fail('Expected exception not thrown');
+    },
+  );
 
   test('#notify-outreach: success', () async {
     final registerOfferResponse = await dio.post(
