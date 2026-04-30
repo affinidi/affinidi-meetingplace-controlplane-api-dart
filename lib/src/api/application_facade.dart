@@ -6,6 +6,7 @@ import '../core/config/env_config.dart';
 import '../core/config/server_config.dart';
 import '../core/logger/logger.dart';
 import '../core/service/device_notification/device_notification_service.dart';
+import '../core/service/did_document/did_document_service.dart';
 import '../core/service/group/delete_group_input.dart';
 import '../core/service/group/deregister_member_input.dart';
 import '../core/service/group/send_message_input.dart';
@@ -63,6 +64,8 @@ import '../core/service/notification/notification_service.dart'
 import '../core/service/offer/register_offer_input.dart';
 import '../core/service/oob/create_oob_input.dart';
 import '../core/service/oob/oob_service.dart';
+import '../core/service/auth/didcomm_auth.dart';
+import '../core/service/auth/didcomm_auth_builder.dart';
 import 'update_offers_score/response_error_model.dart';
 import 'update_offers_score/response_model.dart';
 import 'update_offers_score/update_offers_score_result.dart';
@@ -120,6 +123,7 @@ class ApplicationFacade {
       didResolver: config.didResolver,
       logger: _logger,
     );
+    _didDocumentService = DidDocumentService(storage: config.storage);
   }
 
   static ApplicationFacade? _instance;
@@ -131,6 +135,7 @@ class ApplicationFacade {
   late final NotificationService _notificationService;
   late final OobService _oobService;
   late final GroupService _groupService;
+  late final DidDocumentService _didDocumentService;
   late final DeviceNotificationService _deviceNotificationService;
   late final Logger _logger;
 
@@ -668,4 +673,43 @@ class ApplicationFacade {
     required Object error,
     required StackTrace stackTrace,
   }) => _logger.error(message, error: error, stackTrace: stackTrace);
+
+  Future<DIDCommAuth> buildDidCommAuthorizer() =>
+      DIDCommAuthBuilder(logger: _logger).build();
+
+  Future<Map<String, dynamic>> uploadDidDocument({
+    required String authDid,
+    required Map<String, dynamic> didDocument,
+  }) async {
+    final record = await _didDocumentService.upload(
+      authDid: authDid,
+      didDocument: didDocument,
+    );
+    final segment = record.did.split(':').last;
+    return {
+      'did': record.did,
+      'segment': segment,
+      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/$segment/did.json',
+    };
+  }
+
+  Future<Map<String, dynamic>> updateDidDocument({
+    required String authDid,
+    required Map<String, dynamic> didDocument,
+  }) async {
+    final record = await _didDocumentService.update(
+      authDid: authDid,
+      didDocument: didDocument,
+    );
+    final segment = record.did.split(':').last;
+    return {
+      'did': record.did,
+      'segment': segment,
+      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/$segment/did.json',
+    };
+  }
+
+  Future<Map<String, dynamic>> resolveDidDocumentBySegment(String segment) {
+    return _didDocumentService.resolveBySegment(segment);
+  }
 }
