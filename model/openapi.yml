@@ -206,6 +206,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UpdateOffersScoreInput"
+    MatrixTokenInput:
+      description: List of required parameters to issue a Matrix login token.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MatrixTokenInput"
   responses:
     RegisterOfferOK:
       description: RegisterOfferOK
@@ -363,6 +370,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DidChallengeOK"
+    MatrixTokenOK:
+      description: MatrixTokenOK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MatrixTokenOK"
     RegisterOfferToConnectConflictError:
       description: ConflictError
       content:
@@ -1830,6 +1843,32 @@ components:
           description: >-
             date and time the refresh token expires in ISO-8601 format, e.g.
             2023-09-20T07:12:13
+    MatrixTokenInput:
+      description: List of required parameters to issue a Matrix login token.
+      type: object
+      additionalProperties: false
+      properties:
+        challenge_response:
+          type: string
+          description: >-
+            A base64 encoded string containing the encrypted DIDComm
+            message signed with the user's private key associated with
+            their Decentralised Identifier (DID).
+        homeserver:
+          type: string
+          description: >-
+            The base URI of the Matrix homeserver for which the login token
+            is being requested (e.g. https://matrix.org).
+      required:
+        - challenge_response
+        - homeserver
+    MatrixTokenOK:
+      type: object
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+          description: A short-lived signed JWT for use as a Matrix login token (m.login.token).
     DidChallengeOK:
       type: object
       additionalProperties: false
@@ -2233,3 +2272,16 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GroupMemberDeregisterOK"
+  /v1/matrix/token:
+    post:
+      operationId: matrixToken
+      description: >-
+        Issues a short-lived signed JWT for use as a Matrix login token
+        (m.login.token) by authenticating the caller via DIDComm challenge-response.
+      security: []
+      parameters: []
+      requestBody:
+        $ref: "#/components/requestBodies/MatrixTokenInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/MatrixTokenOK"
