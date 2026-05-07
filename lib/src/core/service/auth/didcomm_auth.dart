@@ -76,6 +76,40 @@ class DIDCommAuth {
     );
   }
 
+  /// Validates a DIDComm challenge response end-to-end and returns the
+  /// authenticated DID.  Throws [ChallengeAuthException] on any failure.
+  Future<String> authenticateChallengeResponse(
+    String challengeResponse,
+    String didResolverUrl,
+  ) async {
+    final AuthenticationResponse authResponse;
+    try {
+      authResponse = await unpackChallengeResponse(
+        challengeResponse,
+        didResolverUrl,
+      );
+    } catch (_) {
+      throw ChallengeAuthException(
+        AuthenticationResponseType.invalidChallengeResponse.name,
+      );
+    }
+
+    if (authResponse.type != AuthenticationResponseType.didcommChallengeOk) {
+      throw ChallengeAuthException(authResponse.type.name);
+    }
+
+    final jwtStatus = verifyAuthChallengeToken(
+      authResponse.did,
+      authResponse.challenge,
+    );
+
+    if (jwtStatus != JWTStatus.valid) {
+      throw ChallengeAuthException(jwtStatus.name);
+    }
+
+    return authResponse.did;
+  }
+
   JWTStatus verifyAuthChallengeToken(String did, String token) {
     try {
       final jwt = JWT.verify(token, _publicKey);

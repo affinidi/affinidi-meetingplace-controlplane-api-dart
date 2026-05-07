@@ -20,4 +20,11 @@ class RequestValidation {
       return false;
     }
   }
+
+  static bool isValidHomeserverUri(String uri) {
+    final parsed = Uri.tryParse(uri);
+    return parsed != null &&
+        (parsed.scheme == 'https' || parsed.scheme == 'http') &&
+        parsed.host.isNotEmpty;
+  }
 }
