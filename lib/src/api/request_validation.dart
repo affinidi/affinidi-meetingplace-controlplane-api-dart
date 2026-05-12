@@ -1,3 +1,4 @@
+import '../core/config/env_config.dart';
 import '../utils/date_time.dart';
 
 class RequestValidation {
@@ -23,8 +24,10 @@ class RequestValidation {
 
   static bool isValidHomeserverUri(String uri) {
     final parsed = Uri.tryParse(uri);
-    return parsed != null &&
-        (parsed.scheme == 'https' || parsed.scheme == 'http') &&
-        parsed.host.isNotEmpty;
+    if (parsed == null || parsed.host.isEmpty) return false;
+    if (parsed.scheme == 'https') return true;
+    if (parsed.scheme == 'http') return getEnvOrNull('ENV') == 'DEV';
+
+    return false;
   }
 }
