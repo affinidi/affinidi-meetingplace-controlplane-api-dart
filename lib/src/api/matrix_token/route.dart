@@ -28,7 +28,9 @@ Future<Response> matrixToken(Request request, ApplicationFacade facade) async {
         matrixTokenRequest.challengeResponse,
         Config().get('auth')['didResolverUrl'],
       );
-    } on ChallengeAuthException catch (e) {
+    } on ChallengeAuthException {
+      facade.logInfo('Challenge response is invalid or could not be verified.');
+
       return Response.badRequest(
         body: jsonEncode({
           'errorCode': 'CHALLENGE_RESPONSE_INVALID',

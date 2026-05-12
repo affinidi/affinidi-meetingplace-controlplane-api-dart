@@ -88,7 +88,8 @@ class DIDCommAuth {
         challengeResponse,
         didResolverUrl,
       );
-    } catch (_) {
+    } catch (e, stackTrace) {
+      _logger.error(e.toString(), error: e, stackTrace: stackTrace);
       throw ChallengeAuthException(
         AuthenticationResponseType.invalidChallengeResponse.name,
       );

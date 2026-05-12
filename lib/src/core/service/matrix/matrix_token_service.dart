@@ -22,7 +22,7 @@ class MatrixTokenService {
       audience: audience,
       expiresInMinutes: int.parse(
         getEnvOrNull('MATRIX_TOKEN_EXPIRY_IN_MINUTES') ?? '5',
-      ), // TODO: make configurable by environment
+      ),
     ).signAsJwt(signingKey);
   }
 
@@ -33,28 +33,24 @@ class MatrixTokenService {
     return sha256.convert(utf8.encode('$did|$serverName')).toString();
   }
 
-  static String _extractMatrixServerName(String homeserver) {
+  static Uri _parseHomeserverUri(String homeserver) {
     final normalized = homeserver.contains('://')
         ? homeserver
         : 'http://$homeserver';
-
-    final host = Uri.parse(normalized).host.trim();
-    if (host.isEmpty) {
+    final uri = Uri.parse(normalized);
+    if (uri.host.trim().isEmpty) {
       throw ArgumentError('Invalid homeserver');
     }
-    return host;
+    return uri;
+  }
+
+  static String _extractMatrixServerName(String homeserver) {
+    return _parseHomeserverUri(homeserver).host.trim();
   }
 
   static String _extractAudience(String homeserver) {
-    final normalized = homeserver.contains('://')
-        ? homeserver
-        : 'http://$homeserver';
-
-    final uri = Uri.parse(normalized);
+    final uri = _parseHomeserverUri(homeserver);
     final host = uri.host.trim();
-    if (host.isEmpty) {
-      throw ArgumentError('Invalid homeserver');
-    }
     final authority = uri.hasPort ? '$host:${uri.port}' : host;
     final scheme = uri.scheme.trim().isEmpty ? 'http' : uri.scheme.trim();
     return '$scheme://$authority';

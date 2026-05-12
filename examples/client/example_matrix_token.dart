@@ -5,7 +5,7 @@ import 'package:dotenv/dotenv.dart';
 import 'lib/client_helper.dart';
 
 Future<void> main() async {
-  final env = DotEnv()..load(['.env', '.env']);
+  final env = DotEnv()..load(['.env']);
 
   final apiEndpoint = env['API_ENDPOINT'] ?? 'http://localhost:3000';
   final controlPlaneDid = env['CONTROL_PLANE_DID'] ?? 'did:localhost:3000';
