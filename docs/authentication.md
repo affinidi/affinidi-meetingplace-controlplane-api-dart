@@ -73,4 +73,4 @@ sequenceDiagram
 
 ```
 
-See the example Dart code for the authentication flow [here](../test/utils/authoritzation.dart).
+See the example Dart code for the authentication flow [here](../test/utils/authorization.dart).
