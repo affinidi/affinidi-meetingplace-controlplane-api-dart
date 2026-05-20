@@ -2883,7 +2883,7 @@ void main() {
   );
 
   test('#matrix/token: success', () async {
-    final challengeResponse = await buildChallengeResponse(
+    final challengeResponse = await buildMatrixChallengeResponse(
       aliceDidManager,
       aliceKeyPair,
       SignatureScheme.ecdsa_p256_sha256,
@@ -2911,7 +2911,7 @@ void main() {
   });
 
   test('#matrix/token: returns 400 for missing homeserver', () async {
-    final challengeResponse = await buildChallengeResponse(
+    final challengeResponse = await buildMatrixChallengeResponse(
       aliceDidManager,
       aliceKeyPair,
       SignatureScheme.ecdsa_p256_sha256,

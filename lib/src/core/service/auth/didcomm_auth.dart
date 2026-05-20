@@ -1,18 +1,38 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import '../../../../meeting_place_control_plane_api.dart';
+import '../../entity/consumed_challenge.dart';
 import '../../logger/logger.dart';
+import '../../storage/exception/already_exists_exception.dart';
+import '../../storage/storage.dart';
+import '../../../utils/date_time.dart';
 import 'auth_response.dart';
 import 'auth_token.dart';
+import 'challenge_purpose.dart';
 import 'didcomm_client.dart';
 import 'mpx_registration_token.dart';
 
-enum JWTStatus { valid, expired, invalid, invalidSubject, configurationError }
+enum JWTStatus {
+  valid,
+  expired,
+  invalid,
+  invalidSubject,
+  configurationError,
+  missingJti,
+  purposeMismatch,
+}
 
 class VerifyAuthTokenResult {
   VerifyAuthTokenResult({required this.status, this.did = ''});
   JWTStatus status;
   String did = '';
+}
+
+class VerifyAuthChallengeResult {
+  VerifyAuthChallengeResult({required this.status, this.jti});
+
+  final JWTStatus status;
+  final String? jti;
 }
 
 class DIDCommAuth {
@@ -21,15 +41,18 @@ class DIDCommAuth {
     required JWTKey publicKey,
     required List<dynamic> jwk,
     required Logger logger,
+    Storage? storage,
   }) : _privateKey = privateKey,
        _publicKey = publicKey,
        _jwk = jwk,
-       _logger = logger;
+       _logger = logger,
+       _storage = storage;
 
   final JWTKey _privateKey;
   final JWTKey _publicKey;
   final List<dynamic> _jwk;
   final Logger _logger;
+  final Storage? _storage;
 
   get jwk => _jwk;
 
@@ -77,12 +100,19 @@ class DIDCommAuth {
   }
 
   /// Validates a DIDComm challenge response end-to-end and returns the
-  /// authenticated DID.  Throws [ChallengeAuthException] on any failure.
-  Future<String> authenticateChallengeResponse(
-    String challengeResponse,
-    String didResolverUrl,
-  ) async {
+  /// authenticated DID. Throws [ChallengeAuthException] on any failure.
+  /// [purpose] must match the purpose claim embedded in the challenge token.
+  Future<String> authenticateChallengeResponse({
+    required String challengeResponse,
+    required String didResolverUrl,
+    required ChallengePurpose purpose,
+  }) async {
+    if (_storage == null) {
+      throw StateError('Storage is required for challenge auth');
+    }
+
     final AuthenticationResponse authResponse;
+
     try {
       authResponse = await unpackChallengeResponse(
         challengeResponse,
@@ -99,32 +129,62 @@ class DIDCommAuth {
       throw ChallengeAuthException(authResponse.type.name);
     }
 
-    final jwtStatus = verifyAuthChallengeToken(
+    final challengeVerification = verifyAuthChallengeToken(
       authResponse.did,
       authResponse.challenge,
+      purpose,
     );
 
-    if (jwtStatus != JWTStatus.valid) {
-      throw ChallengeAuthException(jwtStatus.name);
+    final jti = challengeVerification.jti;
+    if (challengeVerification.status != JWTStatus.valid || jti == null) {
+      throw ChallengeAuthException(challengeVerification.status.name);
+    }
+
+    try {
+      await _storage.create(
+        ConsumedChallenge(
+          jti: jti,
+          ttl: nowUtc().add(const Duration(minutes: 1)),
+        ),
+      );
+    } on AlreadyExists {
+      throw ChallengeAuthException('challengeAlreadyUsed');
     }
 
     return authResponse.did;
   }
 
-  JWTStatus verifyAuthChallengeToken(String did, String token) {
+  VerifyAuthChallengeResult verifyAuthChallengeToken(
+    String did,
+    String token,
+    ChallengePurpose purpose,
+  ) {
     try {
       final jwt = JWT.verify(token, _publicKey);
 
       if (jwt.payload['sub'] != did) {
-        return JWTStatus.invalidSubject;
+        return VerifyAuthChallengeResult(status: JWTStatus.invalidSubject);
       }
-      return JWTStatus.valid;
+
+      final jti = jwt.jwtId;
+      if (jti == null || jti.isEmpty) {
+        return VerifyAuthChallengeResult(status: JWTStatus.missingJti);
+      }
+
+      final tokenPurpose = ChallengePurpose.fromValue(
+        jwt.payload['purpose'] as String? ?? '',
+      );
+      if (tokenPurpose != purpose) {
+        return VerifyAuthChallengeResult(status: JWTStatus.purposeMismatch);
+      }
+
+      return VerifyAuthChallengeResult(status: JWTStatus.valid, jti: jti);
     } on JWTExpiredException {
       _logger.info('jwt expires');
-      return JWTStatus.expired;
+      return VerifyAuthChallengeResult(status: JWTStatus.expired);
     } on JWTException catch (ex) {
       _logger.info(ex.message);
-      return JWTStatus.invalid;
+      return VerifyAuthChallengeResult(status: JWTStatus.invalid);
     }
   }
 

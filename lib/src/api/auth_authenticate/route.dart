@@ -1,5 +1,6 @@
 import 'package:shelf/shelf.dart';
 import '../request_validation_exception.dart';
+import '../../core/service/auth/challenge_purpose.dart';
 import '../../core/service/auth/didcomm_auth_builder.dart';
 import 'request_model.dart';
 import 'response_error_model.dart';
@@ -20,13 +21,15 @@ Future<Response> authAuthenticate(
 
     final authorizer = await DIDCommAuthBuilder(
       logger: facade.config.logger,
+      storage: facade.config.storage,
     ).build();
 
     final String authDid;
     try {
       authDid = await authorizer.authenticateChallengeResponse(
-        requestParams.challengeResponse,
-        Config().get('auth')['didResolverUrl'],
+        challengeResponse: requestParams.challengeResponse,
+        didResolverUrl: Config().get('auth')['didResolverUrl'],
+        purpose: ChallengePurpose.authenticate,
       );
     } on ChallengeAuthException catch (e) {
       return Response.badRequest(

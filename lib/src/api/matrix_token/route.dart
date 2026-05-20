@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../core/service/matrix/matrix_token.dart';
+import '../../core/service/auth/challenge_purpose.dart';
 import '../../core/service/matrix/matrix_token_service.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
@@ -20,13 +20,15 @@ Future<Response> matrixToken(Request request, ApplicationFacade facade) async {
 
     final authorizer = await DIDCommAuthBuilder(
       logger: facade.config.logger,
+      storage: facade.config.storage,
     ).build();
 
     final String authDid;
     try {
       authDid = await authorizer.authenticateChallengeResponse(
-        matrixTokenRequest.challengeResponse,
-        Config().get('auth')['didResolverUrl'],
+        challengeResponse: matrixTokenRequest.challengeResponse,
+        didResolverUrl: Config().get('auth')['didResolverUrl'],
+        purpose: ChallengePurpose.matrixToken,
       );
     } on ChallengeAuthException {
       facade.logInfo('Challenge response is invalid or could not be verified.');
