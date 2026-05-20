@@ -22,7 +22,7 @@ Future<void> main() async {
       await helper.createDidManagerWithKeyPair();
 
   final aliceDidDoc = await aliceDidManager.getDidDocument();
-  final aliceChallengeResponse = await helper.getChallengeResponse(
+  final aliceChallengeResponse = await helper.getMatrixChallengeResponse(
     didManager: aliceDidManager,
     keyPair: aliceKeyPair,
   );

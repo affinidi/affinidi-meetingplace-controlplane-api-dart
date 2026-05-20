@@ -50,15 +50,42 @@ class ClientHelper {
     return authenticateResponse.data['access_token'];
   }
 
+  Future<String> getMatrixChallengeResponse({
+    required DidKeyManager didManager,
+    required KeyPair keyPair,
+    SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
+  }) async {
+    return _getChallengeResponseForEndpoint(
+      didManager: didManager,
+      keyPair: keyPair,
+      signatureScheme: signatureScheme,
+      challengeEndpoint: '/v1/matrix/challenge',
+    );
+  }
+
   Future<String> getChallengeResponse({
     required DidKeyManager didManager,
     required KeyPair keyPair,
     SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
   }) async {
+    return _getChallengeResponseForEndpoint(
+      didManager: didManager,
+      keyPair: keyPair,
+      signatureScheme: signatureScheme,
+      challengeEndpoint: '/v1/authenticate/challenge',
+    );
+  }
+
+  Future<String> _getChallengeResponseForEndpoint({
+    required DidKeyManager didManager,
+    required KeyPair keyPair,
+    required SignatureScheme signatureScheme,
+    required String challengeEndpoint,
+  }) async {
     final didDocument = await didManager.getDidDocument();
 
     final challengeResponse = await _dio.post(
-      '$apiEndpoint/v1/authenticate/challenge',
+      '$apiEndpoint$challengeEndpoint',
       data: {'did': didDocument.id},
     );
 
