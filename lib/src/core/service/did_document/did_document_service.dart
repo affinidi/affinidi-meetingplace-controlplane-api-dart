@@ -1,5 +1,6 @@
 import '../../entity/did_document_record.dart';
 import '../../entity/did_document_segment_record.dart';
+import '../../logger/logger.dart';
 import '../../storage/exception/already_exists_exception.dart';
 import '../../storage/storage.dart';
 
@@ -11,9 +12,12 @@ class InvalidDidDocumentInput implements Exception {
 }
 
 class DidDocumentService {
-  DidDocumentService({required Storage storage}) : _storage = storage;
+  DidDocumentService({required Storage storage, required Logger logger})
+    : _storage = storage,
+      _logger = logger;
 
   final Storage _storage;
+  final Logger _logger;
 
   Future<DidDocumentRecord> upload({
     required String authDid,
@@ -28,7 +32,12 @@ class DidDocumentService {
       did,
       DidDocumentRecord.fromJson,
     );
-    if (existing != null) return existing;
+    if (existing != null) {
+      if (existing.createdBy != authDid) {
+        throw InvalidDidDocumentInput('DID already registered by another user');
+      }
+      return existing;
+    }
 
     final record = DidDocumentRecord(
       did: did,
@@ -43,8 +52,12 @@ class DidDocumentService {
       await _storage.create(
         DidDocumentSegmentRecord(segment: segment, did: did),
       );
-    } on AlreadyExists {
-      // keep idempotent behavior
+    } on AlreadyExists catch (e, stackTrace) {
+      _logger.warn(
+        'Segment record already exists for did $did — keeping idempotent',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     return record;
   }
@@ -96,7 +109,9 @@ class DidDocumentService {
   String _extractAndValidateDid(Map<String, dynamic> didDocument) {
     final did = didDocument['id'];
     if (did is! String || did.trim().isEmpty) {
-      throw InvalidDidDocumentInput('didDocument.id must be a non-empty string');
+      throw InvalidDidDocumentInput(
+        'didDocument.id must be a non-empty string',
+      );
     }
     if (!did.startsWith('did:web:')) {
       throw InvalidDidDocumentInput('didDocument.id must use did:web');

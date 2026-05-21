@@ -123,7 +123,10 @@ class ApplicationFacade {
       didResolver: config.didResolver,
       logger: _logger,
     );
-    _didDocumentService = DidDocumentService(storage: config.storage);
+    _didDocumentService = DidDocumentService(
+      storage: config.storage,
+      logger: _logger,
+    );
   }
 
   static ApplicationFacade? _instance;
