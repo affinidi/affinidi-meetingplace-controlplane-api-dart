@@ -6,12 +6,21 @@ import '../../server/utils.dart';
 import '../application_facade.dart';
 import '../../core/service/did_document/did_document_service.dart';
 
-Future<Response> didDocumentUpload(Request request, ApplicationFacade facade) async {
+Future<Response> didDocumentUpload(
+  Request request,
+  ApplicationFacade facade,
+) async {
   try {
     final bodyText = await request.readAsString();
-    final body = bodyText.trim().isEmpty
+    final dynamic decoded = bodyText.trim().isEmpty
         ? <String, dynamic>{}
-        : jsonDecode(bodyText) as Map<String, dynamic>;
+        : jsonDecode(bodyText);
+    if (decoded is! Map<String, dynamic>) {
+      return Response.badRequest(
+        body: jsonEncode({'error': 'Request body must be a JSON object'}),
+      );
+    }
+    final body = decoded;
     final didDocument = body['didDocument'];
     if (didDocument is! Map<String, dynamic>) {
       return Response.badRequest(
@@ -26,6 +35,8 @@ Future<Response> didDocumentUpload(Request request, ApplicationFacade facade) as
       jsonEncode(result),
       headers: {'content-type': 'application/json'},
     );
+  } on FormatException {
+    return Response.badRequest(body: jsonEncode({'error': 'Invalid JSON'}));
   } on InvalidDidDocumentInput catch (e) {
     return Response.badRequest(body: jsonEncode({'error': e.message}));
   } catch (e, stackTrace) {

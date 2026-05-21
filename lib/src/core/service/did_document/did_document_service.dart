@@ -36,6 +36,14 @@ class DidDocumentService {
       if (existing.createdBy != authDid) {
         throw InvalidDidDocumentInput('DID already registered by another user');
       }
+      // Backfill segment mapping if a prior partial write left it missing.
+      try {
+        await _storage.create(
+          DidDocumentSegmentRecord(segment: segment, did: did),
+        );
+      } on AlreadyExists {
+        // Segment already exists — idempotent.
+      }
       return existing;
     }
 
@@ -113,10 +121,12 @@ class DidDocumentService {
         'didDocument.id must be a non-empty string',
       );
     }
-    if (!did.startsWith('did:web:')) {
-      throw InvalidDidDocumentInput('didDocument.id must use did:web');
-    }
-    if (!did.contains(':user:')) {
+    // Enforce exact shape: did:web:<host>:user:<segment>
+    final parts = did.split(':');
+    if (parts.length != 5 ||
+        parts[0] != 'did' ||
+        parts[1] != 'web' ||
+        parts[3] != 'user') {
       throw InvalidDidDocumentInput(
         'didDocument.id must match did:web:<host>:user:<segment>',
       );
