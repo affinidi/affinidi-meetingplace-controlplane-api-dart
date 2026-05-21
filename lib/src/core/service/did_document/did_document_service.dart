@@ -47,6 +47,19 @@ class DidDocumentService {
       return existing;
     }
 
+    // Verify no other DID has already claimed this segment before persisting
+    // the record, to prevent partial state where a DidDocumentRecord exists
+    // but segment resolution points to a different DID.
+    final segmentConflict = await _storage
+        .findOneById<DidDocumentSegmentRecord>(
+          'DidDocumentSegment',
+          segment,
+          DidDocumentSegmentRecord.fromJson,
+        );
+    if (segmentConflict != null && segmentConflict.did != did) {
+      throw InvalidDidDocumentInput('Segment already claimed by another DID');
+    }
+
     final record = DidDocumentRecord(
       did: did,
       createdBy: authDid,
