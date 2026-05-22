@@ -83,33 +83,6 @@ class DidDocumentService {
     return record;
   }
 
-  Future<DidDocumentRecord> update({
-    required String authDid,
-    required Map<String, dynamic> didDocument,
-  }) async {
-    final did = _extractAndValidateDid(didDocument);
-    final existing = await _storage.findOneById<DidDocumentRecord>(
-      'DidDocument',
-      did,
-      DidDocumentRecord.fromJson,
-    );
-    if (existing == null) throw DidDocumentNotFound();
-    if (existing.createdBy != authDid) {
-      throw InvalidDidDocumentInput(
-        'Authenticated DID does not own this DID document',
-      );
-    }
-
-    final updated = DidDocumentRecord(
-      did: existing.did,
-      createdBy: existing.createdBy,
-      createdAt: existing.createdAt,
-      updatedAt: DateTime.now().toUtc(),
-      didDocument: didDocument,
-    );
-    return _storage.update(updated);
-  }
-
   Future<Map<String, dynamic>> resolveBySegment(String segment) async {
     final lookup = await _storage.findOneById<DidDocumentSegmentRecord>(
       'DidDocumentSegment',

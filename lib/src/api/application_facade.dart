@@ -696,22 +696,6 @@ class ApplicationFacade {
     };
   }
 
-  Future<Map<String, dynamic>> updateDidDocument({
-    required String authDid,
-    required Map<String, dynamic> didDocument,
-  }) async {
-    final record = await _didDocumentService.update(
-      authDid: authDid,
-      didDocument: didDocument,
-    );
-    final segment = record.did.split(':').last;
-    return {
-      'did': record.did,
-      'segment': segment,
-      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/$segment/did.json',
-    };
-  }
-
   Future<Map<String, dynamic>> resolveDidDocumentBySegment(String segment) {
     return _didDocumentService.resolveBySegment(segment);
   }

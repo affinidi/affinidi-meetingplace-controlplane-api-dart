@@ -17,7 +17,6 @@ import '../api/check_offer_phrase/route.dart';
 import '../api/application_facade.dart';
 import '../api/create_oob/route.dart';
 import '../api/did_document_resolve/route.dart';
-import '../api/did_document_update/route.dart';
 import '../api/did_document_upload/route.dart';
 import '../api/delete_pending_notifications/route.dart';
 import '../api/deregister_notification/route.dart';
@@ -111,7 +110,6 @@ Router createRouter(ApplicationFacade facade) {
     ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
     ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
     ..post('/v1/did-document/upload', privatePipeline(didDocumentUpload, facade))
-    ..post('/v1/did-document/update', privatePipeline(didDocumentUpdate, facade))
     // notification routes
     ..post(
       '/v1/notifications',
