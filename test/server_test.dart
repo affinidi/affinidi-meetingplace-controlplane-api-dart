@@ -2171,6 +2171,86 @@ void main() {
     expect(receivedMessage.body!['seq_no'], equals(1));
   });
 
+  test('group-notify-channel: success', () async {
+    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await dio.post(
+      '$apiEndpoint/v1/accept-offer-group',
+      data: getAcceptOfferGroupRequest(
+        did: BobDevice.offerAcceptanceDid,
+        deviceToken: BobDevice.deviceToken,
+        platformType: BobDevice.platformType,
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    final reencryptKeyPair = generateMemberRecryptKeyPair();
+    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
+
+    await dio.post(
+      '$apiEndpoint/v1/group-add-member',
+      data: GroupAddMemberRequest(
+        offerLink: registerOfferResponse.data['offerLink'],
+        mnemonic: registerOfferResponse.data['mnemonic'],
+        groupId: registerOfferResponse.data['groupId'],
+        memberDid: BobDevice.offerAcceptanceDid,
+        acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+        reencryptionKey: reencryptionKey.toBase64(),
+        publicKey: reencryptKeyPair.publicKeyToBase64(),
+        contactCard: '',
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/group-notify-channel',
+      data: {
+        'offerLink': registerOfferResponse.data['offerLink'],
+        'groupDid': registerOfferResponse.data['groupDid'],
+        'type': 'chat-activity',
+      },
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    expect(response.statusCode, equals(200));
+    expect(response.data['status'], equals('success'));
+    expect(
+      response.data['message'],
+      equals('Group channel notified successfully'),
+    );
+  });
+
   test('group-add-member: fails due to missing permissions', () async {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,

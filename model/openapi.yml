@@ -199,6 +199,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GroupDeleteInput"
+    GroupNotifyChannelInput:
+      description: List of required parameters to notify all members of a group chat.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GroupNotifyChannelInput"
     UpdateOffersScoreInput:
       description: List of required parameters to update offers score.
       required: true
@@ -371,6 +378,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GroupSendMessageOK"
+    GroupNotifyChannelOK:
+      description: GroupNotifyChannelOK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GroupNotifyChannelOK"
     DidChallengeOK:
       description: DidChallengeOK
       content:
@@ -1812,6 +1825,24 @@ components:
         - fromDid
         - groupDid
         - payload
+    GroupNotifyChannelInput:
+      description: List of required parameters to notify all members of a group chat.
+      type: object
+      additionalProperties: false
+      properties:
+        offerLink:
+          type: string
+          description: The Offer link associated with the group chat.
+        groupDid:
+          type: string
+          description: The channel DID for the group chat.
+        type:
+          type: string
+          description: The notification type to send to group members.
+      required:
+        - offerLink
+        - groupDid
+        - type
     DidChallenge:
       description: List of required parameters to initiate authentication process.
       type: object
@@ -1831,6 +1862,14 @@ components:
         message:
           type: string
     GroupMemberDeregisterOK:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    GroupNotifyChannelOK:
       type: object
       additionalProperties: false
       properties:
@@ -2316,6 +2355,18 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GroupDeleteOK"
+  /v1/group-notify-channel:
+    post:
+      operationId: groupNotifyChannel
+      description: Sends a notification to all members of a group chat.
+      security:
+        - DidCommTokenAuth: []
+      parameters: []
+      requestBody:
+        $ref: "#/components/requestBodies/GroupNotifyChannelInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/GroupNotifyChannelOK"
   /v1/group-member-deregister:
     post:
       operationId: groupMemberDeregister
