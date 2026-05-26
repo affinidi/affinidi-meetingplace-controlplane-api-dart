@@ -206,6 +206,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UpdateOffersScoreInput"
+    MatrixTokenInput:
+      description: List of required parameters to issue a Matrix login token.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MatrixTokenInput"
+    MatrixChallengeInput:
+      description: List of required parameters to initiate the Matrix token challenge process.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MatrixChallengeInput"
   responses:
     RegisterOfferOK:
       description: RegisterOfferOK
@@ -363,6 +377,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DidChallengeOK"
+    MatrixTokenOK:
+      description: MatrixTokenOK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MatrixTokenOK"
+    MatrixChallengeOK:
+      description: MatrixChallengeOK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MatrixChallengeOK"
     RegisterOfferToConnectConflictError:
       description: ConflictError
       content:
@@ -1830,12 +1856,64 @@ components:
           description: >-
             date and time the refresh token expires in ISO-8601 format, e.g.
             2023-09-20T07:12:13
+    MatrixTokenInput:
+      description: List of required parameters to issue a Matrix login token.
+      type: object
+      additionalProperties: false
+      properties:
+        challenge_response:
+          type: string
+          description: >-
+            A base64 encoded string containing the encrypted DIDComm
+            message signed with the user's private key associated with
+            their Decentralised Identifier (DID).
+        homeserver:
+          type: string
+          description: >-
+            The base URI of the Matrix homeserver for which the login token
+            is being requested (e.g. https://matrix.org).
+      required:
+        - challenge_response
+        - homeserver
+    MatrixTokenOK:
+      type: object
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+          description: A short-lived signed JWT for use as a Matrix login token (m.login.token).
     DidChallengeOK:
       type: object
       additionalProperties: false
       properties:
         challenge:
           type: string
+          description: >-
+            A signed JWT challenge token bound to the authenticate purpose.
+            Contains jti (unique identifier) and purpose claims.
+            Valid for 60 seconds and may only be used once at /v1/authenticate.
+    MatrixChallengeInput:
+      description: List of required parameters to initiate the Matrix token challenge process.
+      type: object
+      additionalProperties: false
+      properties:
+        did:
+          type: string
+          description: >-
+            Decentralised Identifier (DID) of the user to generate the Matrix
+            challenge token for.
+      required:
+        - did
+    MatrixChallengeOK:
+      type: object
+      additionalProperties: false
+      properties:
+        challenge:
+          type: string
+          description: >-
+            A signed JWT challenge token bound to the matrix_token purpose.
+            Contains jti (unique identifier) and purpose claims.
+            Valid for 60 seconds and may only be used once at /v1/matrix/token.
     GetOobNotFoundError:
       type: object
       additionalProperties: false
@@ -2189,7 +2267,10 @@ paths:
   /v1/authenticate/challenge:
     post:
       operationId: didChallenge
-      description: Initiates the authentication process by generating an auth challenge token for the specified Decentralised Identifier (DID).
+      description: >-
+        Initiates the authentication process by generating a one-time challenge
+        token bound to the authenticate purpose for the specified DID.
+        The returned challenge may only be submitted to /v1/authenticate.
       security: []
       parameters: []
       requestBody:
@@ -2197,6 +2278,20 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/DidChallengeOK"
+  /v1/matrix/challenge:
+    post:
+      operationId: matrixChallenge
+      description: >-
+        Generates a one-time challenge token bound to the matrix_token purpose
+        for the specified DID. The returned challenge may only be submitted
+        to /v1/matrix/token.
+      security: []
+      parameters: []
+      requestBody:
+        $ref: "#/components/requestBodies/MatrixChallengeInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/MatrixChallengeOK"
   /v1/group-send-message:
     post:
       operationId: groupSendMessage
@@ -2233,3 +2328,16 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GroupMemberDeregisterOK"
+  /v1/matrix/token:
+    post:
+      operationId: matrixToken
+      description: >-
+        Issues a short-lived signed JWT for use as a Matrix login token
+        (m.login.token) by authenticating the caller via DIDComm challenge-response.
+      security: []
+      parameters: []
+      requestBody:
+        $ref: "#/components/requestBodies/MatrixTokenInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/MatrixTokenOK"

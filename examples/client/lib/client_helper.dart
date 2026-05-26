@@ -36,10 +36,56 @@ class ClientHelper {
     required KeyPair keyPair,
     SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
   }) async {
+    final challengeResponse = await getChallengeResponse(
+      didManager: didManager,
+      keyPair: keyPair,
+      signatureScheme: signatureScheme,
+    );
+
+    final authenticateResponse = await _dio.post(
+      '$apiEndpoint/v1/authenticate',
+      data: {'challenge_response': challengeResponse},
+    );
+
+    return authenticateResponse.data['access_token'];
+  }
+
+  Future<String> getMatrixChallengeResponse({
+    required DidKeyManager didManager,
+    required KeyPair keyPair,
+    SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
+  }) async {
+    return _getChallengeResponseForEndpoint(
+      didManager: didManager,
+      keyPair: keyPair,
+      signatureScheme: signatureScheme,
+      challengeEndpoint: '/v1/matrix/challenge',
+    );
+  }
+
+  Future<String> getChallengeResponse({
+    required DidKeyManager didManager,
+    required KeyPair keyPair,
+    SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
+  }) async {
+    return _getChallengeResponseForEndpoint(
+      didManager: didManager,
+      keyPair: keyPair,
+      signatureScheme: signatureScheme,
+      challengeEndpoint: '/v1/authenticate/challenge',
+    );
+  }
+
+  Future<String> _getChallengeResponseForEndpoint({
+    required DidKeyManager didManager,
+    required KeyPair keyPair,
+    required SignatureScheme signatureScheme,
+    required String challengeEndpoint,
+  }) async {
     final didDocument = await didManager.getDidDocument();
 
     final challengeResponse = await _dio.post(
-      '$apiEndpoint/v1/authenticate/challenge',
+      '$apiEndpoint$challengeEndpoint',
       data: {'did': didDocument.id},
     );
 
@@ -77,13 +123,17 @@ class ClientHelper {
       ),
     );
 
-    final encodedEncrypted = base64Encode(utf8.encode(json.encode(encrypted)));
-    final authenticateResponse = await _dio.post(
-      '$apiEndpoint/v1/authenticate',
-      data: {'challenge_response': encodedEncrypted},
-    );
+    return base64Encode(utf8.encode(json.encode(encrypted)));
+  }
 
-    return authenticateResponse.data['access_token'];
+  Dio getDio() {
+    return Dio(
+      BaseOptions(
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
   }
 
   Dio getDioWithAuth(String accessToken) {
