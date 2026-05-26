@@ -36,3 +36,8 @@ class ChallengeAuthException implements Exception {
   ChallengeAuthException(this.reason);
   final String reason;
 }
+
+class ChallengeAuthException implements Exception {
+  ChallengeAuthException(this.reason);
+  final String reason;
+}
