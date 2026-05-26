@@ -6,7 +6,6 @@ part 'group_member.g.dart';
 
 @JsonSerializable()
 class GroupMember extends Entity {
-  @override
   factory GroupMember.fromJson(Map<String, dynamic> json) =>
       _$GroupMemberFromJson(json);
 

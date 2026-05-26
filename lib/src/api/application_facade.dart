@@ -125,6 +125,7 @@ class ApplicationFacade {
     );
     _didDocumentService = DidDocumentService(
       storage: config.storage,
+      didResolver: config.didResolver,
       logger: _logger,
     );
   }
@@ -586,6 +587,7 @@ class ApplicationFacade {
     return _groupService.deregisterMember(
       DeregisterMemberInput(
         groupId: request.groupId,
+        memberDid: request.memberDid,
         controllingDid: authDid,
         messageToRelay: request.messageToRelay,
       ),
@@ -683,8 +685,8 @@ class ApplicationFacade {
   Future<Map<String, dynamic>> uploadDidDocument({
     required String authDid,
     required Map<String, dynamic> didDocument,
-    required String controlProof,
-    required String proof,
+    required Map<String, dynamic> controlProof,
+    required Map<String, dynamic> proof,
   }) async {
     final record = await _didDocumentService.upload(
       authDid: authDid,

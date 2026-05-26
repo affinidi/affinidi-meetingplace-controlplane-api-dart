@@ -6,6 +6,7 @@ import 'package:meeting_place_control_plane_api/src/core/logger/logger.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/did_document/did_document_service.dart';
 import 'package:meeting_place_control_plane_api/src/core/storage/exception/already_exists_exception.dart';
 import 'package:meeting_place_control_plane_api/src/core/storage/storage.dart';
+import 'package:ssi/ssi.dart';
 import 'package:test/test.dart';
 
 class _InMemoryStorage implements Storage {
@@ -96,6 +97,21 @@ class _NoOpLogger implements Logger {
   void error(String message, {Object? error, StackTrace? stackTrace}) {}
 }
 
+class _FakeDidResolver implements DidResolver {
+  _FakeDidResolver(this._documents);
+
+  final Map<String, DidDocument> _documents;
+
+  @override
+  Future<DidDocument> resolveDid(String did) async {
+    final document = _documents[did];
+    if (document == null) {
+      throw Exception('Missing DID document for $did');
+    }
+    return document;
+  }
+}
+
 String _jwkK(String rawSecret) =>
     base64Url.encode(utf8.encode(rawSecret)).replaceAll('=', '');
 
@@ -107,8 +123,6 @@ Map<String, dynamic> _octJwk(String rawSecret) => {
 Map<String, dynamic> _buildDidDocument({
   required String did,
   required Map<String, dynamic> publicKeyJwk,
-  String proofType = 'JsonWebSignature2020',
-  String proofPurpose = 'authentication',
 }) => {
   '@context': ['https://www.w3.org/ns/did/v1'],
   'id': did,
@@ -120,11 +134,39 @@ Map<String, dynamic> _buildDidDocument({
       'publicKeyJwk': publicKeyJwk,
     },
   ],
-  'proof': {
-    'type': proofType,
-    'proofPurpose': proofPurpose,
-    'verificationMethod': '$did#key-1',
-  },
+};
+
+DidDocument _buildResolvedDidDocument({
+  required String did,
+  required String verificationMethod,
+  required Map<String, dynamic> publicKeyJwk,
+}) => DidDocument.fromJson(
+  jsonEncode({
+    '@context': ['https://www.w3.org/ns/did/v1'],
+    'id': did,
+    'verificationMethod': [
+      {
+        'id': verificationMethod,
+        'type': 'JsonWebKey2020',
+        'controller': did,
+        'publicKeyJwk': publicKeyJwk,
+      },
+    ],
+    'authentication': [verificationMethod],
+  }),
+);
+
+Map<String, dynamic> _buildProof({
+  required String verificationMethod,
+  required String jws,
+  String type = 'JsonWebSignature2020',
+  String proofPurpose = 'authentication',
+}) => {
+  'type': type,
+  'created': '2026-01-01T00:00:00Z',
+  'verificationMethod': verificationMethod,
+  'proofPurpose': proofPurpose,
+  'jws': jws,
 };
 
 String _sign(String rawSecret) {
@@ -134,18 +176,42 @@ String _sign(String rawSecret) {
 
 void main() {
   late _InMemoryStorage storage;
+  late _FakeDidResolver didResolver;
   late DidDocumentService service;
 
   const did = 'did:web:example.com:user:alice';
   const authDid = 'did:key:zAlice123';
+  const otherAuthDid = 'did:key:zBob456';
+  const authVerificationMethod = '$authDid#control-1';
+  const otherAuthVerificationMethod = '$otherAuthDid#control-1';
   const secret = 'unit-test-secret-key-for-did-service';
+  const authSecret = 'control-did-secret-for-unit-tests';
+  const otherAuthSecret = 'other-control-did-secret-for-unit-tests';
 
   final jwk = _octJwk(secret);
+  final authJwk = _octJwk(authSecret);
+  final otherAuthJwk = _octJwk(otherAuthSecret);
   final didDocument = _buildDidDocument(did: did, publicKeyJwk: jwk);
 
   setUp(() {
     storage = _InMemoryStorage();
-    service = DidDocumentService(storage: storage, logger: _NoOpLogger());
+    didResolver = _FakeDidResolver({
+      authDid: _buildResolvedDidDocument(
+        did: authDid,
+        verificationMethod: authVerificationMethod,
+        publicKeyJwk: authJwk,
+      ),
+      otherAuthDid: _buildResolvedDidDocument(
+        did: otherAuthDid,
+        verificationMethod: otherAuthVerificationMethod,
+        publicKeyJwk: otherAuthJwk,
+      ),
+    });
+    service = DidDocumentService(
+      storage: storage,
+      didResolver: didResolver,
+      logger: _NoOpLogger(),
+    );
   });
 
   group('upload', () {
@@ -153,8 +219,14 @@ void main() {
       final record = await service.upload(
         authDid: authDid,
         didDocument: didDocument,
-        controlProof: _sign(secret),
-        proof: _sign(secret),
+        controlProof: _buildProof(
+          verificationMethod: authVerificationMethod,
+          jws: _sign(authSecret),
+        ),
+        proof: _buildProof(
+          verificationMethod: '$did#key-1',
+          jws: _sign(secret),
+        ),
       );
 
       expect(record.did, did);
@@ -166,15 +238,27 @@ void main() {
       await service.upload(
         authDid: authDid,
         didDocument: didDocument,
-        controlProof: _sign(secret),
-        proof: _sign(secret),
+        controlProof: _buildProof(
+          verificationMethod: authVerificationMethod,
+          jws: _sign(authSecret),
+        ),
+        proof: _buildProof(
+          verificationMethod: '$did#key-1',
+          jws: _sign(secret),
+        ),
       );
 
       final second = await service.upload(
         authDid: authDid,
         didDocument: didDocument,
-        controlProof: _sign(secret),
-        proof: _sign(secret),
+        controlProof: _buildProof(
+          verificationMethod: authVerificationMethod,
+          jws: _sign(authSecret),
+        ),
+        proof: _buildProof(
+          verificationMethod: '$did#key-1',
+          jws: _sign(secret),
+        ),
       );
 
       expect(second.did, did);
@@ -185,16 +269,28 @@ void main() {
       await service.upload(
         authDid: authDid,
         didDocument: didDocument,
-        controlProof: _sign(secret),
-        proof: _sign(secret),
+        controlProof: _buildProof(
+          verificationMethod: authVerificationMethod,
+          jws: _sign(authSecret),
+        ),
+        proof: _buildProof(
+          verificationMethod: '$did#key-1',
+          jws: _sign(secret),
+        ),
       );
 
       expect(
         () => service.upload(
-          authDid: 'did:key:zBob456',
+          authDid: otherAuthDid,
           didDocument: didDocument,
-          controlProof: _sign(secret),
-          proof: _sign(secret),
+          controlProof: _buildProof(
+            verificationMethod: otherAuthVerificationMethod,
+            jws: _sign(otherAuthSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign(secret),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
@@ -218,20 +314,53 @@ void main() {
         () => service.upload(
           authDid: authDid,
           didDocument: badDoc,
-          controlProof: _sign(secret),
-          proof: _sign(secret),
+          controlProof: _buildProof(
+            verificationMethod: authVerificationMethod,
+            jws: _sign(authSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign(secret),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws on proof signed by an unknown key', () {
+    test(
+      'throws on controlProof signed by an unknown authenticated DID key',
+      () {
+        expect(
+          () => service.upload(
+            authDid: authDid,
+            didDocument: didDocument,
+            controlProof: _buildProof(
+              verificationMethod: authVerificationMethod,
+              jws: _sign('different-secret-not-in-auth-did'),
+            ),
+            proof: _buildProof(
+              verificationMethod: '$did#key-1',
+              jws: _sign(secret),
+            ),
+          ),
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
+
+    test('throws on proof signed by an unknown didDocument key', () {
       expect(
         () => service.upload(
           authDid: authDid,
           didDocument: didDocument,
-          controlProof: _sign('different-secret-not-in-document'),
-          proof: _sign(secret),
+          controlProof: _buildProof(
+            verificationMethod: authVerificationMethod,
+            jws: _sign(authSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign('different-secret-not-in-document'),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
@@ -247,8 +376,14 @@ void main() {
         () => service.upload(
           authDid: authDid,
           didDocument: docNoKeys,
-          controlProof: _sign(secret),
-          proof: _sign(secret),
+          controlProof: _buildProof(
+            verificationMethod: authVerificationMethod,
+            jws: _sign(authSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign(secret),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
@@ -258,8 +393,14 @@ void main() {
       await service.upload(
         authDid: authDid,
         didDocument: didDocument,
-        controlProof: _sign(secret),
-        proof: _sign(secret),
+        controlProof: _buildProof(
+          verificationMethod: authVerificationMethod,
+          jws: _sign(authSecret),
+        ),
+        proof: _buildProof(
+          verificationMethod: '$did#key-1',
+          jws: _sign(secret),
+        ),
       );
 
       const otherDid = 'did:web:other.com:user:alice';
@@ -269,68 +410,90 @@ void main() {
 
       expect(
         () => service.upload(
-          authDid: 'did:key:zBob456',
+          authDid: otherAuthDid,
           didDocument: otherDoc,
-          controlProof: _sign(otherSecret),
-          proof: _sign(otherSecret),
+          controlProof: _buildProof(
+            verificationMethod: otherAuthVerificationMethod,
+            jws: _sign(otherAuthSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$otherDid#key-1',
+            jws: _sign(otherSecret),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when embedded proof type is wrong', () {
-      final badDoc = _buildDidDocument(
-        did: did,
-        publicKeyJwk: jwk,
-        proofType: 'Ed25519Signature2018',
-      );
+    test('throws when proof type is wrong', () {
       expect(
         () => service.upload(
           authDid: authDid,
-          didDocument: badDoc,
-          controlProof: _sign(secret),
-          proof: _sign(secret),
+          didDocument: didDocument,
+          controlProof: _buildProof(
+            verificationMethod: authVerificationMethod,
+            jws: _sign(authSecret),
+            type: 'Ed25519Signature2018',
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign(secret),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when embedded proof proofPurpose is wrong', () {
-      final badDoc = _buildDidDocument(
-        did: did,
-        publicKeyJwk: jwk,
-        proofPurpose: 'assertionMethod',
-      );
+    test('throws when proof proofPurpose is wrong', () {
       expect(
         () => service.upload(
           authDid: authDid,
-          didDocument: badDoc,
-          controlProof: _sign(secret),
-          proof: _sign(secret),
+          didDocument: didDocument,
+          controlProof: _buildProof(
+            verificationMethod: authVerificationMethod,
+            jws: _sign(authSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign(secret),
+            proofPurpose: 'assertionMethod',
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when embedded proof is missing', () {
-      final docNoProof = {
-        '@context': ['https://www.w3.org/ns/did/v1'],
-        'id': did,
-        'verificationMethod': [
-          {
-            'id': '$did#key-1',
-            'type': 'JsonWebKey2020',
-            'controller': did,
-            'publicKeyJwk': jwk,
-          },
-        ],
-      };
+    test('throws when controlProof verificationMethod is not on authDid', () {
       expect(
         () => service.upload(
           authDid: authDid,
-          didDocument: docNoProof,
-          controlProof: _sign(secret),
-          proof: _sign(secret),
+          didDocument: didDocument,
+          controlProof: _buildProof(
+            verificationMethod: '$authDid#missing',
+            jws: _sign(authSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#key-1',
+            jws: _sign(secret),
+          ),
+        ),
+        throwsA(isA<InvalidDidDocumentInput>()),
+      );
+    });
+
+    test('throws when proof verificationMethod is not in didDocument', () {
+      expect(
+        () => service.upload(
+          authDid: authDid,
+          didDocument: didDocument,
+          controlProof: _buildProof(
+            verificationMethod: authVerificationMethod,
+            jws: _sign(authSecret),
+          ),
+          proof: _buildProof(
+            verificationMethod: '$did#missing',
+            jws: _sign(secret),
+          ),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
@@ -342,8 +505,14 @@ void main() {
       await service.upload(
         authDid: authDid,
         didDocument: didDocument,
-        controlProof: _sign(secret),
-        proof: _sign(secret),
+        controlProof: _buildProof(
+          verificationMethod: authVerificationMethod,
+          jws: _sign(authSecret),
+        ),
+        proof: _buildProof(
+          verificationMethod: '$did#key-1',
+          jws: _sign(secret),
+        ),
       );
 
       final resolved = await service.resolveBySegment('alice');

@@ -1,4 +1,5 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:ssi/ssi.dart';
 
 import '../../entity/did_document_record.dart';
 import '../../entity/did_document_segment_record.dart';
@@ -14,23 +15,32 @@ class InvalidDidDocumentInput implements Exception {
 }
 
 class DidDocumentService {
-  DidDocumentService({required Storage storage, required Logger logger})
-    : _storage = storage,
-      _logger = logger;
+  DidDocumentService({
+    required Storage storage,
+    required DidResolver didResolver,
+    required Logger logger,
+  }) : _storage = storage,
+       _didResolver = didResolver,
+       _logger = logger;
 
   final Storage _storage;
+  final DidResolver _didResolver;
   final Logger _logger;
 
   Future<DidDocumentRecord> upload({
     required String authDid,
     required Map<String, dynamic> didDocument,
-    required String controlProof,
-    required String proof,
+    required Map<String, dynamic> controlProof,
+    required Map<String, dynamic> proof,
   }) async {
     final did = _extractAndValidateDid(didDocument);
-    _verifyJws(didDocument, controlProof);
-    _verifyJws(didDocument, proof);
-    _validateEmbeddedProofMetadata(didDocument);
+    final parsedControlProof = _DidDocumentProof.fromJson(
+      controlProof,
+      fieldName: 'controlProof',
+    );
+    final parsedProof = _DidDocumentProof.fromJson(proof, fieldName: 'proof');
+    await _verifyControlProof(authDid, parsedControlProof);
+    _verifyDidDocumentProof(didDocument, parsedProof);
     final segment = _segmentFromDid(did);
     final now = DateTime.now().toUtc();
 
@@ -107,45 +117,90 @@ class DidDocumentService {
     return record.didDocument;
   }
 
-  void _verifyJws(Map<String, dynamic> didDocument, String jws) {
-    final rawMethods =
-        (didDocument['verificationMethod'] as List?)
-            ?.whereType<Map<String, dynamic>>()
-            .toList() ??
-        [];
-    if (rawMethods.isEmpty) {
-      throw InvalidDidDocumentInput('DID Document has no verification methods');
+  Future<void> _verifyControlProof(
+    String authDid,
+    _DidDocumentProof controlProof,
+  ) async {
+    final authDidDocument = await _didResolver.resolveDid(authDid);
+    final jwk = _findResolvedVerificationMethodJwk(
+      authDidDocument,
+      controlProof.verificationMethod,
+    );
+    if (jwk == null) {
+      throw InvalidDidDocumentInput(
+        'controlProof verificationMethod not found on authenticated DID',
+      );
     }
-    for (final vm in rawMethods) {
-      final pkJwk = vm['publicKeyJwk'] as Map<String, dynamic>?;
-      if (pkJwk == null) continue;
-      try {
-        final key = JWTKey.fromJWK(Map<String, dynamic>.from(pkJwk));
-        JWT.verify(jws, key);
-        return;
-      } catch (_) {
-        continue;
-      }
-    }
-    throw InvalidDidDocumentInput('DID Document proof verification failed');
+    _verifyJws('controlProof', controlProof.jws, jwk);
   }
 
-  void _validateEmbeddedProofMetadata(Map<String, dynamic> didDocument) {
-    final rawProof = didDocument['proof'];
-    if (rawProof is! Map<String, dynamic>) {
+  void _verifyDidDocumentProof(
+    Map<String, dynamic> didDocument,
+    _DidDocumentProof proof,
+  ) {
+    final jwk = _findDidDocumentVerificationMethodJwk(
+      didDocument,
+      proof.verificationMethod,
+    );
+    if (jwk == null) {
       throw InvalidDidDocumentInput(
-        'DID Document must contain an embedded proof',
+        'proof verificationMethod not found in didDocument',
       );
     }
-    if (rawProof['type'] != 'JsonWebSignature2020') {
-      throw InvalidDidDocumentInput(
-        'DID Document proof type must be JsonWebSignature2020',
-      );
+    _verifyJws('proof', proof.jws, jwk);
+  }
+
+  Map<String, dynamic>? _findResolvedVerificationMethodJwk(
+    DidDocument didDocument,
+    String verificationMethodId,
+  ) {
+    for (final verificationMethod in didDocument.verificationMethod) {
+      if (verificationMethod.id != verificationMethodId) {
+        continue;
+      }
+      final publicKeyJwk = verificationMethod.toJson()['publicKeyJwk'];
+      if (publicKeyJwk is Map) {
+        return Map<String, dynamic>.from(publicKeyJwk);
+      }
+      return null;
     }
-    if (rawProof['proofPurpose'] != 'authentication') {
-      throw InvalidDidDocumentInput(
-        'DID Document proof proofPurpose must be authentication',
-      );
+    return null;
+  }
+
+  Map<String, dynamic>? _findDidDocumentVerificationMethodJwk(
+    Map<String, dynamic> didDocument,
+    String verificationMethodId,
+  ) {
+    final rawMethods = didDocument['verificationMethod'];
+    if (rawMethods is! List) {
+      throw InvalidDidDocumentInput('DID Document has no verification methods');
+    }
+    for (final rawMethod in rawMethods) {
+      if (rawMethod is! Map<String, dynamic>) {
+        continue;
+      }
+      if (rawMethod['id'] != verificationMethodId) {
+        continue;
+      }
+      final publicKeyJwk = rawMethod['publicKeyJwk'];
+      if (publicKeyJwk is Map) {
+        return Map<String, dynamic>.from(publicKeyJwk);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  void _verifyJws(
+    String fieldName,
+    String jws,
+    Map<String, dynamic> publicKeyJwk,
+  ) {
+    try {
+      final key = JWTKey.fromJWK(publicKeyJwk);
+      JWT.verify(jws, key);
+    } catch (_) {
+      throw InvalidDidDocumentInput('$fieldName JWS verification failed');
     }
   }
 
@@ -176,4 +231,61 @@ class DidDocumentService {
     }
     return segment;
   }
+}
+
+class _DidDocumentProof {
+  _DidDocumentProof({
+    required this.type,
+    required this.created,
+    required this.verificationMethod,
+    required this.proofPurpose,
+    required this.jws,
+  });
+
+  factory _DidDocumentProof.fromJson(
+    Map<String, dynamic> json, {
+    required String fieldName,
+  }) {
+    final type = json['type'];
+    final created = json['created'];
+    final verificationMethod = json['verificationMethod'];
+    final proofPurpose = json['proofPurpose'];
+    final jws = json['jws'];
+    if (type is! String ||
+        created is! String ||
+        verificationMethod is! String ||
+        proofPurpose is! String ||
+        jws is! String) {
+      throw InvalidDidDocumentInput(
+        '$fieldName must contain type, created, verificationMethod, '
+        'proofPurpose, and jws',
+      );
+    }
+    if (DateTime.tryParse(created) == null) {
+      throw InvalidDidDocumentInput('$fieldName.created must be ISO-8601');
+    }
+    if (type != 'JsonWebSignature2020') {
+      throw InvalidDidDocumentInput(
+        '$fieldName.type must be JsonWebSignature2020',
+      );
+    }
+    if (proofPurpose != 'authentication') {
+      throw InvalidDidDocumentInput(
+        '$fieldName.proofPurpose must be authentication',
+      );
+    }
+    return _DidDocumentProof(
+      type: type,
+      created: created,
+      verificationMethod: verificationMethod,
+      proofPurpose: proofPurpose,
+      jws: jws,
+    );
+  }
+
+  final String type;
+  final String created;
+  final String verificationMethod;
+  final String proofPurpose;
+  final String jws;
 }

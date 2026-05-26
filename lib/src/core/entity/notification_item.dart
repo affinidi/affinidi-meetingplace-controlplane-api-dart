@@ -287,7 +287,6 @@ class NotificationItem extends Entity {
     ).toString(),
   );
 
-  @override
   factory NotificationItem.fromJson(Map<String, dynamic> json) =>
       _$NotificationItemFromJson(json);
   static String entityName = 'NotificationItem';

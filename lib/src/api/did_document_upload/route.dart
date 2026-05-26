@@ -28,13 +28,13 @@ Future<Response> didDocumentUpload(
       );
     }
     final controlProof = body['controlProof'];
-    if (controlProof is! String || controlProof.trim().isEmpty) {
+    if (controlProof is! Map<String, dynamic>) {
       return Response.badRequest(
         body: jsonEncode({'error': 'controlProof is required'}),
       );
     }
     final proof = body['proof'];
-    if (proof is! String || proof.trim().isEmpty) {
+    if (proof is! Map<String, dynamic>) {
       return Response.badRequest(
         body: jsonEncode({'error': 'proof is required'}),
       );
@@ -42,8 +42,8 @@ Future<Response> didDocumentUpload(
     final result = await facade.uploadDidDocument(
       authDid: getAuthDid(request),
       didDocument: didDocument,
-      controlProof: controlProof,
-      proof: proof,
+      controlProof: Map<String, dynamic>.from(controlProof),
+      proof: Map<String, dynamic>.from(proof),
     );
     return Response.ok(
       jsonEncode(result),

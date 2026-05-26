@@ -173,11 +173,32 @@ class GroupService {
     );
   }
 
+  Future<GroupMember> _getGroupMemberByDid(
+    String memberDid, {
+    required String groupId,
+  }) async {
+    final groupMembers = await _storage.findAllById(
+      GroupMember.entityName,
+      groupId,
+      GroupMember.fromJson,
+    );
+
+    return groupMembers.firstWhere(
+      (groupMember) => groupMember.memberDid == memberDid,
+      orElse: () => throw GroupMemberNotInGroup(groupId: groupId),
+    );
+  }
+
   Future<void> deregisterMember(DeregisterMemberInput input) async {
     final group = await getGroup(input.groupId);
 
-    final groupMember = await getGroupMemberByControllingDid(
-      input.controllingDid,
+    await _checkPermissionToRunGroupAction(
+      groupId: group.id,
+      controllerDid: input.controllingDid,
+    );
+
+    final groupMember = await _getGroupMemberByDid(
+      input.memberDid,
       groupId: group.id,
     );
 
@@ -247,31 +268,31 @@ class GroupService {
           return Future.value();
         }
 
-        final recipientDidDoc = await _didResolver.resolveDid(
-          groupMember.memberDid,
-        );
-
-        final payload = jsonDecode(
-          utf8.decode(base64.decode(input.messagePayload)),
-        );
-
-        final messageToSend = GroupMessage.create(
-          from: group.groupDid,
-          to: [recipientDidDoc.id],
-          ciphertext: payload['ciphertext'],
-          iv: payload['iv'],
-          authenticationTag: payload['authentication_tag'],
-          preCapsule: _recryptService
-              .reEncryptCapsule(
-                payload['capsule'],
-                reencryptionKeyBase64: groupMember.memberReencryptionKey,
-              )
-              .toBase64(),
-          fromDid: sender.memberDid,
-          seqNo: group.seqNo,
-        );
-
         try {
+          final recipientDidDoc = await _didResolver.resolveDid(
+            groupMember.memberDid,
+          );
+
+          final payload = jsonDecode(
+            utf8.decode(base64.decode(input.messagePayload)),
+          );
+
+          final messageToSend = GroupMessage.create(
+            from: group.groupDid,
+            to: [recipientDidDoc.id],
+            ciphertext: payload['ciphertext'],
+            iv: payload['iv'],
+            authenticationTag: payload['authentication_tag'],
+            preCapsule: _recryptService
+                .reEncryptCapsule(
+                  payload['capsule'],
+                  reencryptionKeyBase64: groupMember.memberReencryptionKey,
+                )
+                .toBase64(),
+            fromDid: sender.memberDid,
+            seqNo: group.seqNo,
+          );
+
           await mediatorSDK.sendMessage(
             messageToSend.toPlainTextMessage(),
             senderDidManager: groupDidManager,
@@ -388,9 +409,19 @@ class GroupService {
       ),
     );
 
+    final groupMembers = await _getGroupMembers(group.id);
     group.status = GroupStatus.deleted;
     await _storage.update(group);
-    await _storage.delete(GroupMember.entityName, input.groupId);
+    await Future.wait(
+      groupMembers.map(
+        (groupMember) => _storage.deleteFromlist(
+          GroupMember.entityName,
+          group.id,
+          GroupMember.entityName,
+          groupMember.memberDid,
+        ),
+      ),
+    );
     await _groupDidManager.removeKeys(input.groupId);
   }
 

@@ -8,7 +8,6 @@ part 'key_reference.g.dart';
 class KeyReference extends Entity {
   KeyReference({required this.keyId, required this.entityId});
 
-  @override
   factory KeyReference.fromJson(Map<String, dynamic> json) {
     return _$KeyReferenceFromJson(json);
   }

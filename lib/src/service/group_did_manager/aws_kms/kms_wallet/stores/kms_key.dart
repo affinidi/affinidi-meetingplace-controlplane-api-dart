@@ -5,7 +5,6 @@ part 'kms_key.g.dart';
 
 @JsonSerializable()
 class KmsKey extends Entity {
-  @override
   factory KmsKey.fromJson(Map<String, dynamic> json) {
     return _$KmsKeyFromJson(json);
   }

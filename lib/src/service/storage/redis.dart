@@ -172,8 +172,14 @@ class Redis implements Storage {
     String id,
   ) async {
     _command ??= (await connect())._command;
+    final storedEntity = await _command?.send_object([
+      'GET',
+      '$entityName#$id',
+    ]);
+    if (storedEntity != null) {
+      await _command?.send_object(['SREM', '$listName#$listId', storedEntity]);
+    }
     await delete(entityName, id);
-    await _command?.send_object(['SREM', '$listName#$listId', id]);
   }
 
   Future<bool> _doesKeyExist(String key) async {

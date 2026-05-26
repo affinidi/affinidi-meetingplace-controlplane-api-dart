@@ -17,7 +17,6 @@ enum GroupStatus {
 
 @JsonSerializable()
 class Group extends Entity {
-  @override
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
 
   Group({

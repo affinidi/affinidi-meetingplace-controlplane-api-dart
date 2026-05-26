@@ -5,7 +5,6 @@ part 'pending_notification.g.dart';
 
 @JsonSerializable()
 class PendingNotification extends Entity {
-  @override
   factory PendingNotification.fromJson(Map<String, dynamic> json) =>
       _$PendingNotificationFromJson(json);
 
