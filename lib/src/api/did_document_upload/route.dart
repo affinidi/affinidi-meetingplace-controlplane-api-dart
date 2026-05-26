@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 
 import 'package:shelf/shelf.dart';
@@ -41,6 +42,7 @@ Future<Response> didDocumentUpload(
     }
     final result = await facade.uploadDidDocument(
       authDid: getAuthDid(request),
+      authVerificationMethod: getAuthVerificationMethod(request),
       didDocument: didDocument,
       controlProof: Map<String, dynamic>.from(controlProof),
       proof: Map<String, dynamic>.from(proof),
@@ -51,6 +53,12 @@ Future<Response> didDocumentUpload(
     );
   } on FormatException {
     return Response.badRequest(body: jsonEncode({'error': 'Invalid JSON'}));
+  } on DidDocumentConflict catch (e) {
+    return Response(
+      HttpStatus.conflict,
+      body: jsonEncode({'error': e.message}),
+      headers: {'content-type': 'application/json'},
+    );
   } on InvalidDidDocumentInput catch (e) {
     return Response.badRequest(body: jsonEncode({'error': e.message}));
   } catch (e, stackTrace) {

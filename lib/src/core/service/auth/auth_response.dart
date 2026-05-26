@@ -12,6 +12,7 @@ class AuthenticationResponse {
     required this.type,
     this.did = '',
     this.challenge = '',
+    this.verificationMethod = '',
   });
 
   factory AuthenticationResponse.asInvalidChallengeResponse() {
@@ -28,6 +29,7 @@ class AuthenticationResponse {
   AuthenticationResponseType type;
   String did = '';
   String challenge = '';
+  String verificationMethod = '';
 }
 
 class ChallengeAuthException implements Exception {

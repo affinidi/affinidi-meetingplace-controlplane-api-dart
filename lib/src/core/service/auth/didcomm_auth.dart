@@ -23,9 +23,14 @@ enum JWTStatus {
 }
 
 class VerifyAuthTokenResult {
-  VerifyAuthTokenResult({required this.status, this.did = ''});
+  VerifyAuthTokenResult({
+    required this.status,
+    this.did = '',
+    this.verificationMethod = '',
+  });
   JWTStatus status;
   String did = '';
+  String verificationMethod = '';
 }
 
 class VerifyAuthChallengeResult {
@@ -56,22 +61,32 @@ class DIDCommAuth {
 
   get jwk => _jwk;
 
-  String getAuthToken(String did, int expiresInMinutes) {
+  String getAuthToken(
+    String did,
+    String verificationMethod,
+    int expiresInMinutes,
+  ) {
     final apiEndpoint = getEnv('API_ENDPOINT');
     return AuthToken(
       did: did,
       audience: apiEndpoint,
       issuer: apiEndpoint,
+      verificationMethod: verificationMethod,
       expiresInMinutes: expiresInMinutes,
     ).signAsJwt(_privateKey);
   }
 
-  String getAuthRefreshToken(String did, int expiresInMinutes) {
+  String getAuthRefreshToken(
+    String did,
+    String verificationMethod,
+    int expiresInMinutes,
+  ) {
     final apiEndpoint = getEnv('API_ENDPOINT');
     return AuthToken(
       did: did,
       audience: apiEndpoint,
       issuer: apiEndpoint,
+      verificationMethod: verificationMethod,
       expiresInMinutes: expiresInMinutes,
     ).signAsJwt(_privateKey);
   }
@@ -195,6 +210,7 @@ class DIDCommAuth {
       return VerifyAuthTokenResult(
         status: JWTStatus.valid,
         did: jwt.payload['sub'],
+        verificationMethod: jwt.payload['verificationMethod'] as String? ?? '',
       );
     } on JWTExpiredException {
       _logger.info('jwt expires');

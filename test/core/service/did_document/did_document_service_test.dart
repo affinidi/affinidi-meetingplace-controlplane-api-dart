@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:crypto/crypto.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/entity.dart';
 import 'package:meeting_place_control_plane_api/src/core/logger/logger.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/did_document/did_document_service.dart';
@@ -20,7 +21,9 @@ class _InMemoryStorage implements Storage {
     final name = object.getEntityName();
     final id = object.getId();
     _data.putIfAbsent(name, () => {});
-    if (_data[name]!.containsKey(id)) throw AlreadyExists();
+    if (_data[name]!.containsKey(id)) {
+      throw AlreadyExists();
+    }
     _data[name]![id] = object.toJson();
     return object;
   }
@@ -41,9 +44,13 @@ class _InMemoryStorage implements Storage {
     required bool Function(T entity) conditionFn,
   }) async {
     final row = _data[entityName]?[id];
-    if (row == null) return null;
+    if (row == null) {
+      return null;
+    }
     final entity = fromJson(row);
-    if (!conditionFn(entity)) return null;
+    if (!conditionFn(entity)) {
+      return null;
+    }
     final updated = updateFn(entity);
     _data[entityName]![id] = updated.toJson();
     return updated;
@@ -89,10 +96,13 @@ class _InMemoryStorage implements Storage {
 class _NoOpLogger implements Logger {
   @override
   void debug(String message, {Object? error, StackTrace? stackTrace}) {}
+
   @override
   void info(String message, {Object? error, StackTrace? stackTrace}) {}
+
   @override
   void warn(String message, {Object? error, StackTrace? stackTrace}) {}
+
   @override
   void error(String message, {Object? error, StackTrace? stackTrace}) {}
 }
@@ -112,14 +122,6 @@ class _FakeDidResolver implements DidResolver {
   }
 }
 
-String _jwkK(String rawSecret) =>
-    base64Url.encode(utf8.encode(rawSecret)).replaceAll('=', '');
-
-Map<String, dynamic> _octJwk(String rawSecret) => {
-  'kty': 'oct',
-  'k': _jwkK(rawSecret),
-};
-
 Map<String, dynamic> _buildDidDocument({
   required String did,
   required Map<String, dynamic> publicKeyJwk,
@@ -134,25 +136,32 @@ Map<String, dynamic> _buildDidDocument({
       'publicKeyJwk': publicKeyJwk,
     },
   ],
+  'authentication': ['$did#key-1'],
 };
 
 DidDocument _buildResolvedDidDocument({
   required String did,
-  required String verificationMethod,
-  required Map<String, dynamic> publicKeyJwk,
+  required List<
+    ({String verificationMethod, Map<String, dynamic> publicKeyJwk})
+  >
+  methods,
 }) => DidDocument.fromJson(
   jsonEncode({
     '@context': ['https://www.w3.org/ns/did/v1'],
     'id': did,
-    'verificationMethod': [
-      {
-        'id': verificationMethod,
-        'type': 'JsonWebKey2020',
-        'controller': did,
-        'publicKeyJwk': publicKeyJwk,
-      },
-    ],
-    'authentication': [verificationMethod],
+    'verificationMethod': methods
+        .map(
+          (method) => {
+            'id': method.verificationMethod,
+            'type': 'JsonWebKey2020',
+            'controller': did,
+            'publicKeyJwk': method.publicKeyJwk,
+          },
+        )
+        .toList(),
+    'authentication': methods
+        .map((method) => method.verificationMethod)
+        .toList(),
   }),
 );
 
@@ -169,350 +178,724 @@ Map<String, dynamic> _buildProof({
   'jws': jws,
 };
 
-String _sign(String rawSecret) {
-  final key = SecretKey(rawSecret);
-  return JWT({'sub': 'test'}).sign(key, algorithm: JWTAlgorithm.HS256);
+String _canonicalizeJson(Object? value) {
+  if (value is Map) {
+    final entries = value.entries.toList()
+      ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
+    return '{${entries.map((entry) => '${jsonEncode(entry.key.toString())}:${_canonicalizeJson(entry.value)}').join(',')}}';
+  }
+  if (value is List) {
+    return '[${value.map(_canonicalizeJson).join(',')}]';
+  }
+  return jsonEncode(value);
+}
+
+Map<String, dynamic> _proofPayload({
+  required Map<String, dynamic> didDocument,
+  required String authDid,
+  int iat = 1700000000,
+  int exp = 1700000060,
+  String jti = 'proof-jti',
+}) {
+  final didDocumentHash = base64Url
+      .encode(sha256.convert(utf8.encode(_canonicalizeJson(didDocument))).bytes)
+      .replaceAll('=', '');
+  return {
+    'operation': 'did-document/upload',
+    'didDocumentId': didDocument['id'],
+    'didDocumentHash': didDocumentHash,
+    'controlDid': authDid,
+    'aud': 'https://example.com',
+    'iat': iat,
+    'exp': exp,
+    'jti': jti,
+  };
+}
+
+Future<String> _signProof({
+  required PersistentWallet wallet,
+  required String keyId,
+  required String verificationMethod,
+  required Map<String, dynamic> payload,
+  SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
+}) async {
+  final encodedHeader = base64Url
+      .encode(
+        utf8.encode(
+          jsonEncode({'alg': signatureScheme.alg, 'kid': verificationMethod}),
+        ),
+      )
+      .replaceAll('=', '');
+  final encodedPayload = base64Url
+      .encode(utf8.encode(jsonEncode(payload)))
+      .replaceAll('=', '');
+  final signingInput = Uint8List.fromList(
+    utf8.encode('$encodedHeader.$encodedPayload'),
+  );
+  final signature = await wallet.sign(
+    signingInput,
+    keyId: keyId,
+    signatureScheme: signatureScheme,
+  );
+  final encodedSignature = base64Url.encode(signature).replaceAll('=', '');
+  return '$encodedHeader.$encodedPayload.$encodedSignature';
+}
+
+Future<Map<String, dynamic>> _buildSignedProof({
+  required PersistentWallet wallet,
+  required String keyId,
+  required String verificationMethod,
+  required Map<String, dynamic> payload,
+  String type = 'JsonWebSignature2020',
+  String proofPurpose = 'authentication',
+}) async {
+  return _buildProof(
+    verificationMethod: verificationMethod,
+    jws: await _signProof(
+      wallet: wallet,
+      keyId: keyId,
+      verificationMethod: verificationMethod,
+      payload: payload,
+    ),
+    type: type,
+    proofPurpose: proofPurpose,
+  );
+}
+
+Future<({Map<String, dynamic> controlProof, Map<String, dynamic> proof})>
+_buildValidProofs({
+  required PersistentWallet authWallet,
+  required String authKeyId,
+  required String authVerificationMethod,
+  required PersistentWallet didWallet,
+  required String didKeyId,
+  required Map<String, dynamic> didDocument,
+  required String authDid,
+}) async {
+  final payload = _proofPayload(didDocument: didDocument, authDid: authDid);
+  return (
+    controlProof: await _buildSignedProof(
+      wallet: authWallet,
+      keyId: authKeyId,
+      verificationMethod: authVerificationMethod,
+      payload: payload,
+    ),
+    proof: await _buildSignedProof(
+      wallet: didWallet,
+      keyId: didKeyId,
+      verificationMethod: '${didDocument['id']}#key-1',
+      payload: payload,
+    ),
+  );
 }
 
 void main() {
   late _InMemoryStorage storage;
   late _FakeDidResolver didResolver;
   late DidDocumentService service;
+  late PersistentWallet authWallet;
+  late PersistentWallet secondAuthWallet;
+  late PersistentWallet otherAuthWallet;
+  late PersistentWallet didWallet;
+  late PersistentWallet rogueWallet;
+  late String authKeyId;
+  late String secondAuthKeyId;
+  late String otherAuthKeyId;
+  late String didKeyId;
+  late String rogueKeyId;
+  late Map<String, dynamic> authJwk;
+  late Map<String, dynamic> secondAuthJwk;
+  late Map<String, dynamic> otherAuthJwk;
+  late Map<String, dynamic> didJwk;
+  late Map<String, dynamic> didDocument;
 
   const did = 'did:web:example.com:user:alice';
   const authDid = 'did:key:zAlice123';
   const otherAuthDid = 'did:key:zBob456';
   const authVerificationMethod = '$authDid#control-1';
+  const secondAuthVerificationMethod = '$authDid#control-2';
   const otherAuthVerificationMethod = '$otherAuthDid#control-1';
-  const secret = 'unit-test-secret-key-for-did-service';
-  const authSecret = 'control-did-secret-for-unit-tests';
-  const otherAuthSecret = 'other-control-did-secret-for-unit-tests';
+  const proofAudience = 'https://example.com';
+  const hostedDidHost = 'example.com';
 
-  final jwk = _octJwk(secret);
-  final authJwk = _octJwk(authSecret);
-  final otherAuthJwk = _octJwk(otherAuthSecret);
-  final didDocument = _buildDidDocument(did: did, publicKeyJwk: jwk);
-
-  setUp(() {
+  setUp(() async {
     storage = _InMemoryStorage();
+    authWallet = PersistentWallet(InMemoryKeyStore());
+    secondAuthWallet = PersistentWallet(InMemoryKeyStore());
+    otherAuthWallet = PersistentWallet(InMemoryKeyStore());
+    didWallet = PersistentWallet(InMemoryKeyStore());
+    rogueWallet = PersistentWallet(InMemoryKeyStore());
+
+    authKeyId = (await authWallet.generateKey(keyType: KeyType.p256)).id;
+    secondAuthKeyId = (await secondAuthWallet.generateKey(
+      keyType: KeyType.p256,
+    )).id;
+    otherAuthKeyId = (await otherAuthWallet.generateKey(
+      keyType: KeyType.p256,
+    )).id;
+    didKeyId = (await didWallet.generateKey(keyType: KeyType.p256)).id;
+    rogueKeyId = (await rogueWallet.generateKey(keyType: KeyType.p256)).id;
+
+    authJwk = keyToJwk(await authWallet.getPublicKey(authKeyId));
+    secondAuthJwk = keyToJwk(
+      await secondAuthWallet.getPublicKey(secondAuthKeyId),
+    );
+    otherAuthJwk = keyToJwk(await otherAuthWallet.getPublicKey(otherAuthKeyId));
+    didJwk = keyToJwk(await didWallet.getPublicKey(didKeyId));
+    didDocument = _buildDidDocument(did: did, publicKeyJwk: didJwk);
+
     didResolver = _FakeDidResolver({
       authDid: _buildResolvedDidDocument(
         did: authDid,
-        verificationMethod: authVerificationMethod,
-        publicKeyJwk: authJwk,
+        methods: [
+          (verificationMethod: authVerificationMethod, publicKeyJwk: authJwk),
+          (
+            verificationMethod: secondAuthVerificationMethod,
+            publicKeyJwk: secondAuthJwk,
+          ),
+        ],
       ),
       otherAuthDid: _buildResolvedDidDocument(
         did: otherAuthDid,
-        verificationMethod: otherAuthVerificationMethod,
-        publicKeyJwk: otherAuthJwk,
+        methods: [
+          (
+            verificationMethod: otherAuthVerificationMethod,
+            publicKeyJwk: otherAuthJwk,
+          ),
+        ],
       ),
     });
     service = DidDocumentService(
       storage: storage,
       didResolver: didResolver,
+      proofAudience: proofAudience,
+      hostedDidHost: hostedDidHost,
       logger: _NoOpLogger(),
     );
   });
 
   group('upload', () {
     test('stores a new document and returns the record', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+
       final record = await service.upload(
         authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
-        controlProof: _buildProof(
-          verificationMethod: authVerificationMethod,
-          jws: _sign(authSecret),
-        ),
-        proof: _buildProof(
-          verificationMethod: '$did#key-1',
-          jws: _sign(secret),
-        ),
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
       );
 
       expect(record.did, did);
       expect(record.createdBy, authDid);
+      expect(record.createdByVerificationMethod, authVerificationMethod);
       expect(record.didDocument, didDocument);
     });
 
     test('returns existing record when same owner retries', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+
       await service.upload(
         authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
-        controlProof: _buildProof(
-          verificationMethod: authVerificationMethod,
-          jws: _sign(authSecret),
-        ),
-        proof: _buildProof(
-          verificationMethod: '$did#key-1',
-          jws: _sign(secret),
-        ),
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
       );
 
       final second = await service.upload(
         authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
-        controlProof: _buildProof(
-          verificationMethod: authVerificationMethod,
-          jws: _sign(authSecret),
-        ),
-        proof: _buildProof(
-          verificationMethod: '$did#key-1',
-          jws: _sign(secret),
-        ),
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
       );
 
       expect(second.did, did);
       expect(second.createdBy, authDid);
+      expect(second.createdByVerificationMethod, authVerificationMethod);
     });
 
-    test('throws when a different owner claims the same DID', () async {
+    test('throws when same DID uses a different authenticated key', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+
       await service.upload(
         authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
-        controlProof: _buildProof(
-          verificationMethod: authVerificationMethod,
-          jws: _sign(authSecret),
-        ),
-        proof: _buildProof(
-          verificationMethod: '$did#key-1',
-          jws: _sign(secret),
-        ),
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
+      );
+
+      final secondKeyProofs = await _buildValidProofs(
+        authWallet: secondAuthWallet,
+        authKeyId: secondAuthKeyId,
+        authVerificationMethod: secondAuthVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
       );
 
       expect(
-        () => service.upload(
-          authDid: otherAuthDid,
+        service.upload(
+          authDid: authDid,
+          authVerificationMethod: secondAuthVerificationMethod,
           didDocument: didDocument,
-          controlProof: _buildProof(
-            verificationMethod: otherAuthVerificationMethod,
-            jws: _sign(otherAuthSecret),
-          ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign(secret),
-          ),
+          controlProof: secondKeyProofs.controlProof,
+          proof: secondKeyProofs.proof,
         ),
-        throwsA(isA<InvalidDidDocumentInput>()),
+        throwsA(isA<DidDocumentConflict>()),
       );
     });
 
-    test('throws on DID that does not match did:web:<host>:user:<segment>', () {
-      final badDoc = {
-        '@context': ['https://www.w3.org/ns/did/v1'],
-        'id': 'did:web:example.com',
-        'verificationMethod': [
+    test('throws when same owner retries with a different document', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+
+      await service.upload(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
+      );
+
+      final updatedDoc = {
+        ...didDocument,
+        'service': [
           {
-            'id': 'did:web:example.com#key-1',
-            'type': 'JsonWebKey2020',
-            'controller': 'did:web:example.com',
-            'publicKeyJwk': jwk,
+            'id': '$did#didcomm',
+            'type': 'DIDCommMessaging',
+            'serviceEndpoint': {'uri': 'did:example:mediator'},
           },
         ],
       };
+      final updatedProofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: updatedDoc,
+        authDid: authDid,
+      );
 
       expect(
-        () => service.upload(
+        service.upload(
           authDid: authDid,
-          didDocument: badDoc,
-          controlProof: _buildProof(
-            verificationMethod: authVerificationMethod,
-            jws: _sign(authSecret),
-          ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign(secret),
-          ),
+          authVerificationMethod: authVerificationMethod,
+          didDocument: updatedDoc,
+          controlProof: updatedProofs.controlProof,
+          proof: updatedProofs.proof,
         ),
-        throwsA(isA<InvalidDidDocumentInput>()),
+        throwsA(isA<DidDocumentConflict>()),
+      );
+    });
+
+    test('throws when a different owner claims the same DID', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+
+      await service.upload(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
+      );
+
+      final otherProofs = await _buildValidProofs(
+        authWallet: otherAuthWallet,
+        authKeyId: otherAuthKeyId,
+        authVerificationMethod: otherAuthVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: otherAuthDid,
+      );
+
+      expect(
+        service.upload(
+          authDid: otherAuthDid,
+          authVerificationMethod: otherAuthVerificationMethod,
+          didDocument: didDocument,
+          controlProof: otherProofs.controlProof,
+          proof: otherProofs.proof,
+        ),
+        throwsA(isA<DidDocumentConflict>()),
       );
     });
 
     test(
-      'throws on controlProof signed by an unknown authenticated DID key',
-      () {
+      'throws on DID that does not match did:web:<host>:user:<segment>',
+      () async {
+        final badDoc = {
+          '@context': ['https://www.w3.org/ns/did/v1'],
+          'id': 'did:web:example.com',
+          'verificationMethod': [
+            {
+              'id': 'did:web:example.com#key-1',
+              'type': 'JsonWebKey2020',
+              'controller': 'did:web:example.com',
+              'publicKeyJwk': didJwk,
+            },
+          ],
+        };
+        final payload = _proofPayload(didDocument: badDoc, authDid: authDid);
+        final controlProof = await _buildSignedProof(
+          wallet: authWallet,
+          keyId: authKeyId,
+          verificationMethod: authVerificationMethod,
+          payload: payload,
+        );
+        final proof = await _buildSignedProof(
+          wallet: didWallet,
+          keyId: didKeyId,
+          verificationMethod: '${badDoc['id']}#key-1',
+          payload: payload,
+        );
+
         expect(
-          () => service.upload(
+          service.upload(
             authDid: authDid,
-            didDocument: didDocument,
-            controlProof: _buildProof(
-              verificationMethod: authVerificationMethod,
-              jws: _sign('different-secret-not-in-auth-did'),
-            ),
-            proof: _buildProof(
-              verificationMethod: '$did#key-1',
-              jws: _sign(secret),
-            ),
+            authVerificationMethod: authVerificationMethod,
+            didDocument: badDoc,
+            controlProof: controlProof,
+            proof: proof,
           ),
           throwsA(isA<InvalidDidDocumentInput>()),
         );
       },
     );
 
-    test('throws on proof signed by an unknown didDocument key', () {
-      expect(
-        () => service.upload(
-          authDid: authDid,
+    test(
+      'throws on controlProof signed by an unknown authenticated DID key',
+      () async {
+        final payload = _proofPayload(
           didDocument: didDocument,
-          controlProof: _buildProof(
-            verificationMethod: authVerificationMethod,
-            jws: _sign(authSecret),
+          authDid: authDid,
+        );
+        final controlProof = await _buildSignedProof(
+          wallet: rogueWallet,
+          keyId: rogueKeyId,
+          verificationMethod: authVerificationMethod,
+          payload: payload,
+        );
+        final proof = await _buildSignedProof(
+          wallet: didWallet,
+          keyId: didKeyId,
+          verificationMethod: '$did#key-1',
+          payload: payload,
+        );
+
+        expect(
+          service.upload(
+            authDid: authDid,
+            authVerificationMethod: authVerificationMethod,
+            didDocument: didDocument,
+            controlProof: controlProof,
+            proof: proof,
           ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign('different-secret-not-in-document'),
-          ),
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
+
+    test('throws on proof signed by an unknown didDocument key', () async {
+      final payload = _proofPayload(didDocument: didDocument, authDid: authDid);
+      final controlProof = await _buildSignedProof(
+        wallet: authWallet,
+        keyId: authKeyId,
+        verificationMethod: authVerificationMethod,
+        payload: payload,
+      );
+      final proof = await _buildSignedProof(
+        wallet: rogueWallet,
+        keyId: rogueKeyId,
+        verificationMethod: '$did#key-1',
+        payload: payload,
+      );
+
+      expect(
+        service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: controlProof,
+          proof: proof,
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when DID document has no verification methods', () {
+    test('throws when DID document has no verification methods', () async {
       final docNoKeys = {
         '@context': ['https://www.w3.org/ns/did/v1'],
         'id': did,
       };
+      final payload = _proofPayload(didDocument: docNoKeys, authDid: authDid);
+      final controlProof = await _buildSignedProof(
+        wallet: authWallet,
+        keyId: authKeyId,
+        verificationMethod: authVerificationMethod,
+        payload: payload,
+      );
+      final proof = await _buildSignedProof(
+        wallet: didWallet,
+        keyId: didKeyId,
+        verificationMethod: '$did#key-1',
+        payload: payload,
+      );
 
       expect(
-        () => service.upload(
+        service.upload(
           authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
           didDocument: docNoKeys,
-          controlProof: _buildProof(
-            verificationMethod: authVerificationMethod,
-            jws: _sign(authSecret),
-          ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign(secret),
-          ),
+          controlProof: controlProof,
+          proof: proof,
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when segment is already claimed by a different DID', () async {
-      await service.upload(
-        authDid: authDid,
-        didDocument: didDocument,
-        controlProof: _buildProof(
-          verificationMethod: authVerificationMethod,
-          jws: _sign(authSecret),
-        ),
-        proof: _buildProof(
-          verificationMethod: '$did#key-1',
-          jws: _sign(secret),
-        ),
-      );
-
-      const otherDid = 'did:web:other.com:user:alice';
-      final otherSecret = 'other-test-secret-key-for-did-service';
-      final otherJwk = _octJwk(otherSecret);
-      final otherDoc = _buildDidDocument(did: otherDid, publicKeyJwk: otherJwk);
-
-      expect(
-        () => service.upload(
-          authDid: otherAuthDid,
+    test(
+      'throws when did:web host does not match the configured host',
+      () async {
+        const otherDid = 'did:web:other.com:user:alice';
+        final otherDoc = _buildDidDocument(did: otherDid, publicKeyJwk: didJwk);
+        final payload = _proofPayload(
           didDocument: otherDoc,
-          controlProof: _buildProof(
-            verificationMethod: otherAuthVerificationMethod,
-            jws: _sign(otherAuthSecret),
+          authDid: otherAuthDid,
+        );
+        final controlProof = await _buildSignedProof(
+          wallet: otherAuthWallet,
+          keyId: otherAuthKeyId,
+          verificationMethod: otherAuthVerificationMethod,
+          payload: payload,
+        );
+        final proof = await _buildSignedProof(
+          wallet: didWallet,
+          keyId: didKeyId,
+          verificationMethod: '$otherDid#key-1',
+          payload: payload,
+        );
+
+        expect(
+          service.upload(
+            authDid: otherAuthDid,
+            authVerificationMethod: otherAuthVerificationMethod,
+            didDocument: otherDoc,
+            controlProof: controlProof,
+            proof: proof,
           ),
-          proof: _buildProof(
-            verificationMethod: '$otherDid#key-1',
-            jws: _sign(otherSecret),
-          ),
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
+
+    test('throws when proof type is wrong', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+      proofs.controlProof['type'] = 'Ed25519Signature2018';
+
+      expect(
+        service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when proof type is wrong', () {
+    test('throws when proof proofPurpose is wrong', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+      proofs.proof['proofPurpose'] = 'assertionMethod';
+
       expect(
-        () => service.upload(
+        service.upload(
           authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
           didDocument: didDocument,
-          controlProof: _buildProof(
-            verificationMethod: authVerificationMethod,
-            jws: _sign(authSecret),
-            type: 'Ed25519Signature2018',
-          ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign(secret),
-          ),
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
     });
 
-    test('throws when proof proofPurpose is wrong', () {
-      expect(
-        () => service.upload(
-          authDid: authDid,
+    test(
+      'throws when controlProof verificationMethod does not match the authenticated key',
+      () async {
+        final proofs = await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
           didDocument: didDocument,
-          controlProof: _buildProof(
-            verificationMethod: authVerificationMethod,
-            jws: _sign(authSecret),
-          ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign(secret),
-            proofPurpose: 'assertionMethod',
-          ),
-        ),
-        throwsA(isA<InvalidDidDocumentInput>()),
-      );
-    });
+          authDid: authDid,
+        );
+        proofs.controlProof['verificationMethod'] = '$authDid#missing';
 
-    test('throws when controlProof verificationMethod is not on authDid', () {
-      expect(
-        () => service.upload(
-          authDid: authDid,
-          didDocument: didDocument,
-          controlProof: _buildProof(
-            verificationMethod: '$authDid#missing',
-            jws: _sign(authSecret),
+        expect(
+          service.upload(
+            authDid: authDid,
+            authVerificationMethod: authVerificationMethod,
+            didDocument: didDocument,
+            controlProof: proofs.controlProof,
+            proof: proofs.proof,
           ),
-          proof: _buildProof(
-            verificationMethod: '$did#key-1',
-            jws: _sign(secret),
-          ),
-        ),
-        throwsA(isA<InvalidDidDocumentInput>()),
-      );
-    });
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
 
-    test('throws when proof verificationMethod is not in didDocument', () {
-      expect(
-        () => service.upload(
-          authDid: authDid,
+    test(
+      'throws when proof verificationMethod is not in didDocument',
+      () async {
+        final proofs = await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
           didDocument: didDocument,
-          controlProof: _buildProof(
-            verificationMethod: authVerificationMethod,
-            jws: _sign(authSecret),
+          authDid: authDid,
+        );
+        proofs.proof['verificationMethod'] = '$did#missing';
+
+        expect(
+          service.upload(
+            authDid: authDid,
+            authVerificationMethod: authVerificationMethod,
+            didDocument: didDocument,
+            controlProof: proofs.controlProof,
+            proof: proofs.proof,
           ),
-          proof: _buildProof(
-            verificationMethod: '$did#missing',
-            jws: _sign(secret),
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
+
+    test(
+      'throws when proof payload does not match the upload request',
+      () async {
+        final wrongPayload = _proofPayload(
+          didDocument: {
+            ...didDocument,
+            'service': [
+              {
+                'id': '$did#didcomm',
+                'type': 'DIDCommMessaging',
+                'serviceEndpoint': {'uri': 'did:example:other'},
+              },
+            ],
+          },
+          authDid: authDid,
+        );
+        final controlProof = await _buildSignedProof(
+          wallet: authWallet,
+          keyId: authKeyId,
+          verificationMethod: authVerificationMethod,
+          payload: wrongPayload,
+        );
+        final proof = await _buildSignedProof(
+          wallet: didWallet,
+          keyId: didKeyId,
+          verificationMethod: '$did#key-1',
+          payload: wrongPayload,
+        );
+
+        expect(
+          service.upload(
+            authDid: authDid,
+            authVerificationMethod: authVerificationMethod,
+            didDocument: didDocument,
+            controlProof: controlProof,
+            proof: proof,
           ),
-        ),
-        throwsA(isA<InvalidDidDocumentInput>()),
-      );
-    });
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
   });
 
   group('resolveBySegment', () {
     test('returns the DID document for a known segment', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+      );
+
       await service.upload(
         authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
-        controlProof: _buildProof(
-          verificationMethod: authVerificationMethod,
-          jws: _sign(authSecret),
-        ),
-        proof: _buildProof(
-          verificationMethod: '$did#key-1',
-          jws: _sign(secret),
-        ),
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
       );
 
       final resolved = await service.resolveBySegment('alice');

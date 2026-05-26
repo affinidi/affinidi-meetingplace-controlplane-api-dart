@@ -16,6 +16,7 @@ class _FakeApplicationFacade implements ApplicationFacade {
   @override
   Future<Map<String, dynamic>> uploadDidDocument({
     required String authDid,
+    required String authVerificationMethod,
     required Map<String, dynamic> didDocument,
     required Map<String, dynamic> controlProof,
     required Map<String, dynamic> proof,
@@ -39,7 +40,10 @@ Request _request(Map<String, dynamic> body) => Request(
   'POST',
   Uri.parse('http://localhost:3000/v1/did-document/upload'),
   body: jsonEncode(body),
-  context: {'authDid': 'did:key:zAlice123'},
+  context: {
+    'authDid': 'did:key:zAlice123',
+    'authVerificationMethod': 'did:key:zAlice123#control-1',
+  },
 );
 
 void main() {

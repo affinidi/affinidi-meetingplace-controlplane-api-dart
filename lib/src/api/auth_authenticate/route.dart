@@ -1,6 +1,5 @@
 import 'package:shelf/shelf.dart';
 import '../request_validation_exception.dart';
-import '../../core/service/auth/challenge_purpose.dart';
 import '../../core/service/auth/didcomm_auth_builder.dart';
 import 'request_model.dart';
 import 'response_error_model.dart';
@@ -8,6 +7,7 @@ import 'response_model.dart';
 import '../application_facade.dart';
 import '../../core/config/config.dart';
 import '../../core/service/auth/auth_response.dart';
+import '../../core/service/auth/didcomm_auth.dart';
 import '../../utils/date_time.dart';
 
 Future<Response> authAuthenticate(
@@ -21,27 +21,39 @@ Future<Response> authAuthenticate(
 
     final authorizer = await DIDCommAuthBuilder(
       logger: facade.config.logger,
-      storage: facade.config.storage,
     ).build();
 
-    final String authDid;
-    try {
-      authDid = await authorizer.authenticateChallengeResponse(
-        challengeResponse: requestParams.challengeResponse,
-        didResolverUrl: Config().get('auth')['didResolverUrl'],
-        purpose: ChallengePurpose.authenticate,
-      );
-    } on ChallengeAuthException catch (e) {
+    final AuthenticationResponse authResponse = await authorizer
+        .unpackChallengeResponse(
+          requestParams.challengeResponse,
+          Config().get('auth')['didResolverUrl'],
+        );
+
+    if (authResponse.type != AuthenticationResponseType.didcommChallengeOk) {
       return Response.badRequest(
         body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
-          e.reason,
+          authResponse.type.name,
+        ).toString(),
+      );
+    }
+
+    final JWTStatus jwtStatus = authorizer.verifyAuthChallengeToken(
+      authResponse.did,
+      authResponse.challenge,
+    );
+
+    if (jwtStatus != JWTStatus.valid) {
+      return Response.badRequest(
+        body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
+          jwtStatus.name,
         ).toString(),
       );
     }
 
     final authConfig = Config().get('auth');
     final String accessToken = authorizer.getAuthToken(
-      authDid,
+      authResponse.did,
+      authResponse.verificationMethod,
       authConfig['accessTokenExpiryInMinutes'],
     );
 
@@ -50,7 +62,8 @@ Future<Response> authAuthenticate(
     );
 
     final String refreshToken = authorizer.getAuthRefreshToken(
-      authDid,
+      authResponse.did,
+      authResponse.verificationMethod,
       authConfig['refreshTokenExpiryInMinutes'],
     );
 

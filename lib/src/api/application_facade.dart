@@ -126,6 +126,8 @@ class ApplicationFacade {
     _didDocumentService = DidDocumentService(
       storage: config.storage,
       didResolver: config.didResolver,
+      proofAudience: getEnv('API_ENDPOINT'),
+      hostedDidHost: Uri.parse(getEnv('API_ENDPOINT')).host,
       logger: _logger,
     );
   }
@@ -684,12 +686,14 @@ class ApplicationFacade {
 
   Future<Map<String, dynamic>> uploadDidDocument({
     required String authDid,
+    required String authVerificationMethod,
     required Map<String, dynamic> didDocument,
     required Map<String, dynamic> controlProof,
     required Map<String, dynamic> proof,
   }) async {
     final record = await _didDocumentService.upload(
       authDid: authDid,
+      authVerificationMethod: authVerificationMethod,
       didDocument: didDocument,
       controlProof: controlProof,
       proof: proof,
