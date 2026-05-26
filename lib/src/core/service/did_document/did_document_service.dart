@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:ssi/ssi.dart';
 
+import '../../../utils/date_time.dart';
 import '../../entity/did_document_record.dart';
 import '../../entity/did_document_segment_record.dart';
 import '../../logger/logger.dart';
@@ -66,7 +67,7 @@ class DidDocumentService {
     );
     await _verifyDidDocumentProof(didDocument, parsedProof, proofPayload);
     final segment = _segmentFromDid(did);
-    final now = DateTime.now().toUtc();
+    final now = nowUtc();
 
     final existing = await _storage.findOneById<DidDocumentRecord>(
       DidDocumentRecord.entityName,
@@ -340,6 +341,10 @@ class DidDocumentService {
         '$fieldName payload must contain operation, didDocumentId, '
         'didDocumentHash, controlDid, aud, iat, exp, and jti',
       );
+    }
+    final nowEpoch = nowUtc().millisecondsSinceEpoch ~/ 1000;
+    if (exp <= nowEpoch) {
+      throw InvalidDidDocumentInput('$fieldName proof has expired');
     }
   }
 

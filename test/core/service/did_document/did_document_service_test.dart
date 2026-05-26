@@ -193,10 +193,12 @@ String _canonicalizeJson(Object? value) {
 Map<String, dynamic> _proofPayload({
   required Map<String, dynamic> didDocument,
   required String authDid,
-  int iat = 1700000000,
-  int exp = 1700000060,
+  int? iat,
+  int? exp,
   String jti = 'proof-jti',
 }) {
+  final issuedAt = iat ?? DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+  final expiresAt = exp ?? issuedAt + 60;
   final didDocumentHash = base64Url
       .encode(sha256.convert(utf8.encode(_canonicalizeJson(didDocument))).bytes)
       .replaceAll('=', '');
@@ -206,8 +208,8 @@ Map<String, dynamic> _proofPayload({
     'didDocumentHash': didDocumentHash,
     'controlDid': authDid,
     'aud': 'https://example.com',
-    'iat': iat,
-    'exp': exp,
+    'iat': issuedAt,
+    'exp': expiresAt,
     'jti': jti,
   };
 }
@@ -653,6 +655,39 @@ void main() {
         keyId: rogueKeyId,
         verificationMethod: '$did#key-1',
         payload: payload,
+      );
+
+      expect(
+        service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: controlProof,
+          proof: proof,
+        ),
+        throwsA(isA<InvalidDidDocumentInput>()),
+      );
+    });
+
+    test('throws when proof has expired', () async {
+      final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+      final expiredPayload = _proofPayload(
+        didDocument: didDocument,
+        authDid: authDid,
+        iat: nowEpoch - 120,
+        exp: nowEpoch - 60,
+      );
+      final controlProof = await _buildSignedProof(
+        wallet: authWallet,
+        keyId: authKeyId,
+        verificationMethod: authVerificationMethod,
+        payload: expiredPayload,
+      );
+      final proof = await _buildSignedProof(
+        wallet: didWallet,
+        keyId: didKeyId,
+        verificationMethod: '$did#key-1',
+        payload: expiredPayload,
       );
 
       expect(
