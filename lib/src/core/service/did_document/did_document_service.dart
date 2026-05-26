@@ -30,6 +30,7 @@ class DidDocumentService {
     final did = _extractAndValidateDid(didDocument);
     _verifyJws(didDocument, controlProof);
     _verifyJws(didDocument, proof);
+    _validateEmbeddedProofMetadata(didDocument);
     final segment = _segmentFromDid(did);
     final now = DateTime.now().toUtc();
 
@@ -127,6 +128,25 @@ class DidDocumentService {
       }
     }
     throw InvalidDidDocumentInput('DID Document proof verification failed');
+  }
+
+  void _validateEmbeddedProofMetadata(Map<String, dynamic> didDocument) {
+    final rawProof = didDocument['proof'];
+    if (rawProof is! Map<String, dynamic>) {
+      throw InvalidDidDocumentInput(
+        'DID Document must contain an embedded proof',
+      );
+    }
+    if (rawProof['type'] != 'JsonWebSignature2020') {
+      throw InvalidDidDocumentInput(
+        'DID Document proof type must be JsonWebSignature2020',
+      );
+    }
+    if (rawProof['proofPurpose'] != 'authentication') {
+      throw InvalidDidDocumentInput(
+        'DID Document proof proofPurpose must be authentication',
+      );
+    }
   }
 
   String _extractAndValidateDid(Map<String, dynamic> didDocument) {

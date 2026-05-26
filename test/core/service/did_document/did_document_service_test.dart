@@ -107,6 +107,8 @@ Map<String, dynamic> _octJwk(String rawSecret) => {
 Map<String, dynamic> _buildDidDocument({
   required String did,
   required Map<String, dynamic> publicKeyJwk,
+  String proofType = 'JsonWebSignature2020',
+  String proofPurpose = 'authentication',
 }) => {
   '@context': ['https://www.w3.org/ns/did/v1'],
   'id': did,
@@ -118,6 +120,11 @@ Map<String, dynamic> _buildDidDocument({
       'publicKeyJwk': publicKeyJwk,
     },
   ],
+  'proof': {
+    'type': proofType,
+    'proofPurpose': proofPurpose,
+    'verificationMethod': '$did#key-1',
+  },
 };
 
 String _sign(String rawSecret) {
@@ -266,6 +273,64 @@ void main() {
           didDocument: otherDoc,
           controlProof: _sign(otherSecret),
           proof: _sign(otherSecret),
+        ),
+        throwsA(isA<InvalidDidDocumentInput>()),
+      );
+    });
+
+    test('throws when embedded proof type is wrong', () {
+      final badDoc = _buildDidDocument(
+        did: did,
+        publicKeyJwk: jwk,
+        proofType: 'Ed25519Signature2018',
+      );
+      expect(
+        () => service.upload(
+          authDid: authDid,
+          didDocument: badDoc,
+          controlProof: _sign(secret),
+          proof: _sign(secret),
+        ),
+        throwsA(isA<InvalidDidDocumentInput>()),
+      );
+    });
+
+    test('throws when embedded proof proofPurpose is wrong', () {
+      final badDoc = _buildDidDocument(
+        did: did,
+        publicKeyJwk: jwk,
+        proofPurpose: 'assertionMethod',
+      );
+      expect(
+        () => service.upload(
+          authDid: authDid,
+          didDocument: badDoc,
+          controlProof: _sign(secret),
+          proof: _sign(secret),
+        ),
+        throwsA(isA<InvalidDidDocumentInput>()),
+      );
+    });
+
+    test('throws when embedded proof is missing', () {
+      final docNoProof = {
+        '@context': ['https://www.w3.org/ns/did/v1'],
+        'id': did,
+        'verificationMethod': [
+          {
+            'id': '$did#key-1',
+            'type': 'JsonWebKey2020',
+            'controller': did,
+            'publicKeyJwk': jwk,
+          },
+        ],
+      };
+      expect(
+        () => service.upload(
+          authDid: authDid,
+          didDocument: docNoProof,
+          controlProof: _sign(secret),
+          proof: _sign(secret),
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
