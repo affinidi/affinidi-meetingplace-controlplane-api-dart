@@ -5,6 +5,8 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 
+import '../api/matrix_token/route.dart';
+import '../api/matrix_challenge/route.dart';
 import '../api/update_offers_score/route.dart';
 import 'middleware/auth.dart';
 
@@ -93,6 +95,9 @@ Router createRouter(ApplicationFacade facade) {
     )
     // device routes
     ..post('/v1/register-device', privatePipeline(registerDevice, facade))
+    // matrix specific routes
+    ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
+    ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
     // notification routes
     ..post(
       '/v1/notifications',

@@ -29,3 +29,8 @@ class AuthenticationResponse {
   String did = '';
   String challenge = '';
 }
+
+class ChallengeAuthException implements Exception {
+  ChallengeAuthException(this.reason);
+  final String reason;
+}
