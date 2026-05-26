@@ -39,7 +39,9 @@ import 'package:meeting_place_core/meeting_place_core.dart'
     show MeetingPlaceProtocol;
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:proxy_recrypt/proxy_recrypt.dart';
+import 'package:ssi/ssi.dart' as ssi;
 import 'package:ssi/ssi.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:test/test.dart';
 
 import 'mocks/accept_offer_group_request.dart';
@@ -77,25 +79,27 @@ void main() {
   late Wallet aliceWallet;
   late Wallet bobWallet;
 
+  late DidKeyManager aliceDidManager;
+  late ssi.KeyPair aliceKeyPair;
+  late DidKeyManager bobDidManager;
+  late ssi.KeyPair bobKeyPair;
+
   final dio = Dio();
 
   setUp(() async {
     aliceWallet = PersistentWallet(InMemoryKeyStore());
-    final aliceKeyPair = await aliceWallet.generateKey(keyId: "m/44'/60'/0'/0");
+    aliceKeyPair = await aliceWallet.generateKey(keyId: "m/44'/60'/0'/0");
 
-    final aliceDidManager = DidKeyManager(
+    aliceDidManager = DidKeyManager(
       wallet: aliceWallet,
       store: InMemoryDidStore(),
     );
     await aliceDidManager.addVerificationMethod(aliceKeyPair.id);
 
     bobWallet = PersistentWallet(InMemoryKeyStore());
-    final bobKeyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/0");
+    bobKeyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/0");
 
-    final bobDidManager = DidKeyManager(
-      wallet: bobWallet,
-      store: InMemoryDidStore(),
-    );
+    bobDidManager = DidKeyManager(wallet: bobWallet, store: InMemoryDidStore());
     await bobDidManager.addVerificationMethod(bobKeyPair.id);
 
     final (adminDidManager, adminKeyPair) =
@@ -2877,4 +2881,80 @@ void main() {
       );
     },
   );
+
+  test('#matrix/token: success', () async {
+    final challengeResponse = await buildMatrixChallengeResponse(
+      aliceDidManager,
+      aliceKeyPair,
+      SignatureScheme.ecdsa_p256_sha256,
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/matrix/token',
+      data: {
+        'challenge_response': challengeResponse,
+        'homeserver': 'https://matrix.org',
+      },
+      options: Options(
+        headers: {Headers.contentTypeHeader: 'application/json'},
+      ),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    final token = response.data['token'] as String;
+    expect(token, isNotEmpty);
+
+    final jwt = JWT.decode(token);
+    expect(jwt.issuer, equals(getEnv('CONTROL_PLANE_DID')));
+    expect(jwt.audience?.first, equals('https://matrix.org'));
+    expect(jwt.subject, isNotNull);
+  });
+
+  test('#matrix/token: returns 400 for missing homeserver', () async {
+    final challengeResponse = await buildMatrixChallengeResponse(
+      aliceDidManager,
+      aliceKeyPair,
+      SignatureScheme.ecdsa_p256_sha256,
+    );
+
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/matrix/token',
+        data: {'challenge_response': challengeResponse},
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
+      );
+
+      fail('Expected DioException');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(e.response?.data, [
+        {'message': 'Homeserver must be a valid URI.', 'field': 'homeserver'},
+      ]);
+    }
+  });
+
+  test('#matrix/token: returns 400 for invalid challenge response', () async {
+    try {
+      await dio.post(
+        '$apiEndpoint/v1/matrix/token',
+        data: {
+          'challenge_response': 'invalid-challenge',
+          'homeserver': 'https://matrix.org',
+        },
+        options: Options(
+          headers: {Headers.contentTypeHeader: 'application/json'},
+        ),
+      );
+      fail('Expected DioException');
+    } on DioException catch (e) {
+      expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(e.response?.data, {
+        'errorCode': 'CHALLENGE_RESPONSE_INVALID',
+        'errorMessage':
+            'Challenge response is invalid or could not be verified.',
+      });
+    }
+  });
 }

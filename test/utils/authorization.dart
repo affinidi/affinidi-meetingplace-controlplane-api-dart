@@ -38,10 +38,56 @@ handleAuthorization(
   SignatureScheme signatureScheme = SignatureScheme.ecdsa_p256_sha256,
 ]) async {
   final dioInstance = Dio();
+  final encodedEncrypted = await buildChallengeResponse(
+    didManager,
+    keyPair,
+    signatureScheme,
+  );
+  Response authenticateResponse = await dioInstance.post(
+    '$apiEndpoint/v1/authenticate',
+    data: {'challenge_response': encodedEncrypted},
+  );
+
+  return authenticateResponse.data['access_token'];
+}
+
+Future<String> buildChallengeResponse(
+  DidManager didManager,
+  KeyPair keyPair,
+  SignatureScheme signatureScheme,
+) async {
+  return _buildChallengeResponseForEndpoint(
+    didManager,
+    keyPair,
+    signatureScheme,
+    '/v1/authenticate/challenge',
+  );
+}
+
+Future<String> buildMatrixChallengeResponse(
+  DidManager didManager,
+  KeyPair keyPair,
+  SignatureScheme signatureScheme,
+) async {
+  return _buildChallengeResponseForEndpoint(
+    didManager,
+    keyPair,
+    signatureScheme,
+    '/v1/matrix/challenge',
+  );
+}
+
+Future<String> _buildChallengeResponseForEndpoint(
+  DidManager didManager,
+  KeyPair keyPair,
+  SignatureScheme signatureScheme,
+  String challengeEndpoint,
+) async {
+  final dioInstance = Dio();
   final didDocument = await didManager.getDidDocument();
 
   Response response = await dioInstance.post(
-    '$apiEndpoint/v1/authenticate/challenge',
+    '$apiEndpoint$challengeEndpoint',
     data: {'did': didDocument.id},
   );
 
@@ -76,13 +122,7 @@ handleAuthorization(
     ),
   );
 
-  final encodedEncrypted = base64Encode(utf8.encode(json.encode(encrypted)));
-  Response authenticateResponse = await dioInstance.post(
-    '$apiEndpoint/v1/authenticate',
-    data: {'challenge_response': encodedEncrypted},
-  );
-
-  return authenticateResponse.data['access_token'];
+  return base64Encode(utf8.encode(json.encode(encrypted)));
 }
 
 Future<(DidManager, KeyPair)> getAdminDidManagerAndKeyPair([
