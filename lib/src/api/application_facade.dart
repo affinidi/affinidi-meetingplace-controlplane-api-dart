@@ -127,7 +127,7 @@ class ApplicationFacade {
       storage: config.storage,
       didResolver: config.didResolver,
       proofAudience: getEnv('API_ENDPOINT'),
-      hostedDidHost: Uri.parse(getEnv('API_ENDPOINT')).host,
+      hostedDidHost: _hostedDidAuthorityFromApiEndpoint(),
       logger: _logger,
     );
   }
@@ -708,5 +708,10 @@ class ApplicationFacade {
 
   Future<Map<String, dynamic>> resolveDidDocumentBySegment(String segment) {
     return _didDocumentService.resolveBySegment(segment);
+  }
+
+  String _hostedDidAuthorityFromApiEndpoint() {
+    final uri = Uri.parse(getEnv('API_ENDPOINT'));
+    return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
   }
 }

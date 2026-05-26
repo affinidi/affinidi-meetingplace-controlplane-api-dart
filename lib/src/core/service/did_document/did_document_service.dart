@@ -5,6 +5,8 @@ import 'package:crypto/crypto.dart';
 import 'package:ssi/ssi.dart';
 
 import '../../../utils/date_time.dart';
+import '../../../utils/jcs_serializer.dart';
+import '../../entity/did_document_jti_record.dart';
 import '../../entity/did_document_record.dart';
 import '../../entity/did_document_segment_record.dart';
 import '../../logger/logger.dart';
@@ -36,6 +38,8 @@ class DidDocumentService {
        _hostedDidHost = hostedDidHost,
        _logger = logger;
 
+  static final _didSegmentPattern = RegExp(r'^[A-Za-z0-9._-]+$');
+
   final Storage _storage;
   final DidResolver _didResolver;
   final String _proofAudience;
@@ -59,76 +63,42 @@ class DidDocumentService {
       authDid: authDid,
       didDocument: didDocument,
     );
-    await _verifyControlProof(
+    final parsedControlJws = await _verifyControlProof(
       authDid,
       authVerificationMethod,
       parsedControlProof,
       proofPayload,
     );
-    await _verifyDidDocumentProof(didDocument, parsedProof, proofPayload);
-    final segment = _segmentFromDid(did);
-    final now = nowUtc();
-
-    final existing = await _storage.findOneById<DidDocumentRecord>(
-      DidDocumentRecord.entityName,
-      did,
-      DidDocumentRecord.fromJson,
+    final parsedDidDocumentJws = await _verifyDidDocumentProof(
+      didDocument,
+      parsedProof,
+      proofPayload,
     );
-    if (existing != null) {
-      return _handleExistingRecord(
-        existing,
-        authDid: authDid,
-        authVerificationMethod: authVerificationMethod,
-        didDocument: didDocument,
-      );
-    }
-
-    final record = DidDocumentRecord(
+    final sharedClaims = _validateSharedProofClaims(
+      parsedControlJws,
+      parsedDidDocumentJws,
+    );
+    final reservedJti = await _reserveJti(
       did: did,
-      createdBy: authDid,
-      createdByVerificationMethod: authVerificationMethod,
-      createdAt: now,
-      updatedAt: now,
-      didDocument: didDocument,
+      claims: sharedClaims,
+      proofPurpose: parsedProof.proofPurpose,
     );
 
+    var accepted = false;
     try {
-      await _storage.create(record);
-    } on AlreadyExists {
-      final concurrentRecord = await _storage.findOneById<DidDocumentRecord>(
-        DidDocumentRecord.entityName,
-        did,
-        DidDocumentRecord.fromJson,
-      );
-      if (concurrentRecord == null) {
-        throw DidDocumentConflict('DID already registered');
-      }
-      return _handleExistingRecord(
-        concurrentRecord,
+      final record = await _storeDidDocument(
+        did: did,
         authDid: authDid,
         authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
       );
-    }
-
-    try {
-      await _storage.create(
-        DidDocumentSegmentRecord(segment: segment, did: did),
-      );
-    } on AlreadyExists {
-      final segmentRecord = await _storage
-          .findOneById<DidDocumentSegmentRecord>(
-            DidDocumentSegmentRecord.entityName,
-            segment,
-            DidDocumentSegmentRecord.fromJson,
-          );
-      if (segmentRecord?.did == did) {
-        return record;
+      accepted = true;
+      return record;
+    } finally {
+      if (!accepted) {
+        await _releaseReservedJti(reservedJti);
       }
-      await _storage.delete(DidDocumentRecord.entityName, did);
-      throw DidDocumentConflict('Segment already claimed by another DID');
     }
-    return record;
   }
 
   Future<Map<String, dynamic>> resolveBySegment(String segment) async {
@@ -148,7 +118,7 @@ class DidDocumentService {
     return record.didDocument;
   }
 
-  Future<void> _verifyControlProof(
+  Future<_ParsedJws> _verifyControlProof(
     String authDid,
     String authVerificationMethod,
     _DidDocumentProof controlProof,
@@ -173,7 +143,7 @@ class DidDocumentService {
         'controlProof verificationMethod not found on authenticated DID',
       );
     }
-    await _verifyProofJws(
+    return _verifyProofJws(
       fieldName: 'controlProof',
       jws: controlProof.jws,
       verificationMethod: authVerificationMethod,
@@ -187,7 +157,7 @@ class DidDocumentService {
     );
   }
 
-  Future<void> _verifyDidDocumentProof(
+  Future<_ParsedJws> _verifyDidDocumentProof(
     Map<String, dynamic> didDocument,
     _DidDocumentProof proof,
     Map<String, dynamic> expectedPayload,
@@ -205,7 +175,7 @@ class DidDocumentService {
         'proof verificationMethod not found in didDocument',
       );
     }
-    await _verifyProofJws(
+    return _verifyProofJws(
       fieldName: 'proof',
       jws: proof.jws,
       verificationMethod: proof.verificationMethod,
@@ -250,7 +220,7 @@ class DidDocumentService {
     return false;
   }
 
-  Future<void> _verifyProofJws({
+  Future<_ParsedJws> _verifyProofJws({
     required String fieldName,
     required String jws,
     required String verificationMethod,
@@ -272,8 +242,8 @@ class DidDocumentService {
       'exp': parsedJws.payload['exp'],
       'jti': parsedJws.payload['jti'],
     };
-    if (_canonicalizeJson(parsedJws.payload) !=
-        _canonicalizeJson(expectedPayloadWithClaims)) {
+    if (jcsSerializer.serialize(parsedJws.payload) !=
+        jcsSerializer.serialize(expectedPayloadWithClaims)) {
       throw InvalidDidDocumentInput(
         '$fieldName payload does not match the upload request',
       );
@@ -281,6 +251,7 @@ class DidDocumentService {
     if (!verifier.verify(parsedJws.signingInput, parsedJws.signature)) {
       throw InvalidDidDocumentInput('$fieldName JWS verification failed');
     }
+    return parsedJws;
   }
 
   _ParsedJws _parseJws(String fieldName, String jws) {
@@ -365,7 +336,9 @@ class DidDocumentService {
         throw InvalidDidDocumentInput('JWS header must contain alg');
       }
       return SignatureScheme.fromAlg(alg);
-    } catch (_) {
+    } on FormatException {
+      throw InvalidDidDocumentInput('JWS header must be valid base64url JSON');
+    } on ArgumentError {
       throw InvalidDidDocumentInput('JWS header must contain a supported alg');
     }
   }
@@ -374,7 +347,9 @@ class DidDocumentService {
     required String authDid,
     required Map<String, dynamic> didDocument,
   }) {
-    final canonicalDidDocument = utf8.encode(_canonicalizeJson(didDocument));
+    final canonicalDidDocument = jcsSerializer.serializeObjectToUtf8(
+      didDocument,
+    );
     final didDocumentHash = base64Url
         .encode(sha256.convert(canonicalDidDocument).bytes)
         .replaceAll('=', '');
@@ -397,7 +372,87 @@ class DidDocumentService {
         'DID Document authentication must be a list',
       );
     }
-    return authentication.contains(verificationMethodId);
+    for (final entry in authentication) {
+      if (entry == verificationMethodId) {
+        return true;
+      }
+      if (entry is Map<String, dynamic> &&
+          entry['id'] == verificationMethodId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<DidDocumentRecord> _storeDidDocument({
+    required String did,
+    required String authDid,
+    required String authVerificationMethod,
+    required Map<String, dynamic> didDocument,
+  }) async {
+    final segment = _segmentFromDid(did);
+    final now = nowUtc();
+
+    final existing = await _storage.findOneById<DidDocumentRecord>(
+      DidDocumentRecord.entityName,
+      did,
+      DidDocumentRecord.fromJson,
+    );
+    if (existing != null) {
+      return _handleExistingRecord(
+        existing,
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+      );
+    }
+
+    final record = DidDocumentRecord(
+      did: did,
+      createdBy: authDid,
+      createdByVerificationMethod: authVerificationMethod,
+      createdAt: now,
+      updatedAt: now,
+      didDocument: didDocument,
+    );
+
+    try {
+      await _storage.create(record);
+    } on AlreadyExists {
+      final concurrentRecord = await _storage.findOneById<DidDocumentRecord>(
+        DidDocumentRecord.entityName,
+        did,
+        DidDocumentRecord.fromJson,
+      );
+      if (concurrentRecord == null) {
+        throw DidDocumentConflict('DID already registered');
+      }
+      return _handleExistingRecord(
+        concurrentRecord,
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+      );
+    }
+
+    try {
+      await _storage.create(
+        DidDocumentSegmentRecord(segment: segment, did: did),
+      );
+    } on AlreadyExists {
+      final segmentRecord = await _storage
+          .findOneById<DidDocumentSegmentRecord>(
+            DidDocumentSegmentRecord.entityName,
+            segment,
+            DidDocumentSegmentRecord.fromJson,
+          );
+      if (segmentRecord?.did == did) {
+        return record;
+      }
+      await _storage.delete(DidDocumentRecord.entityName, did);
+      throw DidDocumentConflict('Segment already claimed by another DID');
+    }
+    return record;
   }
 
   Future<DidDocumentRecord> _handleExistingRecord(
@@ -422,8 +477,8 @@ class DidDocumentService {
         'DID already registered by another authenticated key',
       );
     }
-    if (_canonicalizeJson(existing.didDocument) !=
-        _canonicalizeJson(didDocument)) {
+    if (jcsSerializer.serializeObject(existing.didDocument) !=
+        jcsSerializer.serializeObject(didDocument)) {
       throw DidDocumentConflict(
         'DID already registered with a different document',
       );
@@ -447,18 +502,6 @@ class DidDocumentService {
     return existing;
   }
 
-  String _canonicalizeJson(Object? value) {
-    if (value is Map) {
-      final entries = value.entries.toList()
-        ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
-      return '{${entries.map((entry) => '${jsonEncode(entry.key.toString())}:${_canonicalizeJson(entry.value)}').join(',')}}';
-    }
-    if (value is List) {
-      return '[${value.map(_canonicalizeJson).join(',')}]';
-    }
-    return jsonEncode(value);
-  }
-
   String _extractAndValidateDid(Map<String, dynamic> didDocument) {
     final did = didDocument['id'];
     if (did is! String || did.trim().isEmpty) {
@@ -476,12 +519,27 @@ class DidDocumentService {
         'didDocument.id must match did:web:<host>:user:<segment>',
       );
     }
-    if (parts[2].toLowerCase() != _hostedDidHost.toLowerCase()) {
+    final hostedDidHost = _decodeDidWebHost(parts[2]);
+    if (hostedDidHost.toLowerCase() != _hostedDidHost.toLowerCase()) {
       throw InvalidDidDocumentInput(
         'didDocument.id host must match $_hostedDidHost',
       );
     }
+    final segment = parts[4].trim();
+    if (!_didSegmentPattern.hasMatch(segment)) {
+      throw InvalidDidDocumentInput(
+        'didDocument.id segment contains invalid characters',
+      );
+    }
     return did;
+  }
+
+  String _decodeDidWebHost(String host) {
+    try {
+      return Uri.decodeComponent(host);
+    } on FormatException {
+      throw InvalidDidDocumentInput('didDocument.id host is not valid');
+    }
   }
 
   String _segmentFromDid(String did) {
@@ -490,6 +548,61 @@ class DidDocumentService {
       throw InvalidDidDocumentInput('Invalid did:web segment');
     }
     return segment;
+  }
+
+  _DidDocumentProofClaims _validateSharedProofClaims(
+    _ParsedJws controlProof,
+    _ParsedJws didDocumentProof,
+  ) {
+    if (jcsSerializer.serialize(controlProof.payload) !=
+        jcsSerializer.serialize(didDocumentProof.payload)) {
+      throw InvalidDidDocumentInput(
+        'controlProof and proof must use the same proof payload',
+      );
+    }
+
+    return _DidDocumentProofClaims.fromPayload(controlProof.payload);
+  }
+
+  Future<DidDocumentJtiRecord> _reserveJti({
+    required String did,
+    required _DidDocumentProofClaims claims,
+    required String proofPurpose,
+  }) async {
+    final record = DidDocumentJtiRecord(
+      did: did,
+      jti: claims.jti,
+      expiresAt: DateTime.fromMillisecondsSinceEpoch(
+        claims.exp * 1000,
+        isUtc: true,
+      ),
+      proofPurpose: proofPurpose,
+      operation: claims.operation,
+    );
+
+    final existing = await _storage.findOneById<DidDocumentJtiRecord>(
+      DidDocumentJtiRecord.entityName,
+      record.getId(),
+      DidDocumentJtiRecord.fromJson,
+    );
+    if (existing != null) {
+      if (!existing.expiresAt.isBefore(nowUtc())) {
+        throw DidDocumentConflict('Proof JTI has already been used');
+      }
+      await _storage.delete(DidDocumentJtiRecord.entityName, record.getId());
+    }
+
+    try {
+      await _storage.create(record);
+    } on AlreadyExists {
+      throw DidDocumentConflict('Proof JTI has already been used');
+    }
+
+    return record;
+  }
+
+  Future<void> _releaseReservedJti(DidDocumentJtiRecord record) {
+    return _storage.delete(DidDocumentJtiRecord.entityName, record.getId());
   }
 }
 
@@ -562,6 +675,29 @@ class _ParsedJws {
   final Map<String, dynamic> payload;
   final Uint8List signingInput;
   final Uint8List signature;
+}
+
+class _DidDocumentProofClaims {
+  _DidDocumentProofClaims({
+    required this.operation,
+    required this.iat,
+    required this.exp,
+    required this.jti,
+  });
+
+  factory _DidDocumentProofClaims.fromPayload(Map<String, dynamic> payload) {
+    return _DidDocumentProofClaims(
+      operation: payload['operation'] as String,
+      iat: payload['iat'] as int,
+      exp: payload['exp'] as int,
+      jti: payload['jti'] as String,
+    );
+  }
+
+  final String operation;
+  final int iat;
+  final int exp;
+  final String jti;
 }
 
 class _InlineDidResolver implements DidResolver {

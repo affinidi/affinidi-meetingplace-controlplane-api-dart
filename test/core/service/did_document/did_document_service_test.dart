@@ -7,6 +7,7 @@ import 'package:meeting_place_control_plane_api/src/core/logger/logger.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/did_document/did_document_service.dart';
 import 'package:meeting_place_control_plane_api/src/core/storage/exception/already_exists_exception.dart';
 import 'package:meeting_place_control_plane_api/src/core/storage/storage.dart';
+import 'package:meeting_place_control_plane_api/src/utils/jcs_serializer.dart';
 import 'package:ssi/ssi.dart';
 import 'package:test/test.dart';
 
@@ -178,18 +179,6 @@ Map<String, dynamic> _buildProof({
   'jws': jws,
 };
 
-String _canonicalizeJson(Object? value) {
-  if (value is Map) {
-    final entries = value.entries.toList()
-      ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
-    return '{${entries.map((entry) => '${jsonEncode(entry.key.toString())}:${_canonicalizeJson(entry.value)}').join(',')}}';
-  }
-  if (value is List) {
-    return '[${value.map(_canonicalizeJson).join(',')}]';
-  }
-  return jsonEncode(value);
-}
-
 Map<String, dynamic> _proofPayload({
   required Map<String, dynamic> didDocument,
   required String authDid,
@@ -200,7 +189,9 @@ Map<String, dynamic> _proofPayload({
   final issuedAt = iat ?? DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
   final expiresAt = exp ?? issuedAt + 60;
   final didDocumentHash = base64Url
-      .encode(sha256.convert(utf8.encode(_canonicalizeJson(didDocument))).bytes)
+      .encode(
+        sha256.convert(jcsSerializer.serializeObjectToUtf8(didDocument)).bytes,
+      )
       .replaceAll('=', '');
   return {
     'operation': 'did-document/upload',
@@ -273,8 +264,13 @@ _buildValidProofs({
   required String didKeyId,
   required Map<String, dynamic> didDocument,
   required String authDid,
+  String jti = 'proof-jti',
 }) async {
-  final payload = _proofPayload(didDocument: didDocument, authDid: authDid);
+  final payload = _proofPayload(
+    didDocument: didDocument,
+    authDid: authDid,
+    jti: jti,
+  );
   return (
     controlProof: await _buildSignedProof(
       wallet: authWallet,
@@ -411,6 +407,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: didDocument,
         authDid: authDid,
+        jti: 'proof-jti-first',
       );
 
       await service.upload(
@@ -425,8 +422,26 @@ void main() {
         authDid: authDid,
         authVerificationMethod: authVerificationMethod,
         didDocument: didDocument,
-        controlProof: proofs.controlProof,
-        proof: proofs.proof,
+        controlProof: (await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
+          didDocument: didDocument,
+          authDid: authDid,
+          jti: 'proof-jti-second',
+        )).controlProof,
+        proof: (await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
+          didDocument: didDocument,
+          authDid: authDid,
+          jti: 'proof-jti-second',
+        )).proof,
       );
 
       expect(second.did, did);
@@ -443,6 +458,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: didDocument,
         authDid: authDid,
+        jti: 'proof-jti-first',
       );
 
       await service.upload(
@@ -461,6 +477,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: didDocument,
         authDid: authDid,
+        jti: 'proof-jti-second',
       );
 
       expect(
@@ -484,6 +501,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: didDocument,
         authDid: authDid,
+        jti: 'proof-jti-first',
       );
 
       await service.upload(
@@ -512,6 +530,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: updatedDoc,
         authDid: authDid,
+        jti: 'proof-jti-second',
       );
 
       expect(
@@ -535,6 +554,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: didDocument,
         authDid: authDid,
+        jti: 'proof-jti-first',
       );
 
       await service.upload(
@@ -553,6 +573,7 @@ void main() {
         didKeyId: didKeyId,
         didDocument: didDocument,
         authDid: otherAuthDid,
+        jti: 'proof-jti-second',
       );
 
       expect(
@@ -700,6 +721,146 @@ void main() {
         ),
         throwsA(isA<InvalidDidDocumentInput>()),
       );
+    });
+
+    test('throws when the same proof JTI is replayed', () async {
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+        jti: 'proof-jti-replay',
+      );
+
+      await service.upload(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
+      );
+
+      expect(
+        service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
+        ),
+        throwsA(isA<DidDocumentConflict>()),
+      );
+    });
+
+    test(
+      'throws when the proof payload claims do not match each other',
+      () async {
+        final controlPayload = _proofPayload(
+          didDocument: didDocument,
+          authDid: authDid,
+          jti: 'proof-jti-control',
+        );
+        final proofPayload = _proofPayload(
+          didDocument: didDocument,
+          authDid: authDid,
+          jti: 'proof-jti-document',
+        );
+        final controlProof = await _buildSignedProof(
+          wallet: authWallet,
+          keyId: authKeyId,
+          verificationMethod: authVerificationMethod,
+          payload: controlPayload,
+        );
+        final proof = await _buildSignedProof(
+          wallet: didWallet,
+          keyId: didKeyId,
+          verificationMethod: '$did#key-1',
+          payload: proofPayload,
+        );
+
+        expect(
+          service.upload(
+            authDid: authDid,
+            authVerificationMethod: authVerificationMethod,
+            didDocument: didDocument,
+            controlProof: controlProof,
+            proof: proof,
+          ),
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
+
+    test('accepts embedded authentication verification methods', () async {
+      final didWithEmbeddedAuth = {
+        ...didDocument,
+        'authentication': [
+          {
+            'id': '$did#key-1',
+            'type': 'JsonWebKey2020',
+            'controller': did,
+            'publicKeyJwk': didJwk,
+          },
+        ],
+      };
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didWithEmbeddedAuth,
+        authDid: authDid,
+        jti: 'proof-jti-embedded-auth',
+      );
+
+      final record = await service.upload(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didWithEmbeddedAuth,
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
+      );
+
+      expect(record.did, did);
+    });
+
+    test('accepts did:web hosts with encoded ports', () async {
+      const didWithPort = 'did:web:example.com%3A3000:user:alice';
+      final didDocumentWithPort = _buildDidDocument(
+        did: didWithPort,
+        publicKeyJwk: didJwk,
+      );
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocumentWithPort,
+        authDid: authDid,
+        jti: 'proof-jti-port-host',
+      );
+      final portAwareService = DidDocumentService(
+        storage: storage,
+        didResolver: didResolver,
+        proofAudience: proofAudience,
+        hostedDidHost: 'example.com:3000',
+        logger: _NoOpLogger(),
+      );
+
+      final record = await portAwareService.upload(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocumentWithPort,
+        controlProof: proofs.controlProof,
+        proof: proofs.proof,
+      );
+
+      expect(record.did, didWithPort);
     });
 
     test('throws when DID document has no verification methods', () async {
