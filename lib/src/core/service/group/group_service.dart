@@ -339,17 +339,25 @@ class GroupService {
           return Future.value();
         }
 
-        final recipientDidDoc = await _didResolver.resolveDid(
-          groupMember.memberDid,
-        );
+        try {
+          final recipientDidDoc = await _didResolver.resolveDid(
+            groupMember.memberDid,
+          );
 
-        await _notificationService.notifyChannelGroup(
-          type: type,
-          platformType: groupMember.platformType,
-          platformEndpointArn: groupMember.platformEndpointArn,
-          authDid: controllingDid,
-          recipientDid: recipientDidDoc.id,
-        );
+          await _notificationService.notifyChannelGroup(
+            type: type,
+            platformType: groupMember.platformType,
+            platformEndpointArn: groupMember.platformEndpointArn,
+            authDid: controllingDid,
+            recipientDid: recipientDidDoc.id,
+          );
+        } catch (e, stackTrace) {
+          _logger.error(
+            'Notification could not be sent to group member: ${e.toString()}',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
       }).toList(),
     );
   }

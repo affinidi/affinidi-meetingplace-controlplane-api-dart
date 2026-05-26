@@ -2358,7 +2358,7 @@ paths:
   /v1/group-notify-channel:
     post:
       operationId: groupNotifyChannel
-      description: Sends a notification to all members of a group chat.
+      description: Sends a notification to all other members of a group chat (excluding the caller).
       security:
         - DidCommTokenAuth: []
       parameters: []
