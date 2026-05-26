@@ -683,10 +683,14 @@ class ApplicationFacade {
   Future<Map<String, dynamic>> uploadDidDocument({
     required String authDid,
     required Map<String, dynamic> didDocument,
+    required String controlProof,
+    required String proof,
   }) async {
     final record = await _didDocumentService.upload(
       authDid: authDid,
       didDocument: didDocument,
+      controlProof: controlProof,
+      proof: proof,
     );
     final segment = record.did.split(':').last;
     return {

@@ -109,7 +109,10 @@ Router createRouter(ApplicationFacade facade) {
     // matrix specific routes
     ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
     ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
-    ..post('/v1/did-document/upload', privatePipeline(didDocumentUpload, facade))
+    ..post(
+      '/v1/did-document/upload',
+      privatePipeline(didDocumentUpload, facade),
+    )
     // notification routes
     ..post(
       '/v1/notifications',

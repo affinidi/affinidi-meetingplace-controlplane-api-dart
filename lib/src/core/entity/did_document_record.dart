@@ -27,8 +27,10 @@ class DidDocumentRecord extends Entity {
   final DateTime updatedAt;
   final Map<String, dynamic> didDocument;
 
+  static String entityName = 'DidDocument';
+
   @override
-  String getEntityName() => 'DidDocument';
+  String getEntityName() => entityName;
 
   @override
   String getId() => did;

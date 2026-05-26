@@ -1,10 +1,7 @@
 import 'entity.dart';
 
 class DidDocumentSegmentRecord extends Entity {
-  DidDocumentSegmentRecord({
-    required this.segment,
-    required this.did,
-  });
+  DidDocumentSegmentRecord({required this.segment, required this.did});
 
   factory DidDocumentSegmentRecord.fromJson(Map<String, dynamic> json) {
     return DidDocumentSegmentRecord(
@@ -16,17 +13,16 @@ class DidDocumentSegmentRecord extends Entity {
   final String segment;
   final String did;
 
+  static String entityName = 'DidDocumentSegment';
+
   @override
-  String getEntityName() => 'DidDocumentSegment';
+  String getEntityName() => entityName;
 
   @override
   String getId() => segment;
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      'segment': segment,
-      'did': did,
-    };
+    return {'segment': segment, 'did': did};
   }
 }

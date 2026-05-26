@@ -1,3 +1,5 @@
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+
 import '../../entity/did_document_record.dart';
 import '../../entity/did_document_segment_record.dart';
 import '../../logger/logger.dart';
@@ -22,13 +24,17 @@ class DidDocumentService {
   Future<DidDocumentRecord> upload({
     required String authDid,
     required Map<String, dynamic> didDocument,
+    required String controlProof,
+    required String proof,
   }) async {
     final did = _extractAndValidateDid(didDocument);
+    _verifyJws(didDocument, controlProof);
+    _verifyJws(didDocument, proof);
     final segment = _segmentFromDid(did);
     final now = DateTime.now().toUtc();
 
     final existing = await _storage.findOneById<DidDocumentRecord>(
-      'DidDocument',
+      DidDocumentRecord.entityName,
       did,
       DidDocumentRecord.fromJson,
     );
@@ -52,7 +58,7 @@ class DidDocumentService {
     // but segment resolution points to a different DID.
     final segmentConflict = await _storage
         .findOneById<DidDocumentSegmentRecord>(
-          'DidDocumentSegment',
+          DidDocumentSegmentRecord.entityName,
           segment,
           DidDocumentSegmentRecord.fromJson,
         );
@@ -85,19 +91,42 @@ class DidDocumentService {
 
   Future<Map<String, dynamic>> resolveBySegment(String segment) async {
     final lookup = await _storage.findOneById<DidDocumentSegmentRecord>(
-      'DidDocumentSegment',
+      DidDocumentSegmentRecord.entityName,
       segment,
       DidDocumentSegmentRecord.fromJson,
     );
     if (lookup == null) throw DidDocumentNotFound();
 
     final record = await _storage.findOneById<DidDocumentRecord>(
-      'DidDocument',
+      DidDocumentRecord.entityName,
       lookup.did,
       DidDocumentRecord.fromJson,
     );
     if (record == null) throw DidDocumentNotFound();
     return record.didDocument;
+  }
+
+  void _verifyJws(Map<String, dynamic> didDocument, String jws) {
+    final rawMethods =
+        (didDocument['verificationMethod'] as List?)
+            ?.whereType<Map<String, dynamic>>()
+            .toList() ??
+        [];
+    if (rawMethods.isEmpty) {
+      throw InvalidDidDocumentInput('DID Document has no verification methods');
+    }
+    for (final vm in rawMethods) {
+      final pkJwk = vm['publicKeyJwk'] as Map<String, dynamic>?;
+      if (pkJwk == null) continue;
+      try {
+        final key = JWTKey.fromJWK(Map<String, dynamic>.from(pkJwk));
+        JWT.verify(jws, key);
+        return;
+      } catch (_) {
+        continue;
+      }
+    }
+    throw InvalidDidDocumentInput('DID Document proof verification failed');
   }
 
   String _extractAndValidateDid(Map<String, dynamic> didDocument) {

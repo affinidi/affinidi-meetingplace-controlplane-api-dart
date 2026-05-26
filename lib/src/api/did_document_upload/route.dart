@@ -27,9 +27,23 @@ Future<Response> didDocumentUpload(
         body: jsonEncode({'error': 'didDocument is required'}),
       );
     }
+    final controlProof = body['controlProof'];
+    if (controlProof is! String || controlProof.trim().isEmpty) {
+      return Response.badRequest(
+        body: jsonEncode({'error': 'controlProof is required'}),
+      );
+    }
+    final proof = body['proof'];
+    if (proof is! String || proof.trim().isEmpty) {
+      return Response.badRequest(
+        body: jsonEncode({'error': 'proof is required'}),
+      );
+    }
     final result = await facade.uploadDidDocument(
       authDid: getAuthDid(request),
       didDocument: didDocument,
+      controlProof: controlProof,
+      proof: proof,
     );
     return Response.ok(
       jsonEncode(result),
