@@ -14,6 +14,7 @@ import '../core/entity/group.dart';
 import '../core/service/notification/notify_group_membership_finalised_input.dart';
 import '../core/service/notification/notify_outreach_input.dart';
 import '../core/service/offer/admin_deregister_offer_input.dart';
+import '../core/service/matrix/matrix_media_access_service.dart';
 import '../utils/platform_type.dart';
 import 'accept_offer/request_model.dart';
 import 'accept_offer_group/request_model.dart';
@@ -64,6 +65,10 @@ import '../core/service/notification/notification_service.dart'
 import '../core/service/offer/register_offer_input.dart';
 import '../core/service/oob/create_oob_input.dart';
 import '../core/service/oob/oob_service.dart';
+import '../core/service/auth/didcomm_auth.dart';
+import '../core/service/auth/didcomm_auth_builder.dart';
+import '../core/service/auth/auth_response.dart';
+import '../core/service/auth/challenge_purpose.dart';
 import 'update_offers_score/response_error_model.dart';
 import 'update_offers_score/response_model.dart';
 import 'update_offers_score/update_offers_score_result.dart';
@@ -131,6 +136,15 @@ class ApplicationFacade {
           int.tryParse(getEnvOrNull('DID_PROOF_MAX_WINDOW_SECONDS') ?? '') ??
           300,
     );
+
+    _matrixMediaAccessService = MatrixMediaAccessService(
+      authorizerBuilder: () => DIDCommAuthBuilder(logger: _logger).build(),
+      didDocumentManager: config.didDocumentManager,
+      logger: _logger,
+      matrixTokenExpirySeconds: config.matrixTokenExpirySeconds,
+      matrixMediaAccessTokenExpirySeconds:
+          config.matrixMediaAccessTokenExpirySeconds,
+    );
   }
 
   static ApplicationFacade? _instance;
@@ -143,6 +157,7 @@ class ApplicationFacade {
   late final OobService _oobService;
   late final GroupService _groupService;
   late final DidDocumentService _didDocumentService;
+  late final MatrixMediaAccessService _matrixMediaAccessService;
   late final DeviceNotificationService _deviceNotificationService;
   late final Logger _logger;
 
@@ -159,6 +174,51 @@ class ApplicationFacade {
 
   Future<Oob?> getOob(GetOobRequest request) {
     return _oobService.get(request.oobId);
+  }
+
+  Future<String> authenticateDidFromChallengeResponse(
+    String challengeResponse,
+  ) async {
+    final authorizer = await DIDCommAuthBuilder(
+      logger: _logger,
+      storage: config.storage,
+    ).build();
+    try {
+      return await authorizer.authenticateChallengeResponse(
+        challengeResponse: challengeResponse,
+        purpose: ChallengePurpose.matrixToken,
+      );
+    } on ChallengeAuthException catch (e) {
+      throw FormatException(e.reason);
+    }
+  }
+
+  Future<String> issueMatrixLoginToken({
+    required String authDid,
+    required Uri homeserver,
+  }) {
+    return _matrixMediaAccessService.issueLoginToken(
+      did: authDid,
+      homeserver: homeserver,
+    );
+  }
+
+  Future<String> createMatrixMediaDownloadUrl({
+    required String authDid,
+    required Uri homeserver,
+    required String roomId,
+    required String mxcUri,
+  }) {
+    return _matrixMediaAccessService.createDownloadUrl(
+      did: authDid,
+      homeserver: homeserver,
+      roomId: roomId,
+      mxcUri: mxcUri,
+    );
+  }
+
+  Future<MatrixDownloadedMedia> downloadMatrixMedia(String token) {
+    return _matrixMediaAccessService.downloadMedia(token);
   }
 
   Future<bool> checkOfferPhrase(CheckOfferPhraseRequest request) {
@@ -711,4 +771,7 @@ class ApplicationFacade {
     final uri = Uri.parse(getEnv('API_ENDPOINT'));
     return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
   }
+
+  Future<DIDCommAuth> buildDidCommAuthorizer() =>
+      DIDCommAuthBuilder(logger: _logger).build();
 }

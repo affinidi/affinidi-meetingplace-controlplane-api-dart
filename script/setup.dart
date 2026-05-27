@@ -48,6 +48,9 @@ void main() async {
   final didDocumentFile = File('./params/did_document.json');
   final didcommAuthFile = File('./secrets/didcommauth.json');
   final hashSecretFile = File('./secrets/hash_secret.json');
+  final matrixMediaSigningSecretFile = File(
+    './secrets/matrix_media_signing_secret.txt',
+  );
 
   final directory = didDocumentFile.parent;
   if (!await directory.exists()) {
@@ -64,6 +67,7 @@ void main() async {
   hashSecretFile.writeAsStringSync(
     jsonEncode({'secret': hex.encode(randomBytes(32))}),
   );
+  matrixMediaSigningSecretFile.writeAsStringSync(hex.encode(randomBytes(32)));
 }
 
 Map<String, dynamic> generateDidDocument({

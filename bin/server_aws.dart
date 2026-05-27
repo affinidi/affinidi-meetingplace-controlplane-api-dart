@@ -63,4 +63,9 @@ void _registerSecrets({
     'hashSecret',
     jsonDecode(await secretManager.getSecret(getEnv('HASH_SECRET'))),
   );
+
+  config.registerSecret(
+    'matrixMediaSigningSecret',
+    await secretManager.getSecret(getEnv('MATRIX_MEDIA_SIGNING_SECRET')),
+  );
 }

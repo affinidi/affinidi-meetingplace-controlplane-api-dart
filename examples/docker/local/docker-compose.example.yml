@@ -13,11 +13,13 @@ services:
       - STORAGE_PORT=6380
       - DIDCOMM_AUTH_SECRET=/run/secrets/didcommauth
       - HASH_SECRET=/run/secrets/hash_secret
+      - MATRIX_MEDIA_SIGNING_SECRET=/run/secrets/matrix_media_signing_secret
       - DID_DOCUMENT=/run/params/did_document.json
       - GROUP_COUNT_LIMIT=10
     secrets:
       - didcommauth
       - hash_secret
+      - matrix_media_signing_secret
     depends_on:
       - storage
     volumes:
@@ -39,3 +41,5 @@ secrets:
     file: ./secrets/didcommauth.json
   hash_secret:
     file: ./secrets/hash_secret.json
+  matrix_media_signing_secret:
+    file: ./secrets/matrix_media_signing_secret.txt
