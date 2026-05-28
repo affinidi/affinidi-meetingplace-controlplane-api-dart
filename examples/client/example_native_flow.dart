@@ -46,8 +46,8 @@ Future<void> main() async {
   );
 
   print('1. Creating Alice\'s DID and authenticating...');
-  final (aliceDidManager, aliceKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (aliceDidManager, aliceKeyPair) =
+      await helper.createDidManagerWithKeyPair();
   final aliceDidDoc = await aliceDidManager.getDidDocument();
   final aliceToken = await helper.authenticate(
     didManager: aliceDidManager,
@@ -93,8 +93,8 @@ Future<void> main() async {
   print('   Offer Link: ${registerResponse.data['offerLink']}\n');
 
   print('4. Creating Bob\'s DID and authenticating...');
-  final (bobDidManager, bobKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (bobDidManager, bobKeyPair) =
+      await helper.createDidManagerWithKeyPair();
   final bobDidDoc = await bobDidManager.getDidDocument();
   final bobToken = await helper.authenticate(
     didManager: bobDidManager,

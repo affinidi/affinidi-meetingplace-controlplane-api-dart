@@ -108,8 +108,7 @@ class ClientHelper {
     final resolver = LocalDidResolver();
     final controlPlaneDidDoc = await resolver.resolveDid(controlPlaneDid);
     final didKeyId = didDocument
-        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc])
-        .first;
+        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc]).first;
 
     final encrypted = await DidcommMessage.packIntoSignedAndEncryptedMessages(
       plaintextMessage,
