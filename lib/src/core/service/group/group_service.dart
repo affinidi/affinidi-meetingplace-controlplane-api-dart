@@ -313,6 +313,55 @@ class GroupService {
     );
   }
 
+  Future<void> notifyChannel({
+    required String offerLink,
+    required String groupDid,
+    required String controllingDid,
+    required String type,
+  }) async {
+    final groupId = GroupUtils.generateGroupId(
+      offerLink: offerLink,
+      groupDid: groupDid,
+    );
+
+    await getGroup(groupId);
+
+    final sender = await getGroupMemberByControllingDid(
+      controllingDid,
+      groupId: groupId,
+    );
+
+    final groupMembers = await _getGroupMembers(groupId);
+
+    await Future.wait(
+      groupMembers.map((groupMember) async {
+        if (groupMember.memberDid == sender.memberDid) {
+          return Future.value();
+        }
+
+        try {
+          final recipientDidDoc = await _didResolver.resolveDid(
+            groupMember.memberDid,
+          );
+
+          await _notificationService.notifyChannelGroup(
+            type: type,
+            platformType: groupMember.platformType,
+            platformEndpointArn: groupMember.platformEndpointArn,
+            authDid: controllingDid,
+            recipientDid: recipientDidDoc.id,
+          );
+        } catch (e, stackTrace) {
+          _logger.error(
+            'Notification could not be sent to group member: ${e.toString()}',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }).toList(),
+    );
+  }
+
   Future<List<GroupMember>> _getGroupMembers(final String groupId) {
     return _storage.findAllById<GroupMember>(
       GroupMember.entityName,

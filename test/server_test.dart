@@ -20,6 +20,7 @@ import 'package:meeting_place_control_plane_api/src/api/group_delete/request_mod
 import 'package:meeting_place_control_plane_api/src/api/group_delete/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_member_deregister/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_member_deregister/response_error_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/group_notify_channel/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_send_message/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/notify_acceptance/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/notify_channel/request_model.dart';
@@ -2169,6 +2170,242 @@ void main() {
     expect(receivedMessage.body!['pre_capsule'], isNotNull);
     expect(receivedMessage.body!['from_did'], registerOfferRequest.adminDid);
     expect(receivedMessage.body!['seq_no'], equals(1));
+  });
+
+  test('group-notify-channel: success', () async {
+    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await dio.post(
+      '$apiEndpoint/v1/accept-offer-group',
+      data: getAcceptOfferGroupRequest(
+        did: BobDevice.offerAcceptanceDid,
+        deviceToken: BobDevice.deviceToken,
+        platformType: BobDevice.platformType,
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    final reencryptKeyPair = generateMemberRecryptKeyPair();
+    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
+
+    await dio.post(
+      '$apiEndpoint/v1/group-add-member',
+      data: GroupAddMemberRequest(
+        offerLink: registerOfferResponse.data['offerLink'],
+        mnemonic: registerOfferResponse.data['mnemonic'],
+        groupId: registerOfferResponse.data['groupId'],
+        memberDid: BobDevice.offerAcceptanceDid,
+        acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+        reencryptionKey: reencryptionKey.toBase64(),
+        publicKey: reencryptKeyPair.publicKeyToBase64(),
+        contactCard: '',
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/group-notify-channel',
+      data: {
+        'offerLink': registerOfferResponse.data['offerLink'],
+        'groupDid': registerOfferResponse.data['groupDid'],
+        'type': 'chat-activity',
+      },
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    expect(response.statusCode, equals(200));
+    expect(response.data['status'], equals('success'));
+    expect(
+      response.data['message'],
+      equals('Group channel notified successfully'),
+    );
+  });
+
+  test('group-notify-channel: fails when group not found', () async {
+    expect(
+      () => dio.post(
+        '$apiEndpoint/v1/group-notify-channel',
+        data: {
+          'offerLink': 'non-existent-offer-link',
+          'groupDid': 'did:key:non-existent',
+          'type': 'chat-activity',
+        },
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.notFound &&
+              e.response?.data['errorCode'] ==
+                  GroupNotifyChannelErrorCodes.notFound.value &&
+              e.response?.data['errorMessage'] ==
+                  'Notify channel failed: group not found.';
+        }),
+      ),
+    );
+  });
+
+  test('group-notify-channel: fails when group is deleted', () async {
+    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await dio.post(
+      '$apiEndpoint/v1/group-delete',
+      data: GroupDeleteRequest(
+        groupId: registerOfferResponse.data['groupId'],
+        messageToRelay: getEncryptedMessageExample(),
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    expect(
+      () => dio.post(
+        '$apiEndpoint/v1/group-notify-channel',
+        data: {
+          'offerLink': registerOfferResponse.data['offerLink'],
+          'groupDid': registerOfferResponse.data['groupDid'],
+          'type': 'chat-activity',
+        },
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.gone &&
+              e.response?.data['errorCode'] ==
+                  GroupNotifyChannelErrorCodes.deleted.value &&
+              e.response?.data['errorMessage'] ==
+                  'Notify channel failed: group has been deleted.';
+        }),
+      ),
+    );
+  });
+
+  test('group-notify-channel: fails when member not in group', () async {
+    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    expect(
+      () => dio.post(
+        '$apiEndpoint/v1/group-notify-channel',
+        data: {
+          'offerLink': registerOfferResponse.data['offerLink'],
+          'groupDid': registerOfferResponse.data['groupDid'],
+          'type': 'chat-activity',
+        },
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.forbidden &&
+              e.response?.data['errorCode'] ==
+                  GroupNotifyChannelErrorCodes.notInGroup.value &&
+              e.response?.data['errorMessage'] ==
+                  'Notify channel failed: group member not in group.';
+        }),
+      ),
+    );
+  });
+
+  test('group-notify-channel: returns 400 for invalid request', () async {
+    expect(
+      () => dio.post(
+        '$apiEndpoint/v1/group-notify-channel',
+        data: {'type': 'chat-activity'},
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.badRequest;
+        }),
+      ),
+    );
   });
 
   test('group-add-member: fails due to missing permissions', () async {
