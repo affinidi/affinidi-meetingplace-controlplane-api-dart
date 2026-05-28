@@ -5,16 +5,16 @@ class GroupNotifyChannelValidator extends LucidValidator {
     ruleFor(
       (request) => request['offerLink'] as String?,
       key: 'offerLink',
-    ).notEmptyOrNull();
+    ).isNotNull().notEmpty();
 
     ruleFor(
       (request) => request['groupDid'] as String?,
       key: 'groupDid',
-    ).notEmptyOrNull();
+    ).isNotNull().notEmpty();
 
     ruleFor(
       (request) => request['type'] as String?,
       key: 'type',
-    ).notEmptyOrNull();
+    ).isNotNull().notEmpty();
   }
 }

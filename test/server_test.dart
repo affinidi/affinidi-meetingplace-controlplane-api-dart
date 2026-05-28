@@ -2387,6 +2387,27 @@ void main() {
     );
   });
 
+  test('group-notify-channel: returns 400 for invalid request', () async {
+    expect(
+      () => dio.post(
+        '$apiEndpoint/v1/group-notify-channel',
+        data: {'type': 'chat-activity'},
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      ),
+      throwsA(
+        predicate((e) {
+          return e is DioException &&
+              e.response?.statusCode == HttpStatus.badRequest;
+        }),
+      ),
+    );
+  });
+
   test('group-add-member: fails due to missing permissions', () async {
     final registerOfferRequest = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
