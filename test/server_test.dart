@@ -3534,9 +3534,7 @@ void main() {
       fail('Expected DioException');
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.badRequest);
-      expect(e.response?.data, [
-        {'message': 'Homeserver must be a valid URI.', 'field': 'homeserver'},
-      ]);
+      expect(e.response?.data, {'error': 'homeserver is required'});
     }
   });
 
@@ -3555,11 +3553,7 @@ void main() {
       fail('Expected DioException');
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.badRequest);
-      expect(e.response?.data, {
-        'errorCode': 'CHALLENGE_RESPONSE_INVALID',
-        'errorMessage':
-            'Challenge response is invalid or could not be verified.',
-      });
+      expect(e.response?.data, {'error': 'invalidChallengeResponse'});
     }
   });
 }
