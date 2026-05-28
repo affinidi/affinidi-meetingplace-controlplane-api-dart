@@ -28,6 +28,7 @@ import 'get_pending_notifications/request_model.dart';
 import 'group_add_member/request_model.dart';
 import 'group_delete/request_model.dart';
 import 'group_member_deregister/request_model.dart';
+import 'group_notify_channel/request_model.dart';
 import 'group_send_message/request_model.dart';
 import 'notify_acceptance/request_model.dart';
 import 'notify_acceptance_group/request_model.dart';
@@ -558,6 +559,15 @@ class ApplicationFacade {
         incSeqNo: request.incSeqNo,
         notify: request.notify,
       ),
+    );
+  }
+
+  Future<void> notifyGroupChannel(GroupNotifyChannel request, String authDid) {
+    return _groupService.notifyChannel(
+      offerLink: request.offerLink,
+      groupDid: request.groupDid,
+      controllingDid: authDid,
+      type: request.type,
     );
   }
 
