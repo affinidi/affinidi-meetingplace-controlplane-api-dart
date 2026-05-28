@@ -20,12 +20,14 @@ class ClientHelper {
     final keyPair = await wallet.generateKey(keyId: "m/44'/60'/0'/0");
     return (
       await createDidManagerFromKeyPair(wallet: wallet, keyPair: keyPair),
-      keyPair
+      keyPair,
     );
   }
 
-  Future<DidKeyManager> createDidManagerFromKeyPair(
-      {required Wallet wallet, required KeyPair keyPair}) async {
+  Future<DidKeyManager> createDidManagerFromKeyPair({
+    required Wallet wallet,
+    required KeyPair keyPair,
+  }) async {
     final didManager = DidKeyManager(wallet: wallet, store: InMemoryDidStore());
     await didManager.addVerificationMethod(keyPair.id);
     return didManager;
@@ -106,7 +108,8 @@ class ClientHelper {
     final resolver = LocalDidResolver();
     final controlPlaneDidDoc = await resolver.resolveDid(controlPlaneDid);
     final didKeyId = didDocument
-        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc]).first;
+        .matchKeysInKeyAgreement(otherDidDocuments: [controlPlaneDidDoc])
+        .first;
 
     final encrypted = await DidcommMessage.packIntoSignedAndEncryptedMessages(
       plaintextMessage,
@@ -127,13 +130,7 @@ class ClientHelper {
   }
 
   Dio getDio() {
-    return Dio(
-      BaseOptions(
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
+    return Dio(BaseOptions(headers: {'Content-Type': 'application/json'}));
   }
 
   Dio getDioWithAuth(String accessToken) {

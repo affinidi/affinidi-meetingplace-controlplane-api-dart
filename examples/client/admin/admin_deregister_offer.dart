@@ -36,8 +36,9 @@ Future<void> main(List<String> arguments) async {
   );
 
   // Create a wallet from the mnemonic
-  final wallet =
-      Bip32Wallet.fromSeed(Uint8List.fromList(hex.decode(walletSeed)));
+  final wallet = Bip32Wallet.fromSeed(
+    Uint8List.fromList(hex.decode(walletSeed)),
+  );
   print('✓ Wallet created from seed');
 
   // Derived key pair matches the admin DID in the whitelist from .env
@@ -61,7 +62,8 @@ Future<void> main(List<String> arguments) async {
 
   final parser = ArgParser()..addOption('mnemonic');
   final args = parser.parse(arguments);
-  final mnemonic = args['mnemonic'] ??
+  final mnemonic =
+      args['mnemonic'] ??
       (throw Exception('Please provide --mnemonic argument'));
 
   try {

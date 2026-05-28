@@ -5,7 +5,6 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 
-import '../api/matrix_token/route.dart';
 import '../api/matrix_challenge/route.dart';
 import '../api/update_offers_score/route.dart';
 import 'middleware/auth.dart';

@@ -14,18 +14,35 @@ Middleware requestLoggerMiddleware(Logger logger) {
       final newRequest = request.change(body: body);
 
       final response = await innerHandler(newRequest);
-      final responseBody = await response.readAsString();
+
+      final contentType = response.headers['content-type'] ?? '';
+      final isTextual =
+          contentType.contains('json') || contentType.contains('text');
 
       logger.info('=== Response ===');
       logger.info('Status code ${response.statusCode}');
-      logger.debug(jsonEncode(responseBody));
-      logger.info('=== Response end ===');
 
-      return Response(
-        response.statusCode,
-        body: responseBody,
-        headers: response.headers,
-      );
+      if (isTextual) {
+        final responseBody = await response.readAsString();
+        logger.debug(jsonEncode(responseBody));
+        logger.info('=== Response end ===');
+
+        return Response(
+          response.statusCode,
+          body: responseBody,
+          headers: response.headers,
+        );
+      } else {
+        final responseBytes = await response.read().expand((c) => c).toList();
+        logger.debug('[binary ${responseBytes.length} bytes]');
+        logger.info('=== Response end ===');
+
+        return Response(
+          response.statusCode,
+          body: responseBytes,
+          headers: response.headers,
+        );
+      }
     };
   };
 }

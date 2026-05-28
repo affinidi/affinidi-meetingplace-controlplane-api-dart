@@ -36,32 +36,58 @@ class AuthDidManager {
       if (jwk.value['privateKeyJwk'] == null) continue;
 
       final keyId = jwk.value['id'];
-      final keyType = _getKeyTypeByCurve(jwk.value['privateKeyJwk']['crv']);
+      final jwkBody = jwk.value['privateKeyJwk'];
+      final keyType = _getKeyTypeByCurve(jwkBody['crv']);
 
       if (keyType == null) {
         continue;
       }
 
-      final key = StoredKey(
-        keyType: keyType,
-        privateKeyBytes: _decodeBase64Url(jwk.value['privateKeyJwk']['d']),
-      );
+      // PersistentWallet does not support X25519 directly. Skip storing it;
+      // ECDH keyAgreement is handled by the P-256 key (used by the app) and
+      // the Ed25519 key (auto-derives X25519 via SSI).
+      if (keyType == KeyType.x25519) {
+        continue;
+      }
+
+      Uint8List privateKeyBytes = _decodeBase64Url(jwkBody['d']);
+
+      // ssi's PersistentWallet calls Ed25519KeyPair.fromPrivateKey which
+      // expects the 64-byte expanded key (seed[32] + public[32]). JWK 'd'
+      // holds only the 32-byte seed, so we splice on the 32-byte public 'x'.
+      if (keyType == KeyType.ed25519 && privateKeyBytes.length == 32) {
+        final publicBytes = _decodeBase64Url(jwkBody['x']);
+        privateKeyBytes = Uint8List.fromList([
+          ...privateKeyBytes,
+          ...publicBytes,
+        ]);
+      }
+
+      final key = StoredKey(keyType: keyType, privateKeyBytes: privateKeyBytes);
 
       await _keyStore.set(keyId, key);
 
-      // Reflect messaging atlas DID document construction
-      if (jwk.key <= 1) {
+      // Assign relationships based on key type capability
+      if (keyType == KeyType.ed25519) {
+        // Ed25519 supports auth+assertion; the SSI lib auto-derives X25519
+        // for keyAgreement when added with that relationship
         await didManager.addVerificationMethod(
           keyId,
           relationships: {
             VerificationRelationship.authentication,
             VerificationRelationship.assertionMethod,
+            VerificationRelationship.keyAgreement,
           },
         );
       } else {
+        // P-256, secp256k1: support all relationships including keyAgreement
         await didManager.addVerificationMethod(
           keyId,
-          relationships: {VerificationRelationship.keyAgreement},
+          relationships: {
+            VerificationRelationship.authentication,
+            VerificationRelationship.assertionMethod,
+            VerificationRelationship.keyAgreement,
+          },
         );
       }
     }
@@ -78,6 +104,10 @@ class AuthDidManager {
         return KeyType.p256;
       case 'secp256k1':
         return KeyType.secp256k1;
+      case 'Ed25519':
+        return KeyType.ed25519;
+      case 'X25519':
+        return KeyType.x25519;
       default:
         return null;
     }

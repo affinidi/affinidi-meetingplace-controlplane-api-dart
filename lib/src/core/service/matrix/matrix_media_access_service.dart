@@ -151,9 +151,10 @@ class MatrixMediaAccessService {
   }
 
   Uri _normalizeHomeserver(Uri homeserver) {
-    if (!homeserver.isAbsolute || homeserver.scheme != 'https') {
+    if (!homeserver.isAbsolute ||
+        (homeserver.scheme != 'https' && homeserver.scheme != 'http')) {
       throw MatrixMediaAccessException.badRequest(
-        'homeserver must be an absolute HTTPS URI',
+        'homeserver must be an absolute HTTP(S) URI',
       );
     }
 
@@ -165,7 +166,7 @@ class MatrixMediaAccessService {
     }
 
     final authority = homeserver.hasPort ? '$host:${homeserver.port}' : host;
-    return Uri.parse('https://$authority');
+    return Uri.parse('${homeserver.scheme}://$authority');
   }
 
   String _normalizeRoomId(String roomId) {
