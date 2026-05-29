@@ -38,7 +38,6 @@ import '../api/finalise_acceptance/route.dart';
 import '../api/auth_authenticate/route.dart';
 import '../api/auth_challenge/route.dart';
 import '../api/get_pending_notifications/route.dart';
-import '../api/matrix_registration_credential/route.dart';
 import '../api/notify_channel/route.dart';
 import '../api/notify_channel_group/route.dart';
 import '../api/register_notification/route.dart';

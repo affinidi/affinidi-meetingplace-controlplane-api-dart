@@ -19,7 +19,6 @@ class DIDCommAuthChallenge {
       did: did,
       audience: apiEndpoint,
       issuer: apiEndpoint,
-      verificationMethod: '',
       expiresInMinutes: 1,
       jti: jti,
       purpose: purpose,

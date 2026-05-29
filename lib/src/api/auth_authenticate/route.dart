@@ -1,5 +1,6 @@
 import 'package:shelf/shelf.dart';
 import '../request_validation_exception.dart';
+import '../../core/service/auth/challenge_purpose.dart';
 import '../../core/service/auth/didcomm_auth_builder.dart';
 import 'request_model.dart';
 import 'response_error_model.dart';
@@ -37,15 +38,17 @@ Future<Response> authAuthenticate(
       );
     }
 
-    final JWTStatus jwtStatus = authorizer.verifyAuthChallengeToken(
-      authResponse.did,
-      authResponse.challenge,
-    );
+    final VerifyAuthChallengeResult verifyResult = authorizer
+        .verifyAuthChallengeToken(
+          authResponse.did,
+          authResponse.challenge,
+          ChallengePurpose.authenticate,
+        );
 
-    if (jwtStatus != JWTStatus.valid) {
+    if (verifyResult.status != JWTStatus.valid) {
       return Response.badRequest(
         body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
-          jwtStatus.name,
+          verifyResult.status.name,
         ).toString(),
       );
     }

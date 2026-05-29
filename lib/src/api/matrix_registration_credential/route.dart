@@ -10,6 +10,7 @@ import '../request_validation_exception.dart';
 import '../../core/config/config.dart';
 import '../../core/config/env_config.dart';
 import '../../core/service/auth/auth_response.dart';
+import '../../core/service/auth/challenge_purpose.dart';
 import '../../core/service/auth/didcomm_auth.dart';
 import '../../core/service/auth/didcomm_auth_builder.dart';
 import '../../utils/supported_curve.dart';
@@ -57,12 +58,16 @@ Future<Response> matrixRegistrationToken(
         body: jsonEncode({'error': authResponse.type.name}),
       );
     }
-    final jwtStatus = authorizer.verifyAuthChallengeToken(
-      authResponse.did,
-      authResponse.challenge,
-    );
-    if (jwtStatus != JWTStatus.valid) {
-      return Response.badRequest(body: jsonEncode({'error': jwtStatus.name}));
+    final VerifyAuthChallengeResult verifyResult = authorizer
+        .verifyAuthChallengeToken(
+          authResponse.did,
+          authResponse.challenge,
+          ChallengePurpose.matrixToken,
+        );
+    if (verifyResult.status != JWTStatus.valid) {
+      return Response.badRequest(
+        body: jsonEncode({'error': verifyResult.status.name}),
+      );
     }
 
     final token = await _issueMatrixToken(
