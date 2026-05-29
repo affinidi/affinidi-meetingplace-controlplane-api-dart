@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:ssi/ssi.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../utils/date_time.dart';
 import '../../../utils/jcs_serializer.dart';
@@ -37,8 +38,6 @@ class DidDocumentService {
        _proofAudience = proofAudience,
        _hostedDidHost = hostedDidHost,
        _logger = logger;
-
-  static final _didSegmentPattern = RegExp(r'^[A-Za-z0-9._-]+$');
 
   final Storage _storage;
   final DidResolver _didResolver;
@@ -526,10 +525,8 @@ class DidDocumentService {
       );
     }
     final segment = parts[4].trim();
-    if (!_didSegmentPattern.hasMatch(segment)) {
-      throw InvalidDidDocumentInput(
-        'didDocument.id segment contains invalid characters',
-      );
+    if (!Uuid.isValidUUID(fromString: segment)) {
+      throw InvalidDidDocumentInput('didDocument.id segment must be a UUID');
     }
     return did;
   }

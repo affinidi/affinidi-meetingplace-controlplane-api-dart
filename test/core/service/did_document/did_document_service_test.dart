@@ -307,7 +307,7 @@ void main() {
   late Map<String, dynamic> didJwk;
   late Map<String, dynamic> didDocument;
 
-  const did = 'did:web:example.com:user:alice';
+  const did = 'did:web:example.com:user:a1b2c3d4-e5f6-4789-8901-abcdef012345';
   const authDid = 'did:key:zAlice123';
   const otherAuthDid = 'did:key:zBob456';
   const authVerificationMethod = '$authDid#control-1';
@@ -829,7 +829,8 @@ void main() {
     });
 
     test('accepts did:web hosts with encoded ports', () async {
-      const didWithPort = 'did:web:example.com%3A3000:user:alice';
+      const didWithPort =
+          'did:web:example.com%3A3000:user:a1b2c3d4-e5f6-4789-8901-abcdef012345';
       final didDocumentWithPort = _buildDidDocument(
         did: didWithPort,
         publicKeyJwk: didJwk,
@@ -897,7 +898,8 @@ void main() {
     test(
       'throws when did:web host does not match the configured host',
       () async {
-        const otherDid = 'did:web:other.com:user:alice';
+        const otherDid =
+            'did:web:other.com:user:a1b2c3d4-e5f6-4789-8901-abcdef012345';
         final otherDoc = _buildDidDocument(did: otherDid, publicKeyJwk: didJwk);
         final payload = _proofPayload(
           didDocument: otherDoc,
@@ -1094,7 +1096,9 @@ void main() {
         proof: proofs.proof,
       );
 
-      final resolved = await service.resolveBySegment('alice');
+      final resolved = await service.resolveBySegment(
+        'a1b2c3d4-e5f6-4789-8901-abcdef012345',
+      );
       expect(resolved['id'], did);
     });
 

@@ -78,6 +78,10 @@ class AuthClient {
       throw Exception('Challenge response signature verification failed');
     }
 
+    if (signedMessage.signatures.isEmpty) {
+      throw Exception('Challenge response contains no signatures');
+    }
+
     final unpacked = await signedMessage.unpack();
     final message = PlainTextMessage.fromJson(unpacked);
     message.validateConsistencyWithSignedMessage(

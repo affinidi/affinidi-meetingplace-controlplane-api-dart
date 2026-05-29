@@ -193,15 +193,18 @@ class GroupService {
   Future<void> deregisterMember(DeregisterMemberInput input) async {
     final group = await getGroup(input.groupId);
 
-    await _checkPermissionToRunGroupAction(
-      groupId: group.id,
-      controllerDid: input.controllingDid,
-    );
-
     final groupMember = await _getGroupMemberByDid(
       input.memberDid,
       groupId: group.id,
     );
+
+    final isSelfRemoval = groupMember.controllingDid == input.controllingDid;
+    if (!isSelfRemoval) {
+      await _checkPermissionToRunGroupAction(
+        groupId: group.id,
+        controllerDid: input.controllingDid,
+      );
+    }
 
     await sendMessage(
       SendMessageInput(
