@@ -213,11 +213,13 @@ String _issueMatrixRegistrationCredential({
   }
 
   final p256JwkDoc = didcommauth.firstWhere(
-    (doc) => doc['privateKeyJwk']?['crv'] == 'P-256',
+    (doc) => doc['privateKeyJwk']?['crv'] == SupportedCurve.p256.value,
     orElse: () => null,
   );
   if (p256JwkDoc == null) {
-    throw Exception('No P-256 signing key found in didcommauth secret');
+    throw Exception(
+      'No ${SupportedCurve.p256.value} signing key found in didcommauth secret',
+    );
   }
 
   final privateJwk = Map<String, dynamic>.from(p256JwkDoc['privateKeyJwk']);
