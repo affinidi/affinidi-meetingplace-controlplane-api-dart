@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:meeting_place_control_plane_api/meeting_place_control_plane_api.dart';
 import 'package:meeting_place_control_plane_api/src/core/logger/logger.dart';
 import 'package:meeting_place_control_plane_api/src/core/secret_manager/secret_provider.dart';
+import 'package:meeting_place_control_plane_api/src/core/service/auth/didcomm_auth.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/matrix/matrix_media_access_service.dart';
 import 'package:meeting_place_control_plane_api/src/core/web_manager/did_document_manager.dart';
 import 'package:ssi/ssi.dart';
@@ -32,6 +34,18 @@ class _FakeSecretProvider implements SecretProvider {
 class _UnusedDidDocumentManager implements DidDocumentManager {
   @override
   Future<DidDocument> getDidDocument() => throw UnimplementedError();
+}
+
+class _FakeDidDocumentManager implements DidDocumentManager {
+  _FakeDidDocumentManager(this._did);
+
+  final String _did;
+
+  @override
+  Future<DidDocument> getDidDocument() async => DidDocument.fromJson({
+    '@context': 'https://www.w3.org/ns/did/v1',
+    'id': _did,
+  });
 }
 
 void main() {
@@ -99,4 +113,55 @@ void main() {
       ),
     );
   });
+
+  test(
+    'issueLoginToken returns a signed JWT with the expected claims',
+    () async {
+      const controlPlaneDid = 'did:example:controlplane-test';
+      const callerDid =
+          'did:key:zDnaerx9CtbPJ1q36T5Ln5wYt3MQYeGRG5ehnPAmxcf5zDcec';
+      final homeserver = Uri.parse('https://matrix.example.com');
+
+      // Ephemeral P-256 key generated for testing purposes only.
+      final testPrivateJwk = <String, dynamic>{
+        'kty': 'EC',
+        'crv': 'P-256',
+        'x': 'Dvnv-V52DS7jcN0NtpD-MdfyT1ypub3Iz1i72AtprGg',
+        'y': 'AoZ4166FC637j3wdV_s3XHk6SrBDtpHBf5BVeeKeosk',
+        'd': 'Q20Kq7OUrBngOyzlLJJF1XkNk_9Cw4Ly-lmsk8OHRvM',
+      };
+      final testPublicJwk = Map<String, dynamic>.from(testPrivateJwk)
+        ..remove('d');
+
+      final testAuth = DIDCommAuth(
+        privateKey: JWTKey.fromJWK(testPrivateJwk),
+        publicKey: JWTKey.fromJWK(testPublicJwk),
+        jwk: [
+          {'privateKeyJwk': testPrivateJwk},
+        ],
+        logger: _NoopLogger(),
+      );
+
+      final service = MatrixMediaAccessService(
+        authorizerBuilder: () async => testAuth,
+        didDocumentManager: _FakeDidDocumentManager(controlPlaneDid),
+        logger: _NoopLogger(),
+        matrixTokenExpirySeconds: 60,
+        matrixMediaAccessTokenExpirySeconds: 60,
+      );
+
+      final token = await service.issueLoginToken(
+        did: callerDid,
+        homeserver: homeserver,
+      );
+
+      expect(token, isNotEmpty);
+
+      final jwt = JWT.decode(token);
+      expect(jwt.issuer, equals(controlPlaneDid));
+      expect(jwt.audience?.first, equals('https://matrix.example.com'));
+      expect(jwt.subject, isNotNull);
+      expect(jwt.jwtId, isNotNull);
+    },
+  );
 }

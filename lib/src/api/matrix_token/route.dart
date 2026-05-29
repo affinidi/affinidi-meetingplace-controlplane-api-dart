@@ -3,48 +3,28 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 
 import '../application_facade.dart';
+import '../request_validation_exception.dart';
+import 'request_model.dart';
 
 Future<Response> matrixToken(Request request, ApplicationFacade facade) async {
   try {
     final bodyText = await request.readAsString();
-    final dynamic decoded = bodyText.trim().isEmpty
-        ? <String, dynamic>{}
-        : jsonDecode(bodyText);
-
-    if (decoded is! Map<String, dynamic>) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'Request body must be a JSON object'}),
-      );
-    }
-
-    final challengeResponse = (decoded['challenge_response'] as String?)
-        ?.trim();
-    final homeserverValue = (decoded['homeserver'] as String?)?.trim();
-
-    if (challengeResponse == null || challengeResponse.isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'challenge_response is required'}),
-      );
-    }
-
-    if (homeserverValue == null || homeserverValue.isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'homeserver is required'}),
-      );
-    }
+    final params = MatrixTokenRequest.fromRequestParams(bodyText);
 
     final authDid = await facade.authenticateDidFromChallengeResponse(
-      challengeResponse,
+      params.challengeResponse,
     );
     final token = await facade.issueMatrixLoginToken(
       authDid: authDid,
-      homeserver: Uri.parse(homeserverValue),
+      homeserver: Uri.parse(params.homeserver),
     );
 
     return Response.ok(
       jsonEncode({'token': token}),
       headers: {'content-type': 'application/json'},
     );
+  } on RequestValidationException catch (e) {
+    return Response.badRequest(body: e.toString());
   } on FormatException catch (e) {
     return Response.badRequest(body: jsonEncode({'error': e.message}));
   } catch (e, stackTrace) {

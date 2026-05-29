@@ -414,13 +414,17 @@ class MatrixMediaAccessService {
       (timestamp) => now.difference(timestamp) >= _downloadWindow,
     );
 
+    if (attempts.isEmpty) {
+      _downloadAttempts.remove(key);
+    }
+
     if (attempts.length >= _maxDownloadsPerMinute) {
       throw MatrixMediaAccessException.rateLimited(
         'Matrix media download rate limit exceeded',
       );
     }
 
-    attempts.add(now);
+    _downloadAttempts.putIfAbsent(key, () => <DateTime>[]).add(now);
   }
 
   MatrixMediaAccessException _mapMatrixResponse(

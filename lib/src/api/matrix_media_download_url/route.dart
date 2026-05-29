@@ -4,6 +4,8 @@ import 'package:shelf/shelf.dart';
 
 import '../../core/service/matrix/matrix_media_access_service.dart';
 import '../application_facade.dart';
+import '../request_validation_exception.dart';
+import 'request_model.dart';
 
 Future<Response> matrixMediaDownloadUrl(
   Request request,
@@ -11,60 +13,24 @@ Future<Response> matrixMediaDownloadUrl(
 ) async {
   try {
     final bodyText = await request.readAsString();
-    final dynamic decoded = bodyText.trim().isEmpty
-        ? <String, dynamic>{}
-        : jsonDecode(bodyText);
-
-    if (decoded is! Map<String, dynamic>) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'Request body must be a JSON object'}),
-      );
-    }
-
-    final challengeResponse = (decoded['challenge_response'] as String?)
-        ?.trim();
-    final homeserverValue = (decoded['homeserver'] as String?)?.trim();
-    final roomId = (decoded['room_id'] as String?)?.trim();
-    final mediaUri = (decoded['media_uri'] as String?)?.trim();
-
-    if (challengeResponse == null || challengeResponse.isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'challenge_response is required'}),
-      );
-    }
-
-    if (homeserverValue == null || homeserverValue.isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'homeserver is required'}),
-      );
-    }
-
-    if (roomId == null || roomId.isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'room_id is required'}),
-      );
-    }
-
-    if (mediaUri == null || mediaUri.isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'error': 'media_uri is required'}),
-      );
-    }
+    final params = MatrixMediaDownloadUrlRequest.fromRequestParams(bodyText);
 
     final authDid = await facade.authenticateDidFromChallengeResponse(
-      challengeResponse,
+      params.challengeResponse,
     );
     final url = await facade.createMatrixMediaDownloadUrl(
       authDid: authDid,
-      homeserver: Uri.parse(homeserverValue),
-      roomId: roomId,
-      mxcUri: mediaUri,
+      homeserver: Uri.parse(params.homeserver),
+      roomId: params.roomId,
+      mxcUri: params.mediaUri,
     );
 
     return Response.ok(
       jsonEncode({'url': url}),
       headers: {'content-type': 'application/json'},
     );
+  } on RequestValidationException catch (e) {
+    return Response.badRequest(body: e.toString());
   } on FormatException catch (e) {
     return Response.badRequest(body: jsonEncode({'error': e.message}));
   } on MatrixMediaAccessException catch (e) {

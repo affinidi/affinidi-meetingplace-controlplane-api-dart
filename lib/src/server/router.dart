@@ -118,7 +118,6 @@ Router createRouter(ApplicationFacade facade) {
     ..post('/v1/register-device', privatePipeline(registerDevice, facade))
     // matrix specific routes
     ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
-    ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
     ..post(
       '/v1/did-document/upload',
       privatePipeline(didDocumentUpload, facade),

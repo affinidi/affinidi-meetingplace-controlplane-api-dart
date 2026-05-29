@@ -190,7 +190,6 @@ void main() {
     await expectLater(
       () => auth.authenticateChallengeResponse(
         challengeResponse: 'invalid-challenge',
-        didResolverUrl: Config().get('auth')['didResolverUrl'],
         purpose: ChallengePurpose.matrixToken,
       ),
       throwsA(
@@ -224,7 +223,6 @@ void main() {
 
       final firstResult = await auth.authenticateChallengeResponse(
         challengeResponse: challengeResponse,
-        didResolverUrl: Config().get('auth')['didResolverUrl'],
         purpose: ChallengePurpose.matrixToken,
       );
 
@@ -233,7 +231,6 @@ void main() {
       await expectLater(
         () => auth.authenticateChallengeResponse(
           challengeResponse: challengeResponse,
-          didResolverUrl: Config().get('auth')['didResolverUrl'],
           purpose: ChallengePurpose.matrixToken,
         ),
         throwsA(

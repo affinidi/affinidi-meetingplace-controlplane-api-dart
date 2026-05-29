@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:mutex/mutex.dart';
-import '../core/config/config.dart';
 import '../core/config/env_config.dart';
 import '../core/config/server_config.dart';
 import '../core/logger/logger.dart';
@@ -70,7 +69,6 @@ import '../core/service/oob/oob_service.dart';
 import '../core/service/auth/didcomm_auth.dart';
 import '../core/service/auth/didcomm_auth_builder.dart';
 import '../core/service/auth/auth_response.dart';
-import '../core/service/auth/challenge_purpose.dart';
 import 'update_offers_score/response_error_model.dart';
 import 'update_offers_score/response_model.dart';
 import 'update_offers_score/update_offers_score_result.dart';
