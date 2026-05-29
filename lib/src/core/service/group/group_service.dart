@@ -198,12 +198,8 @@ class GroupService {
       groupId: group.id,
     );
 
-    final isSelfRemoval = groupMember.controllingDid == input.controllingDid;
-    if (!isSelfRemoval) {
-      await _checkPermissionToRunGroupAction(
-        groupId: group.id,
-        controllerDid: input.controllingDid,
-      );
+    if (groupMember.controllingDid != input.controllingDid) {
+      throw GroupPermissionDenied();
     }
 
     await sendMessage(
