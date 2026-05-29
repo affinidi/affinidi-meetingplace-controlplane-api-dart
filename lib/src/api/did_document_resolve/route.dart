@@ -17,13 +17,22 @@ Future<Response> didDocumentResolve(
       headers: {'content-type': 'application/did+ld+json'},
     );
   } on DidDocumentNotFound {
-    return Response.notFound('DID document not found');
+    return Response.notFound(
+      jsonEncode({'error': 'not_found', 'message': 'DID document not found'}),
+      headers: {'content-type': 'application/json'},
+    );
   } catch (e, stackTrace) {
     facade.logError(
       'Error resolving DID document',
       error: e,
       stackTrace: stackTrace,
     );
-    return Response.internalServerError(body: 'Unable to resolve DID document');
+    return Response.internalServerError(
+      body: jsonEncode({
+        'error': 'server_error',
+        'message': 'Unable to resolve DID document',
+      }),
+      headers: {'content-type': 'application/json'},
+    );
   }
 }

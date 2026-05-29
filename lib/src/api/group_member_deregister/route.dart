@@ -54,7 +54,7 @@ Future<Response> groupDeregisterMember(
       '''Access to group denied. Only group owner is allowed to call this action''',
     );
     return Response.forbidden(
-      GroupMemberDeregisterErrorResponse.notInGroup().toString(),
+      GroupMemberDeregisterErrorResponse.permissionDenied().toString(),
     );
   } catch (e, stackTrace) {
     facade.logError(
