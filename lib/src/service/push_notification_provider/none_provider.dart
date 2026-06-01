@@ -1,6 +1,9 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+
 import '../../core/logger/logger.dart';
 import '../../core/service/device_notification/push_notification_provider.dart';
-import 'package:uuid/uuid.dart';
 
 class NoneProvider implements PushNotificationProvider {
   NoneProvider({required Logger logger}) : _logger = logger;
@@ -15,7 +18,8 @@ class NoneProvider implements PushNotificationProvider {
     _logger.info(
       'Push notification provider: none, skip platform registration',
     );
-    return 'none:${Uuid().v4()}';
+    final hash = sha256.convert(utf8.encode('$deviceToken:${metadata ?? ''}'));
+    return 'none:$hash';
   }
 
   @override
