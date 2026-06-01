@@ -18,8 +18,8 @@ Future<void> main() async {
   );
 
   print('1. Creating Alice\'s DID...');
-  final (aliceDidManager, aliceKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (aliceDidManager, aliceKeyPair) =
+      await helper.createDidManagerWithKeyPair();
 
   final aliceDidDoc = await aliceDidManager.getDidDocument();
   final aliceChallengeResponse = await helper.getMatrixChallengeResponse(

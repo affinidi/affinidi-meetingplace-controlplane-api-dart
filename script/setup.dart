@@ -215,32 +215,6 @@ String ecPublicKeyPemFromFile(String pemPath, String domainParam) {
   return CryptoUtils.encodeEcPublicKeyToPem(ECPublicKey(Q, params));
 }
 
-String ed25519PublicKeyToPem(List<int> publicKeyBytes) {
-  // SubjectPublicKeyInfo DER header for Ed25519 (OID 1.3.101.112)
-  const header = [
-    0x30,
-    0x2a,
-    0x30,
-    0x05,
-    0x06,
-    0x03,
-    0x2b,
-    0x65,
-    0x70,
-    0x03,
-    0x21,
-    0x00,
-  ];
-  final der = [...header, ...publicKeyBytes];
-  final b64 = base64.encode(der);
-  final sb = StringBuffer('-----BEGIN PUBLIC KEY-----\n');
-  for (var i = 0; i < b64.length; i += 64) {
-    sb.writeln(b64.substring(i, i + 64 > b64.length ? b64.length : i + 64));
-  }
-  sb.write('-----END PUBLIC KEY-----');
-  return sb.toString();
-}
-
 Future<Map<String, dynamic>> generateEd25519Jwk({
   bool includePrivate = true,
 }) async {

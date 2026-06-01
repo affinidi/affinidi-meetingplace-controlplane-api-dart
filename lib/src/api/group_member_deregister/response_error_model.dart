@@ -7,8 +7,7 @@ part 'response_error_model.g.dart';
 enum GroupMemberDeregisterErrorCodes {
   notInGroup('group_member_not_in_group'),
   notFound('group_not_found'),
-  deleted('group_deleted'),
-  permissionDenied('group_permission_denied');
+  deleted('group_deleted');
 
   const GroupMemberDeregisterErrorCodes(this.value);
 
@@ -40,13 +39,6 @@ class GroupMemberDeregisterErrorResponse {
     return GroupMemberDeregisterErrorResponse(
       errorCode: GroupMemberDeregisterErrorCodes.deleted.value,
       errorMessage: 'Deregister member failed: group has been deleted.',
-    );
-  }
-
-  factory GroupMemberDeregisterErrorResponse.permissionDenied() {
-    return GroupMemberDeregisterErrorResponse(
-      errorCode: GroupMemberDeregisterErrorCodes.permissionDenied.value,
-      errorMessage: 'Deregister member failed: permission denied.',
     );
   }
 

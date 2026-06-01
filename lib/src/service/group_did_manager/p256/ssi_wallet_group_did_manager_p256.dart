@@ -47,7 +47,7 @@ class SsiWalletGroupDidManagerP256 implements GroupDidManager {
 
     final keyPair = await _wallet.generateKey(
       keyId: keyReference.keyId,
-      keyType: KeyType.p256,
+      keyType: KeyType.secp256k1,
     );
 
     return _getDidManager(_wallet, keyPair);

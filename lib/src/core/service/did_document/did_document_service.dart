@@ -59,7 +59,10 @@ class DidDocumentService {
       proofJson: proof,
       proofAudience: _proofAudience,
     );
-    final reservedJti = await _reserveJti(verifiedClaims: verifiedClaims);
+    final reservedJti = await _reserveJti(
+      authDid: authDid,
+      verifiedClaims: verifiedClaims,
+    );
 
     var accepted = false;
     try {
@@ -260,9 +263,11 @@ class DidDocumentService {
   }
 
   Future<DidDocumentJtiRecord> _reserveJti({
+    required String authDid,
     required DidDocumentVerifiedProofClaims verifiedClaims,
   }) async {
     final record = DidDocumentJtiRecord(
+      did: authDid,
       jti: verifiedClaims.jti,
       expiresAt: DateTime.fromMillisecondsSinceEpoch(
         verifiedClaims.exp * 1000,

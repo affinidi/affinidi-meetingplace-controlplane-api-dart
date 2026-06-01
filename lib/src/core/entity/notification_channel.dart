@@ -29,6 +29,7 @@ class NotificationChannel extends Entity {
     modifiedBy = createdBy;
   }
 
+  @override
   factory NotificationChannel.fromJson(Map<String, dynamic> json) =>
       _$NotificationChannelFromJson(json);
   static String entityName = 'NotificationChannel';

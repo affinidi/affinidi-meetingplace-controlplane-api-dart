@@ -38,6 +38,7 @@ class Acceptance extends Entity {
     modifiedBy = createdBy;
   }
 
+  @override
   factory Acceptance.fromJson(Map<String, dynamic> json) {
     return _$AcceptanceFromJson(json);
   }

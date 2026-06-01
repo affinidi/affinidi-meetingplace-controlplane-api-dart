@@ -71,6 +71,7 @@ class Offer extends Entity {
     modifiedBy = createdBy;
   }
 
+  @override
   factory Offer.fromJson(Map<String, dynamic> json) => _$OfferFromJson(json);
   static String entityName = 'Offer';
 

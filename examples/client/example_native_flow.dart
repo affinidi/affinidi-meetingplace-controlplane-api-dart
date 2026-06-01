@@ -10,7 +10,7 @@ String generateContactCard(String fullName) {
     'firstName': fullName.split(' ').first,
     'lastName': fullName.split(' ').length > 1
         ? fullName.split(' ').sublist(1).join(' ')
-        : '',
+        : ''
   });
   return base64Encode(utf8.encode(card));
 }
@@ -46,13 +46,11 @@ Future<void> main() async {
   );
 
   print('1. Creating Alice\'s DID and authenticating...');
-  final (aliceDidManager, aliceKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (aliceDidManager, aliceKeyPair) =
+      await helper.createDidManagerWithKeyPair();
   final aliceDidDoc = await aliceDidManager.getDidDocument();
   final aliceToken = await helper.authenticate(
-    didManager: aliceDidManager,
-    keyPair: aliceKeyPair,
-  );
+      didManager: aliceDidManager, keyPair: aliceKeyPair);
 
   print('   Alice DID: ${aliceDidDoc.id}');
   print('   Alice authenticated\n');
@@ -93,13 +91,11 @@ Future<void> main() async {
   print('   Offer Link: ${registerResponse.data['offerLink']}\n');
 
   print('4. Creating Bob\'s DID and authenticating...');
-  final (bobDidManager, bobKeyPair) = await helper
-      .createDidManagerWithKeyPair();
+  final (bobDidManager, bobKeyPair) =
+      await helper.createDidManagerWithKeyPair();
   final bobDidDoc = await bobDidManager.getDidDocument();
-  final bobToken = await helper.authenticate(
-    didManager: bobDidManager,
-    keyPair: bobKeyPair,
-  );
+  final bobToken =
+      await helper.authenticate(didManager: bobDidManager, keyPair: bobKeyPair);
   print('   Bob DID: ${bobDidDoc.id}');
   print('   Bob authenticated\n');
 

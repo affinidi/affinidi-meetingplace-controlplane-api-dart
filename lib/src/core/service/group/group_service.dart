@@ -18,7 +18,6 @@ import '../../storage/storage.dart';
 import 'delete_group_input.dart';
 import 'deregister_member_input.dart';
 import 'group_utils.dart';
-import 'notify_group_members_input.dart';
 import 'send_message_input.dart';
 
 class GroupCreationFailed implements Exception {}
@@ -174,33 +173,13 @@ class GroupService {
     );
   }
 
-  Future<GroupMember> _getGroupMemberByDid(
-    String memberDid, {
-    required String groupId,
-  }) async {
-    final groupMembers = await _storage.findAllById(
-      GroupMember.entityName,
-      groupId,
-      GroupMember.fromJson,
-    );
-
-    return groupMembers.firstWhere(
-      (groupMember) => groupMember.memberDid == memberDid,
-      orElse: () => throw GroupMemberNotInGroup(groupId: groupId),
-    );
-  }
-
   Future<void> deregisterMember(DeregisterMemberInput input) async {
     final group = await getGroup(input.groupId);
 
-    final groupMember = await _getGroupMemberByDid(
-      input.memberDid,
+    final groupMember = await getGroupMemberByControllingDid(
+      input.controllingDid,
       groupId: group.id,
     );
-
-    if (groupMember.controllingDid != input.controllingDid) {
-      throw GroupPermissionDenied();
-    }
 
     await sendMessage(
       SendMessageInput(
@@ -268,31 +247,31 @@ class GroupService {
           return Future.value();
         }
 
+        final recipientDidDoc = await _didResolver.resolveDid(
+          groupMember.memberDid,
+        );
+
+        final payload = jsonDecode(
+          utf8.decode(base64.decode(input.messagePayload)),
+        );
+
+        final messageToSend = GroupMessage.create(
+          from: group.groupDid,
+          to: [recipientDidDoc.id],
+          ciphertext: payload['ciphertext'],
+          iv: payload['iv'],
+          authenticationTag: payload['authentication_tag'],
+          preCapsule: _recryptService
+              .reEncryptCapsule(
+                payload['capsule'],
+                reencryptionKeyBase64: groupMember.memberReencryptionKey,
+              )
+              .toBase64(),
+          fromDid: sender.memberDid,
+          seqNo: group.seqNo,
+        );
+
         try {
-          final recipientDidDoc = await _didResolver.resolveDid(
-            groupMember.memberDid,
-          );
-
-          final payload = jsonDecode(
-            utf8.decode(base64.decode(input.messagePayload)),
-          );
-
-          final messageToSend = GroupMessage.create(
-            from: group.groupDid,
-            to: [recipientDidDoc.id],
-            ciphertext: payload['ciphertext'],
-            iv: payload['iv'],
-            authenticationTag: payload['authentication_tag'],
-            preCapsule: _recryptService
-                .reEncryptCapsule(
-                  payload['capsule'],
-                  reencryptionKeyBase64: groupMember.memberReencryptionKey,
-                )
-                .toBase64(),
-            fromDid: sender.memberDid,
-            seqNo: group.seqNo,
-          );
-
           await mediatorSDK.sendMessage(
             messageToSend.toPlainTextMessage(),
             senderDidManager: groupDidManager,
@@ -409,19 +388,9 @@ class GroupService {
       ),
     );
 
-    final groupMembers = await _getGroupMembers(group.id);
     group.status = GroupStatus.deleted;
     await _storage.update(group);
-    await Future.wait(
-      groupMembers.map(
-        (groupMember) => _storage.deleteFromlist(
-          GroupMember.entityName,
-          group.id,
-          GroupMember.entityName,
-          groupMember.memberDid,
-        ),
-      ),
-    );
+    await _storage.delete(GroupMember.entityName, input.groupId);
     await _groupDidManager.removeKeys(input.groupId);
   }
 
@@ -457,40 +426,5 @@ class GroupService {
     if (group.conrollingDid != controllerDid) {
       throw GroupPermissionDenied();
     }
-  }
-
-  Future<int> notifyAllGroupMembers(NotifyGroupMembersInput input) async {
-    // Validate group exists and caller is a member
-    await getGroup(input.groupId);
-    await getGroupMemberByControllingDid(
-      input.controllingDid,
-      groupId: input.groupId,
-    );
-
-    final groupMembers = await _getGroupMembers(input.groupId);
-    int notifiedCount = 0;
-
-    await Future.wait(
-      groupMembers.map((groupMember) async {
-        try {
-          await _notificationService.notifyChannelGroup(
-            type: input.type,
-            platformType: groupMember.platformType,
-            platformEndpointArn: groupMember.platformEndpointArn,
-            authDid: input.controllingDid,
-            recipientDid: groupMember.memberDid,
-          );
-          notifiedCount++;
-        } catch (e, stackTrace) {
-          _logger.error(
-            'Failed to notify group member ${groupMember.memberDid}: $e',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        }
-      }).toList(),
-    );
-
-    return notifiedCount;
   }
 }

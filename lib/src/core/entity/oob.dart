@@ -5,6 +5,7 @@ part 'oob.g.dart';
 
 @JsonSerializable()
 class Oob extends Entity {
+  @override
   factory Oob.fromJson(Map<String, dynamic> json) => _$OobFromJson(json);
 
   Oob({

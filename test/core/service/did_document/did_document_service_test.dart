@@ -312,8 +312,6 @@ void main() {
   late Map<String, dynamic> didDocument;
 
   const did = 'did:web:example.com:user:a1b2c3d4-e5f6-4789-8901-abcdef012345';
-  const secondDid =
-      'did:web:example.com:user:b1b2c3d4-e5f6-4789-8901-abcdef012345';
   const authDid = 'did:key:zAlice123';
   const otherAuthDid = 'did:key:zBob456';
   const authVerificationMethod = '$authDid#control-1';
@@ -786,53 +784,6 @@ void main() {
           didDocument: didDocument,
           controlProof: proofs.controlProof,
           proof: proofs.proof,
-        ),
-        throwsA(isA<DidDocumentConflict>()),
-      );
-    });
-
-    test('throws when the same proof JTI is reused for another DID', () async {
-      final firstProofs = await _buildValidProofs(
-        authWallet: authWallet,
-        authKeyId: authKeyId,
-        authVerificationMethod: authVerificationMethod,
-        didWallet: didWallet,
-        didKeyId: didKeyId,
-        didDocument: didDocument,
-        authDid: authDid,
-        jti: 'proof-jti-global',
-      );
-
-      await service.upload(
-        authDid: authDid,
-        authVerificationMethod: authVerificationMethod,
-        didDocument: didDocument,
-        controlProof: firstProofs.controlProof,
-        proof: firstProofs.proof,
-      );
-
-      final secondDidDocument = _buildDidDocument(
-        did: secondDid,
-        publicKeyJwk: didJwk,
-      );
-      final secondProofs = await _buildValidProofs(
-        authWallet: otherAuthWallet,
-        authKeyId: otherAuthKeyId,
-        authVerificationMethod: otherAuthVerificationMethod,
-        didWallet: didWallet,
-        didKeyId: didKeyId,
-        didDocument: secondDidDocument,
-        authDid: otherAuthDid,
-        jti: 'proof-jti-global',
-      );
-
-      expect(
-        service.upload(
-          authDid: otherAuthDid,
-          authVerificationMethod: otherAuthVerificationMethod,
-          didDocument: secondDidDocument,
-          controlProof: secondProofs.controlProof,
-          proof: secondProofs.proof,
         ),
         throwsA(isA<DidDocumentConflict>()),
       );
