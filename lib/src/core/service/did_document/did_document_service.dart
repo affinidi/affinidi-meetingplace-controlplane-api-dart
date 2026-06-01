@@ -27,11 +27,15 @@ class DidDocumentService {
     required String proofAudience,
     required String hostedDidHost,
     required Logger logger,
+    int maxProofWindowSeconds = 300,
   }) : _storage = storage,
        _proofAudience = proofAudience,
        _hostedDidHost = hostedDidHost,
        _logger = logger,
-       _proofVerifier = DidDocumentProofVerifier(didResolver: didResolver);
+       _proofVerifier = DidDocumentProofVerifier(
+         didResolver: didResolver,
+         maxProofWindowSeconds: maxProofWindowSeconds,
+       );
 
   final Storage _storage;
   final String _proofAudience;

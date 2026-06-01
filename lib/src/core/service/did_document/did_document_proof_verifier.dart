@@ -33,10 +33,14 @@ class DidDocumentVerifiedProofClaims {
 /// key) and the [proof] (signed by a key listed in the DID document itself),
 /// confirms their payloads match, and returns the verified claims.
 class DidDocumentProofVerifier {
-  DidDocumentProofVerifier({required DidResolver didResolver})
-    : _didResolver = didResolver;
+  DidDocumentProofVerifier({
+    required DidResolver didResolver,
+    int maxProofWindowSeconds = 300,
+  }) : _didResolver = didResolver,
+       _maxProofWindowSeconds = maxProofWindowSeconds;
 
   final DidResolver _didResolver;
+  final int _maxProofWindowSeconds;
 
   Future<DidDocumentVerifiedProofClaims> verify({
     required String authDid,
@@ -115,7 +119,7 @@ class DidDocumentProofVerifier {
       verificationMethod: authVerificationMethod,
       expectedPayload: expectedPayload,
       verifier: await DidVerifier.create(
-        algorithm: _signatureSchemeForJws(controlProof.jws),
+        algorithm: _JwsParser.signatureScheme(controlProof.jws),
         issuerDid: authDid,
         kid: authVerificationMethod,
         didResolver: _didResolver,
@@ -153,7 +157,7 @@ class DidDocumentProofVerifier {
       verificationMethod: proof.verificationMethod,
       expectedPayload: expectedPayload,
       verifier: await DidVerifier.create(
-        algorithm: _signatureSchemeForJws(proof.jws),
+        algorithm: _JwsParser.signatureScheme(proof.jws),
         issuerDid: documentId,
         kid: proof.verificationMethod,
         didResolver: _InlineDidResolver(didDocument),
@@ -168,7 +172,8 @@ class DidDocumentProofVerifier {
     required Map<String, dynamic> expectedPayload,
     required DidVerifier verifier,
   }) {
-    final parsedJws = _parseJws(fieldName, jws);
+    final parsedJws = _JwsParser.parse(fieldName, jws);
+    _validateProofPayload(fieldName, parsedJws.payload);
     final headerKid = parsedJws.header['kid'];
     if (headerKid is String &&
         headerKid.isNotEmpty &&
@@ -195,41 +200,6 @@ class DidDocumentProofVerifier {
     return parsedJws;
   }
 
-  _ParsedJws _parseJws(String fieldName, String jws) {
-    final parts = jws.split('.');
-    if (parts.length != 3 || parts[1].isEmpty) {
-      throw InvalidDidDocumentInput(
-        '$fieldName.jws must be a compact JWS with an embedded payload',
-      );
-    }
-    try {
-      final header = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[0]))),
-      );
-      final payload = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-      );
-      if (header is! Map<String, dynamic> || payload is! Map<String, dynamic>) {
-        throw InvalidDidDocumentInput(
-          '$fieldName.jws must contain JSON header and payload objects',
-        );
-      }
-      _validateProofPayload(fieldName, payload);
-      return _ParsedJws(
-        header: header,
-        payload: payload,
-        signingInput: Uint8List.fromList(
-          utf8.encode('${parts[0]}.${parts[1]}'),
-        ),
-        signature: Uint8List.fromList(
-          base64Url.decode(base64Url.normalize(parts[2])),
-        ),
-      );
-    } on FormatException {
-      throw InvalidDidDocumentInput('$fieldName.jws must be valid base64url');
-    }
-  }
-
   void _validateProofPayload(String fieldName, Map<String, dynamic> payload) {
     final operation = payload['operation'];
     final didDocumentId = payload['didDocumentId'];
@@ -254,33 +224,14 @@ class DidDocumentProofVerifier {
         'didDocumentHash, controlDid, aud, iat, exp, and jti',
       );
     }
+    if (exp - iat > _maxProofWindowSeconds) {
+      throw InvalidDidDocumentInput(
+        '$fieldName proof window exceeds maximum allowed duration',
+      );
+    }
     final nowEpoch = nowUtc().millisecondsSinceEpoch ~/ 1000;
     if (exp <= nowEpoch) {
       throw InvalidDidDocumentInput('$fieldName proof has expired');
-    }
-  }
-
-  SignatureScheme _signatureSchemeForJws(String jws) {
-    final parts = jws.split('.');
-    if (parts.length != 3) {
-      throw InvalidDidDocumentInput('JWS must use compact serialization');
-    }
-    try {
-      final header = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[0]))),
-      );
-      if (header is! Map<String, dynamic>) {
-        throw InvalidDidDocumentInput('JWS header must be a JSON object');
-      }
-      final alg = header['alg'];
-      if (alg is! String) {
-        throw InvalidDidDocumentInput('JWS header must contain alg');
-      }
-      return SignatureScheme.fromAlg(alg);
-    } on FormatException {
-      throw InvalidDidDocumentInput('JWS header must be valid base64url JSON');
-    } on ArgumentError {
-      throw InvalidDidDocumentInput('JWS header must contain a supported alg');
     }
   }
 
@@ -471,6 +422,75 @@ class _InlineDidResolver implements DidResolver {
 
   @override
   Future<DidDocument> resolveDid(String did) async {
+    final documentId = _didDocumentJson['id'];
+    if (documentId != did) {
+      throw InvalidDidDocumentInput(
+        'DID does not match the inline document id',
+      );
+    }
     return DidDocument.fromJson(_didDocumentJson);
+  }
+}
+
+/// Handles compact JWS structural parsing: base64url decoding, JSON decoding,
+/// and algorithm extraction. Domain-level payload validation is the caller's
+/// responsibility.
+class _JwsParser {
+  static SignatureScheme signatureScheme(String jws) {
+    final parts = jws.split('.');
+    if (parts.length != 3) {
+      throw InvalidDidDocumentInput('JWS must use compact serialization');
+    }
+    try {
+      final header = jsonDecode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[0]))),
+      );
+      if (header is! Map<String, dynamic>) {
+        throw InvalidDidDocumentInput('JWS header must be a JSON object');
+      }
+      final alg = header['alg'];
+      if (alg is! String) {
+        throw InvalidDidDocumentInput('JWS header must contain alg');
+      }
+      return SignatureScheme.fromAlg(alg);
+    } on FormatException {
+      throw InvalidDidDocumentInput('JWS header must be valid base64url JSON');
+    } on ArgumentError {
+      throw InvalidDidDocumentInput('JWS header must contain a supported alg');
+    }
+  }
+
+  static _ParsedJws parse(String fieldName, String jws) {
+    final parts = jws.split('.');
+    if (parts.length != 3 || parts[1].isEmpty) {
+      throw InvalidDidDocumentInput(
+        '$fieldName.jws must be a compact JWS with an embedded payload',
+      );
+    }
+    try {
+      final header = jsonDecode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[0]))),
+      );
+      final payload = jsonDecode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+      );
+      if (header is! Map<String, dynamic> || payload is! Map<String, dynamic>) {
+        throw InvalidDidDocumentInput(
+          '$fieldName.jws must contain JSON header and payload objects',
+        );
+      }
+      return _ParsedJws(
+        header: header,
+        payload: payload,
+        signingInput: Uint8List.fromList(
+          utf8.encode('${parts[0]}.${parts[1]}'),
+        ),
+        signature: Uint8List.fromList(
+          base64Url.decode(base64Url.normalize(parts[2])),
+        ),
+      );
+    } on FormatException {
+      throw InvalidDidDocumentInput('$fieldName.jws must be valid base64url');
+    }
   }
 }

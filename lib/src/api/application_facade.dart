@@ -129,6 +129,9 @@ class ApplicationFacade {
       proofAudience: getEnv('API_ENDPOINT'),
       hostedDidHost: _hostedDidAuthorityFromApiEndpoint(),
       logger: _logger,
+      maxProofWindowSeconds:
+          int.tryParse(getEnvOrNull('DID_PROOF_MAX_WINDOW_SECONDS') ?? '') ??
+          300,
     );
   }
 
