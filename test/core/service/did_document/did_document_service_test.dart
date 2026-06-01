@@ -264,11 +264,15 @@ _buildValidProofs({
   required String didKeyId,
   required Map<String, dynamic> didDocument,
   required String authDid,
+  int? iat,
+  int? exp,
   String jti = 'proof-jti',
 }) async {
   final payload = _proofPayload(
     didDocument: didDocument,
     authDid: authDid,
+    iat: iat,
+    exp: exp,
     jti: jti,
   );
   return (
@@ -308,6 +312,8 @@ void main() {
   late Map<String, dynamic> didDocument;
 
   const did = 'did:web:example.com:user:a1b2c3d4-e5f6-4789-8901-abcdef012345';
+  const secondDid =
+      'did:web:example.com:user:b1b2c3d4-e5f6-4789-8901-abcdef012345';
   const authDid = 'did:key:zAlice123';
   const otherAuthDid = 'did:key:zBob456';
   const authVerificationMethod = '$authDid#control-1';
@@ -723,6 +729,36 @@ void main() {
       );
     });
 
+    test(
+      'throws when proof window is too large even if exp is still future',
+      () async {
+        final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+        final proofs = await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
+          didDocument: didDocument,
+          authDid: authDid,
+          iat: nowEpoch - 86400,
+          exp: nowEpoch + 300,
+          jti: 'proof-jti-too-old',
+        );
+
+        expect(
+          service.upload(
+            authDid: authDid,
+            authVerificationMethod: authVerificationMethod,
+            didDocument: didDocument,
+            controlProof: proofs.controlProof,
+            proof: proofs.proof,
+          ),
+          throwsA(isA<InvalidDidDocumentInput>()),
+        );
+      },
+    );
+
     test('throws when the same proof JTI is replayed', () async {
       final proofs = await _buildValidProofs(
         authWallet: authWallet,
@@ -750,6 +786,53 @@ void main() {
           didDocument: didDocument,
           controlProof: proofs.controlProof,
           proof: proofs.proof,
+        ),
+        throwsA(isA<DidDocumentConflict>()),
+      );
+    });
+
+    test('throws when the same proof JTI is reused for another DID', () async {
+      final firstProofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+        jti: 'proof-jti-global',
+      );
+
+      await service.upload(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+        controlProof: firstProofs.controlProof,
+        proof: firstProofs.proof,
+      );
+
+      final secondDidDocument = _buildDidDocument(
+        did: secondDid,
+        publicKeyJwk: didJwk,
+      );
+      final secondProofs = await _buildValidProofs(
+        authWallet: otherAuthWallet,
+        authKeyId: otherAuthKeyId,
+        authVerificationMethod: otherAuthVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: secondDidDocument,
+        authDid: otherAuthDid,
+        jti: 'proof-jti-global',
+      );
+
+      expect(
+        service.upload(
+          authDid: otherAuthDid,
+          authVerificationMethod: otherAuthVerificationMethod,
+          didDocument: secondDidDocument,
+          controlProof: secondProofs.controlProof,
+          proof: secondProofs.proof,
         ),
         throwsA(isA<DidDocumentConflict>()),
       );

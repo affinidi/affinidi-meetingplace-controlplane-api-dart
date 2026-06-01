@@ -8,7 +8,6 @@ import 'response_model.dart';
 import '../application_facade.dart';
 import '../../core/config/config.dart';
 import '../../core/service/auth/auth_response.dart';
-import '../../core/service/auth/didcomm_auth.dart';
 import '../../utils/date_time.dart';
 
 Future<Response> authAuthenticate(
@@ -22,30 +21,19 @@ Future<Response> authAuthenticate(
 
     final authorizer = await DIDCommAuthBuilder(
       logger: facade.config.logger,
+      storage: facade.config.storage,
     ).build();
 
-    final AuthenticationResponse authResponse = await authorizer
-        .unpackChallengeResponse(requestParams.challengeResponse);
-
-    if (authResponse.type != AuthenticationResponseType.didcommChallengeOk) {
-      return Response.badRequest(
-        body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
-          authResponse.type.name,
-        ).toString(),
+    late final AuthenticationResponse authResponse;
+    try {
+      authResponse = await authorizer.authenticateChallengeResponseWithDetails(
+        challengeResponse: requestParams.challengeResponse,
+        purpose: ChallengePurpose.authenticate,
       );
-    }
-
-    final VerifyAuthChallengeResult verifyResult = authorizer
-        .verifyAuthChallengeToken(
-          authResponse.did,
-          authResponse.challenge,
-          ChallengePurpose.authenticate,
-        );
-
-    if (verifyResult.status != JWTStatus.valid) {
+    } on ChallengeAuthException catch (e) {
       return Response.badRequest(
         body: AuthAuthenticateErrorResponse.invalidChallengeResponse(
-          verifyResult.status.name,
+          e.reason,
         ).toString(),
       );
     }

@@ -110,10 +110,11 @@ class DIDCommAuth {
     return authClient.unpackChallengeResponse(challengeResponse);
   }
 
-  /// Validates a DIDComm challenge response end-to-end and returns the
-  /// authenticated DID. Throws [ChallengeAuthException] on any failure.
+  /// Validates a DIDComm challenge response end-to-end, consumes its one-time
+  /// challenge token, and returns the authenticated response details.
+  /// Throws [ChallengeAuthException] on any failure.
   /// [purpose] must match the purpose claim embedded in the challenge token.
-  Future<String> authenticateChallengeResponse({
+  Future<AuthenticationResponse> authenticateChallengeResponseWithDetails({
     required String challengeResponse,
     required ChallengePurpose purpose,
   }) async {
@@ -158,6 +159,20 @@ class DIDCommAuth {
       throw ChallengeAuthException('challengeAlreadyUsed');
     }
 
+    return authResponse;
+  }
+
+  /// Validates a DIDComm challenge response end-to-end and returns the
+  /// authenticated DID. Throws [ChallengeAuthException] on any failure.
+  /// [purpose] must match the purpose claim embedded in the challenge token.
+  Future<String> authenticateChallengeResponse({
+    required String challengeResponse,
+    required ChallengePurpose purpose,
+  }) async {
+    final authResponse = await authenticateChallengeResponseWithDetails(
+      challengeResponse: challengeResponse,
+      purpose: purpose,
+    );
     return authResponse.did;
   }
 
