@@ -78,7 +78,6 @@ void main() {
             signer: signerIdentity.signer,
             recipientDidDocument: recipient.didDocument,
           ),
-          'unused',
         );
 
         expect(

@@ -105,13 +105,9 @@ class DIDCommAuth {
 
   Future<AuthenticationResponse> unpackChallengeResponse(
     String challengeResponse,
-    String didResolverUrl,
   ) async {
     final authClient = AuthClient(privateJwks: _jwk);
-    return authClient.unpackChallengeResponse(
-      challengeResponse,
-      didResolverUrl,
-    );
+    return authClient.unpackChallengeResponse(challengeResponse);
   }
 
   /// Validates a DIDComm challenge response end-to-end and returns the
@@ -119,7 +115,6 @@ class DIDCommAuth {
   /// [purpose] must match the purpose claim embedded in the challenge token.
   Future<String> authenticateChallengeResponse({
     required String challengeResponse,
-    required String didResolverUrl,
     required ChallengePurpose purpose,
   }) async {
     if (_storage == null) {
@@ -129,10 +124,7 @@ class DIDCommAuth {
     final AuthenticationResponse authResponse;
 
     try {
-      authResponse = await unpackChallengeResponse(
-        challengeResponse,
-        didResolverUrl,
-      );
+      authResponse = await unpackChallengeResponse(challengeResponse);
     } catch (e, stackTrace) {
       _logger.error(e.toString(), error: e, stackTrace: stackTrace);
       throw ChallengeAuthException(

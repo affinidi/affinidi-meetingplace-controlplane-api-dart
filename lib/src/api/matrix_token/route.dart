@@ -7,7 +7,6 @@ import 'request_model.dart';
 import '../application_facade.dart';
 import 'package:shelf/shelf.dart';
 
-import '../../core/config/config.dart';
 import '../../core/service/auth/auth_response.dart';
 import '../../core/service/auth/didcomm_auth_builder.dart';
 import 'response_model.dart';
@@ -27,7 +26,6 @@ Future<Response> matrixToken(Request request, ApplicationFacade facade) async {
     try {
       authDid = await authorizer.authenticateChallengeResponse(
         challengeResponse: matrixTokenRequest.challengeResponse,
-        didResolverUrl: Config().get('auth')['didResolverUrl'],
         purpose: ChallengePurpose.matrixToken,
       );
     } on ChallengeAuthException {

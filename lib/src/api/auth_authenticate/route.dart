@@ -25,10 +25,7 @@ Future<Response> authAuthenticate(
     ).build();
 
     final AuthenticationResponse authResponse = await authorizer
-        .unpackChallengeResponse(
-          requestParams.challengeResponse,
-          Config().get('auth')['didResolverUrl'],
-        );
+        .unpackChallengeResponse(requestParams.challengeResponse);
 
     if (authResponse.type != AuthenticationResponseType.didcommChallengeOk) {
       return Response.badRequest(

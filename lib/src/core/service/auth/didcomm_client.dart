@@ -19,14 +19,12 @@ class AuthClient {
 
   Future<AuthenticationResponse> unpackChallengeResponse(
     String authChallengeResponse,
-    String didResolverUrl,
   ) async {
     late _VerifiedChallengeResponse challengeResponse;
 
     try {
       challengeResponse = await _unpackDidCommMessageFromBase64(
         authChallengeResponse,
-        didResolverUrl,
       );
     } catch (e) {
       return AuthenticationResponse.asInvalidChallengeResponse();
@@ -50,16 +48,14 @@ class AuthClient {
 
   Future<_VerifiedChallengeResponse> _unpackDidCommMessageFromBase64(
     String base64Data,
-    String didResolverUrl,
   ) async {
     Base64Codec base64 = const Base64Codec();
     String data = base64.normalize(base64Data);
-    return await _unpack(utf8.decode(base64Url.decode(data)), didResolverUrl);
+    return await _unpack(utf8.decode(base64Url.decode(data)));
   }
 
   Future<_VerifiedChallengeResponse> _unpack(
     String encryptedMessageAsString,
-    String didResolverUrl,
   ) async {
     final encrypted = EncryptedMessage.fromJson(
       jsonDecode(encryptedMessageAsString),
@@ -111,18 +107,6 @@ class AuthClient {
     // Add padding if needed
     String normalized = base64Url.normalize(input);
     return base64Url.decode(normalized);
-  }
-
-  String addBase64Padding(String base64String) {
-    // Calculate padding needed
-    int remainder = base64String.length % 4;
-
-    if (remainder > 0) {
-      int paddingLength = 4 - remainder;
-      base64String += '=' * paddingLength;
-    }
-
-    return base64String;
   }
 }
 
