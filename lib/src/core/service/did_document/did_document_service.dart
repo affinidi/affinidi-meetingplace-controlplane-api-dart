@@ -1,7 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:crypto/crypto.dart';
 import 'package:ssi/ssi.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,13 +9,11 @@ import '../../entity/did_document_segment_record.dart';
 import '../../logger/logger.dart';
 import '../../storage/exception/already_exists_exception.dart';
 import '../../storage/storage.dart';
+import 'did_document_proof_verifier.dart';
+
+export 'did_document_proof_verifier.dart' show InvalidDidDocumentInput;
 
 class DidDocumentNotFound implements Exception {}
-
-class InvalidDidDocumentInput implements Exception {
-  InvalidDidDocumentInput(this.message);
-  final String message;
-}
 
 class DidDocumentConflict implements Exception {
   DidDocumentConflict(this.message);
@@ -34,16 +28,16 @@ class DidDocumentService {
     required String hostedDidHost,
     required Logger logger,
   }) : _storage = storage,
-       _didResolver = didResolver,
        _proofAudience = proofAudience,
        _hostedDidHost = hostedDidHost,
-       _logger = logger;
+       _logger = logger,
+       _proofVerifier = DidDocumentProofVerifier(didResolver: didResolver);
 
   final Storage _storage;
-  final DidResolver _didResolver;
   final String _proofAudience;
   final String _hostedDidHost;
   final Logger _logger;
+  final DidDocumentProofVerifier _proofVerifier;
 
   Future<DidDocumentRecord> upload({
     required String authDid,
@@ -53,34 +47,17 @@ class DidDocumentService {
     required Map<String, dynamic> proof,
   }) async {
     final did = _extractAndValidateDid(didDocument);
-    final parsedControlProof = _DidDocumentProof.fromJson(
-      controlProof,
-      fieldName: 'controlProof',
-    );
-    final parsedProof = _DidDocumentProof.fromJson(proof, fieldName: 'proof');
-    final proofPayload = _buildExpectedProofPayloadFields(
+    final verifiedClaims = await _proofVerifier.verify(
       authDid: authDid,
+      authVerificationMethod: authVerificationMethod,
       didDocument: didDocument,
-    );
-    final parsedControlJws = await _verifyControlProof(
-      authDid,
-      authVerificationMethod,
-      parsedControlProof,
-      proofPayload,
-    );
-    final parsedDidDocumentJws = await _verifyDidDocumentProof(
-      didDocument,
-      parsedProof,
-      proofPayload,
-    );
-    final sharedClaims = _validateSharedProofClaims(
-      parsedControlJws,
-      parsedDidDocumentJws,
+      controlProofJson: controlProof,
+      proofJson: proof,
+      proofAudience: _proofAudience,
     );
     final reservedJti = await _reserveJti(
       did: did,
-      claims: sharedClaims,
-      proofPurpose: parsedProof.proofPurpose,
+      verifiedClaims: verifiedClaims,
     );
 
     var accepted = false;
@@ -115,272 +92,6 @@ class DidDocumentService {
     );
     if (record == null) throw DidDocumentNotFound();
     return record.didDocument;
-  }
-
-  Future<_ParsedJws> _verifyControlProof(
-    String authDid,
-    String authVerificationMethod,
-    _DidDocumentProof controlProof,
-    Map<String, dynamic> expectedPayload,
-  ) async {
-    if (authVerificationMethod.isEmpty) {
-      throw InvalidDidDocumentInput(
-        'Authenticated verification method is required',
-      );
-    }
-    if (controlProof.verificationMethod != authVerificationMethod) {
-      throw InvalidDidDocumentInput(
-        'controlProof verificationMethod must match the authenticated key',
-      );
-    }
-    final authDidDocument = await _didResolver.resolveDid(authDid);
-    if (!_containsResolvedVerificationMethod(
-      authDidDocument,
-      authVerificationMethod,
-    )) {
-      throw InvalidDidDocumentInput(
-        'controlProof verificationMethod not found on authenticated DID',
-      );
-    }
-    return _verifyProofJws(
-      fieldName: 'controlProof',
-      jws: controlProof.jws,
-      verificationMethod: authVerificationMethod,
-      expectedPayload: expectedPayload,
-      verifier: await DidVerifier.create(
-        algorithm: _signatureSchemeForJws(controlProof.jws),
-        issuerDid: authDid,
-        kid: authVerificationMethod,
-        didResolver: _didResolver,
-      ),
-    );
-  }
-
-  Future<_ParsedJws> _verifyDidDocumentProof(
-    Map<String, dynamic> didDocument,
-    _DidDocumentProof proof,
-    Map<String, dynamic> expectedPayload,
-  ) async {
-    if (!_isAuthenticationMethod(didDocument, proof.verificationMethod)) {
-      throw InvalidDidDocumentInput(
-        'proof verificationMethod must be listed in didDocument.authentication',
-      );
-    }
-    if (!_containsDidDocumentVerificationMethod(
-      didDocument,
-      proof.verificationMethod,
-    )) {
-      throw InvalidDidDocumentInput(
-        'proof verificationMethod not found in didDocument',
-      );
-    }
-    return _verifyProofJws(
-      fieldName: 'proof',
-      jws: proof.jws,
-      verificationMethod: proof.verificationMethod,
-      expectedPayload: expectedPayload,
-      verifier: await DidVerifier.create(
-        algorithm: _signatureSchemeForJws(proof.jws),
-        issuerDid: didDocument['id'] as String,
-        kid: proof.verificationMethod,
-        didResolver: _InlineDidResolver(didDocument),
-      ),
-    );
-  }
-
-  bool _containsResolvedVerificationMethod(
-    DidDocument didDocument,
-    String verificationMethodId,
-  ) {
-    for (final verificationMethod in didDocument.verificationMethod) {
-      if (verificationMethod.id == verificationMethodId) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool _containsDidDocumentVerificationMethod(
-    Map<String, dynamic> didDocument,
-    String verificationMethodId,
-  ) {
-    final rawMethods = didDocument['verificationMethod'];
-    if (rawMethods is! List) {
-      throw InvalidDidDocumentInput('DID Document has no verification methods');
-    }
-    for (final rawMethod in rawMethods) {
-      if (rawMethod is! Map<String, dynamic>) {
-        continue;
-      }
-      if (rawMethod['id'] == verificationMethodId) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  Future<_ParsedJws> _verifyProofJws({
-    required String fieldName,
-    required String jws,
-    required String verificationMethod,
-    required Map<String, dynamic> expectedPayload,
-    required DidVerifier verifier,
-  }) async {
-    final parsedJws = _parseJws(fieldName, jws);
-    final headerKid = parsedJws.header['kid'];
-    if (headerKid is String &&
-        headerKid.isNotEmpty &&
-        headerKid != verificationMethod) {
-      throw InvalidDidDocumentInput(
-        '$fieldName JWS kid must match $verificationMethod',
-      );
-    }
-    final expectedPayloadWithClaims = {
-      ...expectedPayload,
-      'iat': parsedJws.payload['iat'],
-      'exp': parsedJws.payload['exp'],
-      'jti': parsedJws.payload['jti'],
-    };
-    if (jcsSerializer.serialize(parsedJws.payload) !=
-        jcsSerializer.serialize(expectedPayloadWithClaims)) {
-      throw InvalidDidDocumentInput(
-        '$fieldName payload does not match the upload request',
-      );
-    }
-    if (!verifier.verify(parsedJws.signingInput, parsedJws.signature)) {
-      throw InvalidDidDocumentInput('$fieldName JWS verification failed');
-    }
-    return parsedJws;
-  }
-
-  _ParsedJws _parseJws(String fieldName, String jws) {
-    final parts = jws.split('.');
-    if (parts.length != 3 || parts[1].isEmpty) {
-      throw InvalidDidDocumentInput(
-        '$fieldName.jws must be a compact JWS with an embedded payload',
-      );
-    }
-    try {
-      final header = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[0]))),
-      );
-      final payload = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-      );
-      if (header is! Map<String, dynamic> || payload is! Map<String, dynamic>) {
-        throw InvalidDidDocumentInput(
-          '$fieldName.jws must contain JSON header and payload objects',
-        );
-      }
-      _validateProofPayload(fieldName, payload);
-      return _ParsedJws(
-        header: header,
-        payload: payload,
-        signingInput: Uint8List.fromList(
-          utf8.encode('${parts[0]}.${parts[1]}'),
-        ),
-        signature: Uint8List.fromList(
-          base64Url.decode(base64Url.normalize(parts[2])),
-        ),
-      );
-    } on FormatException {
-      throw InvalidDidDocumentInput('$fieldName.jws must be valid base64url');
-    }
-  }
-
-  void _validateProofPayload(String fieldName, Map<String, dynamic> payload) {
-    final operation = payload['operation'];
-    final didDocumentId = payload['didDocumentId'];
-    final didDocumentHash = payload['didDocumentHash'];
-    final controlDid = payload['controlDid'];
-    final aud = payload['aud'];
-    final iat = payload['iat'];
-    final exp = payload['exp'];
-    final jti = payload['jti'];
-    if (operation is! String ||
-        didDocumentId is! String ||
-        didDocumentHash is! String ||
-        controlDid is! String ||
-        aud is! String ||
-        iat is! int ||
-        exp is! int ||
-        jti is! String ||
-        jti.isEmpty ||
-        exp <= iat) {
-      throw InvalidDidDocumentInput(
-        '$fieldName payload must contain operation, didDocumentId, '
-        'didDocumentHash, controlDid, aud, iat, exp, and jti',
-      );
-    }
-    final nowEpoch = nowUtc().millisecondsSinceEpoch ~/ 1000;
-    if (exp <= nowEpoch) {
-      throw InvalidDidDocumentInput('$fieldName proof has expired');
-    }
-  }
-
-  SignatureScheme _signatureSchemeForJws(String jws) {
-    final parts = jws.split('.');
-    if (parts.length != 3) {
-      throw InvalidDidDocumentInput('JWS must use compact serialization');
-    }
-    try {
-      final header = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[0]))),
-      );
-      if (header is! Map<String, dynamic>) {
-        throw InvalidDidDocumentInput('JWS header must be a JSON object');
-      }
-      final alg = header['alg'];
-      if (alg is! String) {
-        throw InvalidDidDocumentInput('JWS header must contain alg');
-      }
-      return SignatureScheme.fromAlg(alg);
-    } on FormatException {
-      throw InvalidDidDocumentInput('JWS header must be valid base64url JSON');
-    } on ArgumentError {
-      throw InvalidDidDocumentInput('JWS header must contain a supported alg');
-    }
-  }
-
-  Map<String, dynamic> _buildExpectedProofPayloadFields({
-    required String authDid,
-    required Map<String, dynamic> didDocument,
-  }) {
-    final canonicalDidDocument = jcsSerializer.serializeObjectToUtf8(
-      didDocument,
-    );
-    final didDocumentHash = base64Url
-        .encode(sha256.convert(canonicalDidDocument).bytes)
-        .replaceAll('=', '');
-    return {
-      'operation': 'did-document/upload',
-      'didDocumentId': didDocument['id'],
-      'didDocumentHash': didDocumentHash,
-      'controlDid': authDid,
-      'aud': _proofAudience,
-    };
-  }
-
-  bool _isAuthenticationMethod(
-    Map<String, dynamic> didDocument,
-    String verificationMethodId,
-  ) {
-    final authentication = didDocument['authentication'];
-    if (authentication is! List) {
-      throw InvalidDidDocumentInput(
-        'DID Document authentication must be a list',
-      );
-    }
-    for (final entry in authentication) {
-      if (entry == verificationMethodId) {
-        return true;
-      }
-      if (entry is Map<String, dynamic> &&
-          entry['id'] == verificationMethodId) {
-        return true;
-      }
-    }
-    return false;
   }
 
   Future<DidDocumentRecord> _storeDidDocument({
@@ -547,34 +258,19 @@ class DidDocumentService {
     return segment;
   }
 
-  _DidDocumentProofClaims _validateSharedProofClaims(
-    _ParsedJws controlProof,
-    _ParsedJws didDocumentProof,
-  ) {
-    if (jcsSerializer.serialize(controlProof.payload) !=
-        jcsSerializer.serialize(didDocumentProof.payload)) {
-      throw InvalidDidDocumentInput(
-        'controlProof and proof must use the same proof payload',
-      );
-    }
-
-    return _DidDocumentProofClaims.fromPayload(controlProof.payload);
-  }
-
   Future<DidDocumentJtiRecord> _reserveJti({
     required String did,
-    required _DidDocumentProofClaims claims,
-    required String proofPurpose,
+    required DidDocumentVerifiedProofClaims verifiedClaims,
   }) async {
     final record = DidDocumentJtiRecord(
       did: did,
-      jti: claims.jti,
+      jti: verifiedClaims.jti,
       expiresAt: DateTime.fromMillisecondsSinceEpoch(
-        claims.exp * 1000,
+        verifiedClaims.exp * 1000,
         isUtc: true,
       ),
-      proofPurpose: proofPurpose,
-      operation: claims.operation,
+      proofPurpose: verifiedClaims.proofPurpose,
+      operation: verifiedClaims.operation,
     );
 
     final existing = await _storage.findOneById<DidDocumentJtiRecord>(
@@ -600,110 +296,5 @@ class DidDocumentService {
 
   Future<void> _releaseReservedJti(DidDocumentJtiRecord record) {
     return _storage.delete(DidDocumentJtiRecord.entityName, record.getId());
-  }
-}
-
-class _DidDocumentProof {
-  _DidDocumentProof({
-    required this.type,
-    required this.created,
-    required this.verificationMethod,
-    required this.proofPurpose,
-    required this.jws,
-  });
-
-  factory _DidDocumentProof.fromJson(
-    Map<String, dynamic> json, {
-    required String fieldName,
-  }) {
-    final type = json['type'];
-    final created = json['created'];
-    final verificationMethod = json['verificationMethod'];
-    final proofPurpose = json['proofPurpose'];
-    final jws = json['jws'];
-    if (type is! String ||
-        created is! String ||
-        verificationMethod is! String ||
-        proofPurpose is! String ||
-        jws is! String) {
-      throw InvalidDidDocumentInput(
-        '$fieldName must contain type, created, verificationMethod, '
-        'proofPurpose, and jws',
-      );
-    }
-    if (DateTime.tryParse(created) == null) {
-      throw InvalidDidDocumentInput('$fieldName.created must be ISO-8601');
-    }
-    if (type != 'JsonWebSignature2020') {
-      throw InvalidDidDocumentInput(
-        '$fieldName.type must be JsonWebSignature2020',
-      );
-    }
-    if (proofPurpose != 'authentication') {
-      throw InvalidDidDocumentInput(
-        '$fieldName.proofPurpose must be authentication',
-      );
-    }
-    return _DidDocumentProof(
-      type: type,
-      created: created,
-      verificationMethod: verificationMethod,
-      proofPurpose: proofPurpose,
-      jws: jws,
-    );
-  }
-
-  final String type;
-  final String created;
-  final String verificationMethod;
-  final String proofPurpose;
-  final String jws;
-}
-
-class _ParsedJws {
-  _ParsedJws({
-    required this.header,
-    required this.payload,
-    required this.signingInput,
-    required this.signature,
-  });
-
-  final Map<String, dynamic> header;
-  final Map<String, dynamic> payload;
-  final Uint8List signingInput;
-  final Uint8List signature;
-}
-
-class _DidDocumentProofClaims {
-  _DidDocumentProofClaims({
-    required this.operation,
-    required this.iat,
-    required this.exp,
-    required this.jti,
-  });
-
-  factory _DidDocumentProofClaims.fromPayload(Map<String, dynamic> payload) {
-    return _DidDocumentProofClaims(
-      operation: payload['operation'] as String,
-      iat: payload['iat'] as int,
-      exp: payload['exp'] as int,
-      jti: payload['jti'] as String,
-    );
-  }
-
-  final String operation;
-  final int iat;
-  final int exp;
-  final String jti;
-}
-
-class _InlineDidResolver implements DidResolver {
-  _InlineDidResolver(this._didDocumentJson);
-
-  final Map<String, dynamic> _didDocumentJson;
-
-  @override
-  Future<DidDocument> resolveDid(String did) async {
-    return DidDocument.fromJson(_didDocumentJson);
   }
 }

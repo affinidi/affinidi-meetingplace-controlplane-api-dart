@@ -32,7 +32,6 @@ import '../api/notify_acceptance_group/route.dart';
 import '../api/notify_outreach/route.dart';
 import '../api/register_device/route.dart';
 import '../api/register_offer_group/route.dart';
-import '../api/matrix_registration_credential/route.dart';
 import '../core/web_manager/did_document_manager.dart';
 import '../api/finalise_acceptance/route.dart';
 import '../api/auth_authenticate/route.dart';
@@ -77,11 +76,6 @@ Router createRouter(ApplicationFacade facade) {
     })
     ..get('/asset/<imageName>', _assertImageHandler)
     ..get('/discover', publicPipeline(discoverApi, facade))
-    // DID-based Matrix registration authorization
-    ..post(
-      '/api/did/matrix-registration-credential',
-      privatePipeline(matrixRegistrationCredential, facade),
-    )
     // authentication routes
     ..post('/v1/authenticate', publicPipeline(authAuthenticate, facade))
     ..post('/v1/authenticate/challenge', publicPipeline(authChallenge, facade))

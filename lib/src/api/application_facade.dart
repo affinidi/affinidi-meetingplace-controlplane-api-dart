@@ -66,8 +66,6 @@ import '../core/service/notification/notification_service.dart'
 import '../core/service/offer/register_offer_input.dart';
 import '../core/service/oob/create_oob_input.dart';
 import '../core/service/oob/oob_service.dart';
-import '../core/service/auth/didcomm_auth.dart';
-import '../core/service/auth/didcomm_auth_builder.dart';
 import 'update_offers_score/response_error_model.dart';
 import 'update_offers_score/response_model.dart';
 import 'update_offers_score/update_offers_score_result.dart';
@@ -695,9 +693,6 @@ class ApplicationFacade {
     required Object error,
     required StackTrace stackTrace,
   }) => _logger.error(message, error: error, stackTrace: stackTrace);
-
-  Future<DIDCommAuth> buildDidCommAuthorizer() =>
-      DIDCommAuthBuilder(logger: _logger).build();
 
   Future<Map<String, dynamic>> uploadDidDocument({
     required String authDid,
