@@ -828,39 +828,43 @@ void main() {
       },
     );
 
-    test('accepts embedded authentication verification methods', () async {
-      final didWithEmbeddedAuth = {
-        ...didDocument,
-        'authentication': [
-          {
-            'id': '$did#key-1',
-            'type': 'JsonWebKey2020',
-            'controller': did,
-            'publicKeyJwk': didJwk,
-          },
-        ],
-      };
-      final proofs = await _buildValidProofs(
-        authWallet: authWallet,
-        authKeyId: authKeyId,
-        authVerificationMethod: authVerificationMethod,
-        didWallet: didWallet,
-        didKeyId: didKeyId,
-        didDocument: didWithEmbeddedAuth,
-        authDid: authDid,
-        jti: 'proof-jti-embedded-auth',
-      );
+    test(
+      'accepts embedded authentication verification methods without a top-level verificationMethod',
+      () async {
+        final didWithEmbeddedAuth = {
+          '@context': didDocument['@context'],
+          'id': did,
+          'authentication': [
+            {
+              'id': '$did#key-1',
+              'type': 'JsonWebKey2020',
+              'controller': did,
+              'publicKeyJwk': didJwk,
+            },
+          ],
+        };
+        final proofs = await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
+          didDocument: didWithEmbeddedAuth,
+          authDid: authDid,
+          jti: 'proof-jti-embedded-auth',
+        );
 
-      final record = await service.upload(
-        authDid: authDid,
-        authVerificationMethod: authVerificationMethod,
-        didDocument: didWithEmbeddedAuth,
-        controlProof: proofs.controlProof,
-        proof: proofs.proof,
-      );
+        final record = await service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didWithEmbeddedAuth,
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
+        );
 
-      expect(record.did, did);
-    });
+        expect(record.did, did);
+      },
+    );
 
     test('accepts did:web hosts with encoded ports', () async {
       const didWithPort =

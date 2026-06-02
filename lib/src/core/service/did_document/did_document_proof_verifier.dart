@@ -160,7 +160,9 @@ class DidDocumentProofVerifier {
         algorithm: _JwsParser.signatureScheme(proof.jws),
         issuerDid: documentId,
         kid: proof.verificationMethod,
-        didResolver: _InlineDidResolver(didDocument),
+        didResolver: _InlineDidResolver(
+          _normalizeDidDocumentForInlineResolution(didDocument),
+        ),
       ),
     );
   }
@@ -324,6 +326,48 @@ class DidDocumentProofVerifier {
     }
 
     return false;
+  }
+
+  Map<String, dynamic> _normalizeDidDocumentForInlineResolution(
+    Map<String, dynamic> didDocument,
+  ) {
+    final normalizedDidDocument = Map<String, dynamic>.from(didDocument);
+    final mergedVerificationMethods = <Map<String, dynamic>>[];
+    final seenVerificationMethodIds = <String>{};
+
+    void addVerificationMethod(dynamic candidate) {
+      if (candidate is! Map) {
+        return;
+      }
+
+      final method = Map<String, dynamic>.from(candidate);
+      final id = method['id'];
+      if (id is! String || id.isEmpty || !seenVerificationMethodIds.add(id)) {
+        return;
+      }
+
+      mergedVerificationMethods.add(method);
+    }
+
+    final rawMethods = didDocument['verificationMethod'];
+    if (rawMethods is List) {
+      for (final rawMethod in rawMethods) {
+        addVerificationMethod(rawMethod);
+      }
+    }
+
+    final authentication = didDocument['authentication'];
+    if (authentication is List) {
+      for (final entry in authentication) {
+        addVerificationMethod(entry);
+      }
+    }
+
+    if (mergedVerificationMethods.isNotEmpty) {
+      normalizedDidDocument['verificationMethod'] = mergedVerificationMethods;
+    }
+
+    return normalizedDidDocument;
   }
 
   _DidDocumentProofClaims _validateSharedProofClaims(

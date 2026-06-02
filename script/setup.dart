@@ -36,9 +36,6 @@ void main() async {
   final ed25519Jwk = await generateEd25519Jwk();
   final jwks = <Map<String, dynamic>>[p256Jwk, secp256k1Jwk, ed25519Jwk];
 
-  stdout.writeln('P-256 public key (PEM):');
-  stdout.writeln(ecPublicKeyPemFromFile('./keys/p256.pem', 'prime256v1'));
-
   final privateJwks = createPrivateJwks(jwks, didWeb);
   final publicJwks = createPublicJwks(jwks, didWeb);
 
@@ -205,15 +202,6 @@ List<int> _encodeBigIntPadded(BigInt number, int length) {
 
 String base64url(BigInt val) =>
     base64UrlEncode(_stripLeadingZero(_encodeBigIntUnsigned(val)));
-
-String ecPublicKeyPemFromFile(String pemPath, String domainParam) {
-  final ecPrivateKey = CryptoUtils.ecPrivateKeyFromPem(
-    File(pemPath).readAsStringSync(),
-  );
-  final params = ECDomainParameters(domainParam);
-  final Q = params.G * ecPrivateKey.d;
-  return CryptoUtils.encodeEcPublicKeyToPem(ECPublicKey(Q, params));
-}
 
 Future<Map<String, dynamic>> generateEd25519Jwk({
   bool includePrivate = true,
