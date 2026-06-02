@@ -15,7 +15,7 @@ class DidDocumentRecord extends Entity {
       did: json['did'] as String,
       createdBy: json['createdBy'] as String,
       createdByVerificationMethod:
-          json['createdByVerificationMethod'] as String? ?? '',
+          json['createdByVerificationMethod'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       didDocument: Map<String, dynamic>.from(

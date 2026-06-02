@@ -31,7 +31,7 @@ class DidDocumentJtiRecord extends Entity {
   String getEntityName() => entityName;
 
   @override
-  String getId() => '$did::$jti';
+  String getId() => jti;
 
   @override
   Map<String, dynamic> toJson() {

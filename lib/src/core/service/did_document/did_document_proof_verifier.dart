@@ -233,6 +233,9 @@ class DidDocumentProofVerifier {
     if (exp <= nowEpoch) {
       throw InvalidDidDocumentInput('$fieldName proof has expired');
     }
+    if (iat > nowEpoch) {
+      throw InvalidDidDocumentInput('$fieldName proof iat is in the future');
+    }
   }
 
   static const String _uploadOperation = 'did-document/upload';
@@ -296,17 +299,30 @@ class DidDocumentProofVerifier {
     String verificationMethodId,
   ) {
     final rawMethods = didDocument['verificationMethod'];
-    if (rawMethods is! List) {
+    if (rawMethods is List) {
+      for (final rawMethod in rawMethods) {
+        if (rawMethod is Map<String, dynamic> &&
+            rawMethod['id'] == verificationMethodId) {
+          return true;
+        }
+      }
+    }
+
+    // Also accept verification methods embedded directly in authentication.
+    final authentication = didDocument['authentication'];
+    if (authentication is List) {
+      for (final entry in authentication) {
+        if (entry is Map<String, dynamic> &&
+            entry['id'] == verificationMethodId) {
+          return true;
+        }
+      }
+    }
+
+    if (rawMethods is! List && authentication is! List) {
       throw InvalidDidDocumentInput('DID Document has no verification methods');
     }
-    for (final rawMethod in rawMethods) {
-      if (rawMethod is! Map<String, dynamic>) {
-        continue;
-      }
-      if (rawMethod['id'] == verificationMethodId) {
-        return true;
-      }
-    }
+
     return false;
   }
 
