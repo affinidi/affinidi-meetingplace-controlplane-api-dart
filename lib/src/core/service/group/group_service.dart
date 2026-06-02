@@ -18,7 +18,6 @@ import '../../storage/storage.dart';
 import 'delete_group_input.dart';
 import 'deregister_member_input.dart';
 import 'group_utils.dart';
-import 'notify_group_members_input.dart';
 import 'send_message_input.dart';
 
 class GroupCreationFailed implements Exception {}
@@ -460,40 +459,5 @@ class GroupService {
     if (group.conrollingDid != controllerDid) {
       throw GroupPermissionDenied();
     }
-  }
-
-  Future<int> notifyAllGroupMembers(NotifyGroupMembersInput input) async {
-    // Validate group exists and caller is a member
-    await getGroup(input.groupId);
-    await getGroupMemberByControllingDid(
-      input.controllingDid,
-      groupId: input.groupId,
-    );
-
-    final groupMembers = await _getGroupMembers(input.groupId);
-    int notifiedCount = 0;
-
-    await Future.wait(
-      groupMembers.map((groupMember) async {
-        try {
-          await _notificationService.notifyChannelGroup(
-            type: input.type,
-            platformType: groupMember.platformType,
-            platformEndpointArn: groupMember.platformEndpointArn,
-            authDid: input.controllingDid,
-            recipientDid: groupMember.memberDid,
-          );
-          notifiedCount++;
-        } catch (e, stackTrace) {
-          _logger.error(
-            'Failed to notify group member ${groupMember.memberDid}: $e',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        }
-      }).toList(),
-    );
-
-    return notifiedCount;
   }
 }

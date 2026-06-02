@@ -34,7 +34,6 @@ import 'group_send_message/request_model.dart';
 import 'notify_acceptance/request_model.dart';
 import 'notify_acceptance_group/request_model.dart';
 import 'notify_channel/request_model.dart';
-import 'notify_channel_group/request_model.dart';
 import 'notify_outreach/request_model.dart';
 import 'query_offer/request_model.dart';
 import 'register_device/request_model.dart';
@@ -50,7 +49,6 @@ import '../core/service/device_mapping/register_device_input.dart';
 import '../core/service/group/add_group_member_input.dart';
 import '../core/service/group/create_group_input.dart';
 import '../core/service/group/group_service.dart';
-import '../core/service/group/notify_group_members_input.dart';
 import '../core/service/notification/create_notification_channel_input.dart';
 import '../core/service/notification/notify_acceptance_input.dart';
 import '../core/service/notification/notify_channel_input.dart';
@@ -582,19 +580,6 @@ class ApplicationFacade {
       groupDid: request.groupDid,
       controllingDid: authDid,
       type: request.type,
-    );
-  }
-
-  Future<int> notifyAllGroupMembers(
-    NotifyChannelGroupRequest request,
-    String authDid,
-  ) async {
-    return _groupService.notifyAllGroupMembers(
-      NotifyGroupMembersInput(
-        groupId: request.groupId,
-        type: request.type,
-        controllingDid: authDid,
-      ),
     );
   }
 
