@@ -67,6 +67,12 @@ Future<Response> didDocumentUpload(
       error: e,
       stackTrace: stackTrace,
     );
-    return Response.internalServerError(body: 'Unable to upload DID document');
+    return Response.internalServerError(
+      body: jsonEncode({
+        'error': 'server_error',
+        'message': 'Unable to upload DID document',
+      }),
+      headers: {'content-type': 'application/json'},
+    );
   }
 }

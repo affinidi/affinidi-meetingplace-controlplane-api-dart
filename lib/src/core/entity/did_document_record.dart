@@ -11,6 +11,11 @@ class DidDocumentRecord extends Entity {
   });
 
   factory DidDocumentRecord.fromJson(Map<String, dynamic> json) {
+    final didDocument = json['didDocument'];
+    if (didDocument is! Map) {
+      throw FormatException('didDocument must be a JSON object');
+    }
+
     return DidDocumentRecord(
       did: json['did'] as String,
       createdBy: json['createdBy'] as String,
@@ -18,9 +23,7 @@ class DidDocumentRecord extends Entity {
           json['createdByVerificationMethod'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      didDocument: Map<String, dynamic>.from(
-        (json['didDocument'] as Map?) ?? <String, dynamic>{},
-      ),
+      didDocument: Map<String, dynamic>.from(didDocument),
     );
   }
 
