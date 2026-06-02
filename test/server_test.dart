@@ -2578,6 +2578,375 @@ void main() {
     );
   });
 
+  test('group-deregister-member: self-deregister success', () async {
+    final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+      deviceToken: AliceDevice.deviceToken,
+      platformType: AliceDevice.platformType,
+      wallet: aliceWallet,
+    );
+
+    final registerOfferResponse = await dio.post(
+      '$apiEndpoint/v1/register-offer-group',
+      data: registerOfferRequest.toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    await dio.post(
+      '$apiEndpoint/v1/accept-offer-group',
+      data: getAcceptOfferGroupRequest(
+        did: BobDevice.offerAcceptanceDid,
+        deviceToken: BobDevice.deviceToken,
+        platformType: BobDevice.platformType,
+        mnemonic: registerOfferResponse.data['mnemonic'],
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
+
+    final didManager = DidKeyManager(
+      store: InMemoryDidStore(),
+      wallet: bobWallet,
+    );
+
+    await didManager.addVerificationMethod(keyPair.id);
+    final bobDidDoc = await didManager.getDidDocument();
+
+    final reencryptKeyPair = generateMemberRecryptKeyPair();
+    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
+
+    await dio.post(
+      '$apiEndpoint/v1/group-add-member',
+      data: GroupAddMemberRequest(
+        offerLink: registerOfferResponse.data['offerLink'],
+        mnemonic: registerOfferResponse.data['mnemonic'],
+        groupId: registerOfferResponse.data['groupId'],
+        memberDid: bobDidDoc.id,
+        acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+        reencryptionKey: reencryptionKey.toBase64(),
+        publicKey: reencryptKeyPair.publicKeyToBase64(),
+        contactCard: '',
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/group-member-deregister',
+      data: GroupMemberDeregisterRequest(
+        groupId: registerOfferResponse.data['groupId'],
+        memberDid: bobDidDoc.id,
+        messageToRelay: getEncryptedMessageExample(),
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    expect(response.data['status'], equals('success'));
+    expect(
+      response.data['message'],
+      equals('Group member deregistered successfully'),
+    );
+  });
+
+  test(
+    'group-deregister-member: forbidden when non-owner deregisters another member',
+    () async {
+      final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+        wallet: aliceWallet,
+      );
+
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer-group',
+        data: registerOfferRequest.toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/accept-offer-group',
+        data: getAcceptOfferGroupRequest(
+          did: BobDevice.offerAcceptanceDid,
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      );
+
+      final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
+      final didManager = DidKeyManager(
+        store: InMemoryDidStore(),
+        wallet: bobWallet,
+      );
+      await didManager.addVerificationMethod(keyPair.id);
+      final bobDidDoc = await didManager.getDidDocument();
+
+      final reencryptKeyPair = generateMemberRecryptKeyPair();
+      final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
+
+      await dio.post(
+        '$apiEndpoint/v1/group-add-member',
+        data: GroupAddMemberRequest(
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          groupId: registerOfferResponse.data['groupId'],
+          memberDid: bobDidDoc.id,
+          acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+          reencryptionKey: reencryptionKey.toBase64(),
+          publicKey: reencryptKeyPair.publicKeyToBase64(),
+          contactCard: '',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/group-member-deregister',
+          data: GroupMemberDeregisterRequest(
+            groupId: registerOfferResponse.data['groupId'],
+            memberDid: registerOfferRequest.adminDid,
+            messageToRelay: getEncryptedMessageExample(),
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate(
+            (e) =>
+                e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] ==
+                    GroupMemberDeregisterErrorCodes.permissionDenied.value,
+          ),
+        ),
+      );
+    },
+  );
+
+  test(
+    'group-deregister-member: forbidden when regular member deregisters another regular member',
+    () async {
+      final registerOfferRequest = await getRegisterOfferGroupRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+        wallet: aliceWallet,
+      );
+
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer-group',
+        data: registerOfferRequest.toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      // Bob accepts the offer and is added as a regular member.
+      await dio.post(
+        '$apiEndpoint/v1/accept-offer-group',
+        data: getAcceptOfferGroupRequest(
+          did: BobDevice.offerAcceptanceDid,
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      );
+
+      final bobMemberKeyPair = await bobWallet.generateKey(
+        keyId: "m/44'/60'/0'/1",
+      );
+      final bobMemberDidManager = DidKeyManager(
+        store: InMemoryDidStore(),
+        wallet: bobWallet,
+      );
+      await bobMemberDidManager.addVerificationMethod(bobMemberKeyPair.id);
+      final bobDidDoc = await bobMemberDidManager.getDidDocument();
+
+      final bobReencryptKeyPair = generateMemberRecryptKeyPair();
+      final bobReencryptionKey = generateReEncryptionKey(bobReencryptKeyPair);
+
+      await dio.post(
+        '$apiEndpoint/v1/group-add-member',
+        data: GroupAddMemberRequest(
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          groupId: registerOfferResponse.data['groupId'],
+          memberDid: bobDidDoc.id,
+          acceptOfferAsDid: BobDevice.offerAcceptanceDid,
+          reencryptionKey: bobReencryptionKey.toBase64(),
+          publicKey: bobReencryptKeyPair.publicKeyToBase64(),
+          contactCard: '',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      // Set up Charlie as a second regular member.
+      final charlieWallet = PersistentWallet(InMemoryKeyStore());
+      final charlieAuthKeyPair = await charlieWallet.generateKey(
+        keyId: "m/44'/60'/0'/0",
+      );
+      final charlieAuthDidManager = DidKeyManager(
+        store: InMemoryDidStore(),
+        wallet: charlieWallet,
+      );
+      await charlieAuthDidManager.addVerificationMethod(charlieAuthKeyPair.id);
+      final charlieAccessToken = await handleAuthorization(
+        charlieAuthDidManager,
+        charlieAuthKeyPair,
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/register-device',
+        data: RegisterDeviceRequest(
+          deviceToken: CharlieDevice.deviceToken,
+          platformType: CharlieDevice.platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': charlieAccessToken,
+          },
+        ),
+      );
+
+      final charlieOfferAcceptanceDid = await DidGenerator.generateDidKey(
+        charlieWallet,
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/accept-offer-group',
+        data: getAcceptOfferGroupRequest(
+          did: charlieOfferAcceptanceDid,
+          deviceToken: CharlieDevice.deviceToken,
+          platformType: CharlieDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': charlieAccessToken,
+          },
+        ),
+      );
+
+      final charlieMemberKeyPair = await charlieWallet.generateKey(
+        keyId: "m/44'/60'/0'/1",
+      );
+      final charlieMemberDidManager = DidKeyManager(
+        store: InMemoryDidStore(),
+        wallet: charlieWallet,
+      );
+      await charlieMemberDidManager.addVerificationMethod(
+        charlieMemberKeyPair.id,
+      );
+      final charlieDidDoc = await charlieMemberDidManager.getDidDocument();
+
+      final charlieReencryptKeyPair = generateMemberRecryptKeyPair();
+      final charlieReencryptionKey = generateReEncryptionKey(
+        charlieReencryptKeyPair,
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/group-add-member',
+        data: GroupAddMemberRequest(
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          groupId: registerOfferResponse.data['groupId'],
+          memberDid: charlieDidDoc.id,
+          acceptOfferAsDid: charlieOfferAcceptanceDid,
+          reencryptionKey: charlieReencryptionKey.toBase64(),
+          publicKey: charlieReencryptKeyPair.publicKeyToBase64(),
+          contactCard: '',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      // Bob (regular member) tries to deregister Charlie (regular member).
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/group-member-deregister',
+          data: GroupMemberDeregisterRequest(
+            groupId: registerOfferResponse.data['groupId'],
+            memberDid: charlieDidDoc.id,
+            messageToRelay: getEncryptedMessageExample(),
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate(
+            (e) =>
+                e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] ==
+                    GroupMemberDeregisterErrorCodes.permissionDenied.value,
+          ),
+        ),
+      );
+    },
+  );
+
   test(
     'group-deregister-member: fails because group was deleted already',
     () async {

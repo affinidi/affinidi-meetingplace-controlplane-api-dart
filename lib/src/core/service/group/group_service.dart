@@ -176,10 +176,18 @@ class GroupService {
   Future<void> deregisterMember(DeregisterMemberInput input) async {
     final group = await getGroup(input.groupId);
 
-    final groupMember = await getGroupMemberByControllingDid(
-      input.controllingDid,
-      groupId: group.id,
+    final groupMembers = await _getGroupMembers(group.id);
+    final groupMember = groupMembers.firstWhere(
+      (m) => m.memberDid == input.memberDid,
+      orElse: () => throw GroupMemberNotInGroup(groupId: group.id),
     );
+
+    final isOwner = group.conrollingDid == input.controllingDid;
+    final isSelfDeregister = groupMember.controllingDid == input.controllingDid;
+
+    if (!isOwner && !isSelfDeregister) {
+      throw GroupPermissionDenied();
+    }
 
     await sendMessage(
       SendMessageInput(

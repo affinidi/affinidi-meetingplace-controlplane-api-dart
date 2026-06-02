@@ -3,7 +3,7 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-| **memberDid** | **String** | Decentralised Identifier (DID) of the member to remove. | **`Required`**   |
+| **memberDid** | **String** | Decentralised Identifier (DID) of the member to remove. The owner may pass any member's DID; a non-owner caller may only pass their own member DID. | **`Required`**   |
 | **groupId** | **String** | The unique identifier of the group chat to remove the member from. | **`Required`**   |
 | **messageToRelay** | **String** | An encrypted DIDComm message to send to the remaining group chat members in base64 format. |   |
 
