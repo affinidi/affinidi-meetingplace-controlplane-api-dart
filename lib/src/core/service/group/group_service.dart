@@ -189,17 +189,6 @@ class GroupService {
       throw GroupPermissionDenied();
     }
 
-    await sendMessage(
-      SendMessageInput(
-        offerLink: group.offerLink,
-        groupDid: group.groupDid,
-        controllingDid: input.controllingDid,
-        messagePayload: input.messageToRelay,
-        incSeqNo: false,
-        notify: false,
-      ),
-    );
-
     await _storage.deleteFromlist(
       GroupMember.entityName,
       group.id,
