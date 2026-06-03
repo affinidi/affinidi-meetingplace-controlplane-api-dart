@@ -24,11 +24,10 @@ Future<Response> authAuthenticate(
       storage: facade.config.storage,
     ).build();
 
-    final String authDid;
+    late final AuthenticationResponse authResponse;
     try {
-      authDid = await authorizer.authenticateChallengeResponse(
+      authResponse = await authorizer.authenticateChallengeResponseWithDetails(
         challengeResponse: requestParams.challengeResponse,
-        didResolverUrl: Config().get('auth')['didResolverUrl'],
         purpose: ChallengePurpose.authenticate,
       );
     } on ChallengeAuthException catch (e) {
@@ -41,7 +40,8 @@ Future<Response> authAuthenticate(
 
     final authConfig = Config().get('auth');
     final String accessToken = authorizer.getAuthToken(
-      authDid,
+      authResponse.did,
+      authResponse.verificationMethod,
       authConfig['accessTokenExpiryInMinutes'],
     );
 
@@ -50,7 +50,8 @@ Future<Response> authAuthenticate(
     );
 
     final String refreshToken = authorizer.getAuthRefreshToken(
-      authDid,
+      authResponse.did,
+      authResponse.verificationMethod,
       authConfig['refreshTokenExpiryInMinutes'],
     );
 

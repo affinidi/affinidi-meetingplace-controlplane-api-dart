@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../../../../meeting_place_control_plane_api.dart';
-import '../../../config/config.dart';
 import '../../../entity/notification_item.dart';
 import '../device_notification.dart';
 import '../device_notification_service.dart';

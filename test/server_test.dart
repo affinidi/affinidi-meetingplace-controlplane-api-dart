@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:meeting_place_control_plane_api/src/api/accept_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/accept_offer/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/accept_offer_group/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/admin/deregister_offer/request_model.dart';
