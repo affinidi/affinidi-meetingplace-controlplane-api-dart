@@ -1772,13 +1772,13 @@ components:
         - groupId
         - messageToRelay
     GroupDeregisterMemberInput:
-      description: List of required and optional parameters to remove a member from the group chat.
+      description: List of required and optional parameters to remove a member from the group chat. The caller must be either the group owner or the controller of the target member.
       type: object
       additionalProperties: false
       properties:
         memberDid:
           type: string
-          description: Decentralised Identifier (DID) of the member to remove.
+          description: Decentralised Identifier (DID) of the member to remove. The owner may pass any member's DID; a non-owner caller may only pass their own member DID.
         groupId:
           type: string
           description: The unique identifier of the group chat to remove the member from.
@@ -2370,7 +2370,10 @@ paths:
   /v1/group-member-deregister:
     post:
       operationId: groupMemberDeregister
-      description: Removes a member from the group chat.
+      description: >-
+        Removes a member from the group chat. The caller must be either the
+        group owner (admin) — who may deregister any member — or the controller
+        of the member being deregistered (self-deregister).
       security:
         - DidCommTokenAuth: []
       parameters: []

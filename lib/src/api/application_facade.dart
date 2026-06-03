@@ -578,6 +578,7 @@ class ApplicationFacade {
     return _groupService.deregisterMember(
       DeregisterMemberInput(
         groupId: request.groupId,
+        memberDid: request.memberDid,
         controllingDid: authDid,
         messageToRelay: request.messageToRelay,
       ),
