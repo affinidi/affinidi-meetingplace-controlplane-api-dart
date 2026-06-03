@@ -695,11 +695,10 @@ class ApplicationFacade {
       controlProof: controlProof,
       proof: proof,
     );
-    final segment = record.did.split(':').last;
     return {
       'did': record.did,
-      'segment': segment,
-      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/$segment/did.json',
+      'segment': record.segment,
+      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/${record.segment}/did.json',
     };
   }
 

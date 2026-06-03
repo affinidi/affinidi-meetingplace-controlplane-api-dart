@@ -5,7 +5,6 @@ import '../../../utils/date_time.dart';
 import '../../../utils/jcs_serializer.dart';
 import '../../entity/did_document_jti_record.dart';
 import '../../entity/did_document_record.dart';
-import '../../entity/did_document_segment_record.dart';
 import '../../logger/logger.dart';
 import '../../storage/exception/already_exists_exception.dart';
 import '../../storage/storage.dart';
@@ -82,16 +81,11 @@ class DidDocumentService {
   }
 
   Future<Map<String, dynamic>> resolveBySegment(String segment) async {
-    final lookup = await _storage.findOneById<DidDocumentSegmentRecord>(
-      DidDocumentSegmentRecord.entityName,
-      segment,
-      DidDocumentSegmentRecord.fromJson,
-    );
-    if (lookup == null) throw DidDocumentNotFound();
-
+    final encodedHost = Uri.encodeComponent(_hostedDidHost);
+    final did = 'did:web:$encodedHost:user:$segment';
     final record = await _storage.findOneById<DidDocumentRecord>(
       DidDocumentRecord.entityName,
-      lookup.did,
+      did,
       DidDocumentRecord.fromJson,
     );
     if (record == null) throw DidDocumentNotFound();
@@ -104,7 +98,6 @@ class DidDocumentService {
     required String authVerificationMethod,
     required Map<String, dynamic> didDocument,
   }) async {
-    final segment = _segmentFromDid(did);
     final now = nowUtc();
 
     final existing = await _storage.findOneById<DidDocumentRecord>(
@@ -149,23 +142,6 @@ class DidDocumentService {
       );
     }
 
-    try {
-      await _storage.create(
-        DidDocumentSegmentRecord(segment: segment, did: did),
-      );
-    } on AlreadyExists {
-      final segmentRecord = await _storage
-          .findOneById<DidDocumentSegmentRecord>(
-            DidDocumentSegmentRecord.entityName,
-            segment,
-            DidDocumentSegmentRecord.fromJson,
-          );
-      if (segmentRecord?.did == did) {
-        return record;
-      }
-      await _storage.delete(DidDocumentRecord.entityName, did);
-      throw DidDocumentConflict('Segment already claimed by another DID');
-    }
     return record;
   }
 
@@ -197,22 +173,6 @@ class DidDocumentService {
         'DID already registered with a different document',
       );
     }
-    final segment = _segmentFromDid(existing.did);
-    try {
-      await _storage.create(
-        DidDocumentSegmentRecord(segment: segment, did: existing.did),
-      );
-    } on AlreadyExists {
-      final segmentRecord = await _storage
-          .findOneById<DidDocumentSegmentRecord>(
-            DidDocumentSegmentRecord.entityName,
-            segment,
-            DidDocumentSegmentRecord.fromJson,
-          );
-      if (segmentRecord?.did != existing.did) {
-        throw DidDocumentConflict('Segment already claimed by another DID');
-      }
-    }
     return existing;
   }
 
@@ -243,7 +203,8 @@ class DidDocumentService {
     if (!Uuid.isValidUUID(fromString: segment)) {
       throw InvalidDidDocumentInput('didDocument.id segment must be a UUID');
     }
-    return did;
+    final canonicalHost = Uri.encodeComponent(_hostedDidHost);
+    return 'did:web:$canonicalHost:user:$segment';
   }
 
   String _decodeDidWebHost(String host) {
@@ -252,14 +213,6 @@ class DidDocumentService {
     } on FormatException {
       throw InvalidDidDocumentInput('didDocument.id host is not valid');
     }
-  }
-
-  String _segmentFromDid(String did) {
-    final segment = did.split(':').last.trim();
-    if (segment.isEmpty) {
-      throw InvalidDidDocumentInput('Invalid did:web segment');
-    }
-    return segment;
   }
 
   Future<DidDocumentJtiRecord> _reserveJti({

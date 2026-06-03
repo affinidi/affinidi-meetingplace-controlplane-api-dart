@@ -34,6 +34,8 @@ class DidDocumentRecord extends Entity {
   final DateTime updatedAt;
   final Map<String, dynamic> didDocument;
 
+  String get segment => did.split(':').last;
+
   static String entityName = 'DidDocument';
 
   @override
