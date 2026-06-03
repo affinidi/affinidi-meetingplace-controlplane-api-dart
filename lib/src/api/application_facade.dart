@@ -6,6 +6,7 @@ import '../core/config/env_config.dart';
 import '../core/config/server_config.dart';
 import '../core/logger/logger.dart';
 import '../core/service/device_notification/device_notification_service.dart';
+import '../core/service/did_document/did_document_service.dart';
 import '../core/service/group/delete_group_input.dart';
 import '../core/service/group/deregister_member_input.dart';
 import '../core/service/group/send_message_input.dart';
@@ -120,6 +121,16 @@ class ApplicationFacade {
       didResolver: config.didResolver,
       logger: _logger,
     );
+    _didDocumentService = DidDocumentService(
+      storage: config.storage,
+      didResolver: config.didResolver,
+      proofAudience: getEnv('API_ENDPOINT'),
+      hostedDidHost: _hostedDidAuthorityFromApiEndpoint(),
+      logger: _logger,
+      maxProofWindowSeconds:
+          int.tryParse(getEnvOrNull('DID_PROOF_MAX_WINDOW_SECONDS') ?? '') ??
+          300,
+    );
   }
 
   static ApplicationFacade? _instance;
@@ -131,6 +142,7 @@ class ApplicationFacade {
   late final NotificationService _notificationService;
   late final OobService _oobService;
   late final GroupService _groupService;
+  late final DidDocumentService _didDocumentService;
   late final DeviceNotificationService _deviceNotificationService;
   late final Logger _logger;
 
@@ -669,4 +681,34 @@ class ApplicationFacade {
     required Object error,
     required StackTrace stackTrace,
   }) => _logger.error(message, error: error, stackTrace: stackTrace);
+
+  Future<Map<String, dynamic>> uploadDidDocument({
+    required String authDid,
+    required String authVerificationMethod,
+    required Map<String, dynamic> didDocument,
+    required Map<String, dynamic> controlProof,
+    required Map<String, dynamic> proof,
+  }) async {
+    final record = await _didDocumentService.upload(
+      authDid: authDid,
+      authVerificationMethod: authVerificationMethod,
+      didDocument: didDocument,
+      controlProof: controlProof,
+      proof: proof,
+    );
+    return {
+      'did': record.did,
+      'segment': record.segment,
+      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/${record.segment}/did.json',
+    };
+  }
+
+  Future<Map<String, dynamic>> resolveDidDocumentBySegment(String segment) {
+    return _didDocumentService.resolveBySegment(segment);
+  }
+
+  String _hostedDidAuthorityFromApiEndpoint() {
+    final uri = Uri.parse(getEnv('API_ENDPOINT'));
+    return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+  }
 }

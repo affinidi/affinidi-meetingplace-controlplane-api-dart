@@ -16,6 +16,8 @@ import '../api/admin/deregister_offer/route.dart';
 import '../api/check_offer_phrase/route.dart';
 import '../api/application_facade.dart';
 import '../api/create_oob/route.dart';
+import '../api/did_document_resolve/route.dart';
+import '../api/did_document_upload/route.dart';
 import '../api/delete_pending_notifications/route.dart';
 import '../api/deregister_notification/route.dart';
 import '../api/discovery/route.dart';
@@ -64,6 +66,13 @@ Router createRouter(ApplicationFacade facade) {
       '/.well-known/did.json',
       (Request req) => _didHandler(req, facade.config.didDocumentManager),
     )
+    ..get('/user/<segment>/did.json', (Request req, String segment) {
+      return publicPipeline(
+        (Request request, ApplicationFacade appFacade) =>
+            didDocumentResolve(request, appFacade, segment),
+        facade,
+      )(req);
+    })
     ..get('/asset/<imageName>', _assertImageHandler)
     ..get('/discover', publicPipeline(discoverApi, facade))
     // authentication routes
@@ -99,6 +108,10 @@ Router createRouter(ApplicationFacade facade) {
     // matrix specific routes
     ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
     ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
+    ..post(
+      '/v1/did-document/upload',
+      privatePipeline(didDocumentUpload, facade),
+    )
     // notification routes
     ..post(
       '/v1/notifications',
