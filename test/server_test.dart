@@ -3534,6 +3534,9 @@ void main() {
       fail('Expected DioException');
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.badRequest);
+      expect(e.response?.data, [
+        {'message': 'Homeserver must be a valid URI.', 'field': 'homeserver'},
+      ]);
     }
   });
 
@@ -3552,71 +3555,11 @@ void main() {
       fail('Expected DioException');
     } on DioException catch (e) {
       expect(e.response?.statusCode, HttpStatus.badRequest);
-      expect(e.response?.data, {'error': 'invalidChallengeResponse'});
+      expect(e.response?.data, {
+        'errorCode': 'CHALLENGE_RESPONSE_INVALID',
+        'errorMessage':
+            'Challenge response is invalid or could not be verified.',
+      });
     }
   });
-
-  test(
-    '#matrix/media/download-url: returns 400 for missing challenge_response',
-    () async {
-      try {
-        await dio.post(
-          '$apiEndpoint/v1/matrix/media/download-url',
-          data: {
-            'homeserver': 'https://matrix.org',
-            'room_id': '!room:matrix.org',
-            'media_uri': 'mxc://matrix.org/abc',
-          },
-          options: Options(
-            headers: {Headers.contentTypeHeader: 'application/json'},
-          ),
-        );
-        fail('Expected DioException');
-      } on DioException catch (e) {
-        expect(e.response?.statusCode, HttpStatus.badRequest);
-      }
-    },
-  );
-
-  test(
-    '#matrix/media/download-url: returns 400 for missing homeserver',
-    () async {
-      final challengeResponse = await buildMatrixChallengeResponse(
-        aliceDidManager,
-        aliceKeyPair,
-        SignatureScheme.ecdsa_p256_sha256,
-      );
-
-      try {
-        await dio.post(
-          '$apiEndpoint/v1/matrix/media/download-url',
-          data: {
-            'challenge_response': challengeResponse,
-            'room_id': '!room:matrix.org',
-            'media_uri': 'mxc://matrix.org/abc',
-          },
-          options: Options(
-            headers: {Headers.contentTypeHeader: 'application/json'},
-          ),
-        );
-        fail('Expected DioException');
-      } on DioException catch (e) {
-        expect(e.response?.statusCode, HttpStatus.badRequest);
-      }
-    },
-  );
-
-  test(
-    '#matrix/media/download/<token>: returns 403 for invalid token',
-    () async {
-      try {
-        await dio.get(
-          '$apiEndpoint/v1/matrix/media/download/not-a-valid-token',
-        );
-        fail('Expected DioException');
-      } on DioException catch (e) {
-        expect(e.response?.statusCode, HttpStatus.forbidden);
-      }
-    },
-  );
 }

@@ -15,7 +15,6 @@ services:
       - STORAGE_PORT=6380
       - DIDCOMM_AUTH_SECRET=/run/secrets/didcommauth
       - HASH_SECRET=/run/secrets/hash-secret
-      - MATRIX_MEDIA_SIGNING_SECRET=/run/secrets/matrix_media_signing_secret
       - DID_DOCUMENT=/run/params/did_document
       - PUSH_NOTIFICATION_PROVIDER=none
       - AWS_REGION=
@@ -29,7 +28,6 @@ services:
       - GROUP_COUNT_LIMIT=10
     secrets:
       - didcommauth
-      - matrix_media_signing_secret
     depends_on:
       - storage
 
@@ -47,7 +45,5 @@ volumes:
 secrets:
   didcommauth:
     file: ./secrets/didcommauth.json
-  matrix_media_signing_secret:
-    file: ./secrets/matrix_media_signing_secret.txt
   gitlab-token:
     file: ./secrets/gitlab-token

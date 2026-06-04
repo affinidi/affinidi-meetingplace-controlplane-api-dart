@@ -16,8 +16,6 @@ class ServerConfig {
     required this.didDocumentManager,
     required this.didResolver,
     required this.logger,
-    this.matrixTokenExpirySeconds = 60,
-    this.matrixMediaAccessTokenExpirySeconds = 300,
   });
 
   final Storage storage;
@@ -27,6 +25,4 @@ class ServerConfig {
   final DidDocumentManager didDocumentManager;
   final DidResolver didResolver;
   final Logger logger;
-  final int matrixTokenExpirySeconds;
-  final int matrixMediaAccessTokenExpirySeconds;
 }

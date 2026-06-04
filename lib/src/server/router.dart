@@ -5,6 +5,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 
+import '../api/matrix_token/route.dart';
 import '../api/matrix_challenge/route.dart';
 import '../api/update_offers_score/route.dart';
 import 'middleware/auth.dart';
@@ -26,9 +27,6 @@ import '../api/group_delete/route.dart';
 import '../api/group_member_deregister/route.dart';
 import '../api/group_notify_channel/route.dart';
 import '../api/group_send_message/route.dart';
-import '../api/matrix_media_download/route.dart';
-import '../api/matrix_media_download_url/route.dart';
-import '../api/matrix_token/route.dart';
 import '../api/notify_acceptance/route.dart';
 import '../api/notify_acceptance_group/route.dart';
 import '../api/notify_outreach/route.dart';
@@ -80,15 +78,6 @@ Router createRouter(ApplicationFacade facade) {
     // authentication routes
     ..post('/v1/authenticate', publicPipeline(authAuthenticate, facade))
     ..post('/v1/authenticate/challenge', publicPipeline(authChallenge, facade))
-    ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
-    ..post(
-      '/v1/matrix/media/download-url',
-      publicPipeline(matrixMediaDownloadUrl, facade),
-    )
-    ..get(
-      '/v1/matrix/media/download/<token>',
-      (Request req, String token) => matrixMediaDownload(req, token, facade),
-    )
     // admin routes
     ..post(
       '/v1/admin/deregister-offer',
@@ -118,6 +107,7 @@ Router createRouter(ApplicationFacade facade) {
     ..post('/v1/register-device', privatePipeline(registerDevice, facade))
     // matrix specific routes
     ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
+    ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
     ..post(
       '/v1/did-document/upload',
       privatePipeline(didDocumentUpload, facade),

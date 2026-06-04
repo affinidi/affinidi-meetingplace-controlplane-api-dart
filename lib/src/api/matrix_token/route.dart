@@ -1,40 +1,61 @@
 import 'dart:convert';
 
-import 'package:shelf/shelf.dart';
-
-import '../application_facade.dart';
+import '../../core/service/auth/challenge_purpose.dart';
+import '../../core/service/matrix/matrix_token_service.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
+import '../application_facade.dart';
+import 'package:shelf/shelf.dart';
+
+import '../../core/service/auth/auth_response.dart';
+import '../../core/service/auth/didcomm_auth_builder.dart';
+import 'response_model.dart';
 
 Future<Response> matrixToken(Request request, ApplicationFacade facade) async {
   try {
-    final bodyText = await request.readAsString();
-    final params = MatrixTokenRequest.fromRequestParams(bodyText);
-
-    final authDid = await facade.authenticateDidFromChallengeResponse(
-      params.challengeResponse,
-    );
-    final token = await facade.issueMatrixLoginToken(
-      authDid: authDid,
-      homeserver: Uri.parse(params.homeserver),
+    final matrixTokenRequest = MatrixTokenRequest.fromRequestParams(
+      await request.readAsString(),
     );
 
-    return Response.ok(
-      jsonEncode({'token': token}),
-      headers: {'content-type': 'application/json'},
+    final authorizer = await DIDCommAuthBuilder(
+      logger: facade.config.logger,
+      storage: facade.config.storage,
+    ).build();
+
+    final String authDid;
+    try {
+      authDid = await authorizer.authenticateChallengeResponse(
+        challengeResponse: matrixTokenRequest.challengeResponse,
+        purpose: ChallengePurpose.matrixToken,
+      );
+    } on ChallengeAuthException {
+      facade.logInfo('Challenge response is invalid or could not be verified.');
+
+      return Response.badRequest(
+        body: jsonEncode({
+          'errorCode': 'CHALLENGE_RESPONSE_INVALID',
+          'errorMessage':
+              'Challenge response is invalid or could not be verified.',
+        }),
+        headers: {'content-type': 'application/json'},
+      );
+    }
+
+    final credential = await MatrixTokenService.issueToken(
+      did: authDid,
+      homeserver: matrixTokenRequest.homeserver,
     );
+
+    return Response.ok(MatrixTokenResponse(token: credential).toString());
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
-  } on FormatException catch (e) {
-    return Response.badRequest(body: jsonEncode({'error': e.message}));
   } catch (e, stackTrace) {
     facade.logError(
-      'Error issuing Matrix token',
+      'Error when issuing matrix credential: $e',
       error: e,
       stackTrace: stackTrace,
     );
-    return Response.internalServerError(
-      body: jsonEncode({'error': 'Unable to issue Matrix token'}),
-    );
+
+    return Response.internalServerError(body: 'Unable to issue credential');
   }
 }

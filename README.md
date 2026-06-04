@@ -76,7 +76,6 @@ List of the environment variables required to run the Control Plane API server.
 | CONTROL_PLANE_DID   | The DID used for authentication (e.g., did:web:yourdomain.com). The caller will resolve the CONTROL_PLANE_DID to fetch the public key information and encrypt the DIDComm message containing the auth challenge string. For testing or running the server locally, use the `did:local:8080` - replace the `8080` depending on your configured SERVER_PORT. |                                                                                        |
 | DIDCOMM_AUTH_SECRET | Specifies path and filename containing the didcommauth secret (e.g., `secrets/didcommauth.json`)                                                                                                                                                                                                                                                           |
 | HASH_SECRET         | A secret value to enhance the security of hashing operations within the application.                                                                                                                                                                                                                                                                       |
-| MATRIX_MEDIA_SIGNING_SECRET | Specifies the path or secret identifier for the HMAC secret used to sign short-lived Matrix media download URLs.                                                                                                                                                                                                                                         |
 | DID_DOCUMENT        | Specifies path and filename of the DID document parameter (e.g., `params/did_document.json`.                                                                                                                                                                                                                                                               |
 
 Configure the following environment variables if AWS is the selected option.
@@ -384,7 +383,6 @@ If you're using a local secret manager, specify the path to the JSON file contai
 ```bash
 DIDCOMM_AUTH_SECRET=secrets/didcommauth.json
 HASH_SECRET=secrets/hash-secret.txt
-MATRIX_MEDIA_SIGNING_SECRET=secrets/matrix_media_signing_secret.txt
 ```
 
 ### AWS Secret Manager
@@ -393,7 +391,6 @@ If you're using AWS Secrets Manager, the `DIDCOMM_AUTH_SECRET` environment varia
 
 ```bash
 DIDCOMM_AUTH_SECRET=<MY_AWS_SECRET_NAME>
-MATRIX_MEDIA_SIGNING_SECRET=<MY_MATRIX_MEDIA_SIGNING_SECRET_NAME>
 ```
 
 ## Push Notifications
