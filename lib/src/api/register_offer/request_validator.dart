@@ -1,6 +1,7 @@
 import 'package:lucid_validation/lucid_validation.dart';
 
 import '../../utils/platform_type.dart';
+import '../../core/entity/transport.dart';
 import '../request_validation.dart';
 
 class RegisterOfferRequestValidator extends LucidValidator {
@@ -86,6 +87,15 @@ class RegisterOfferRequestValidator extends LucidValidator {
       (value) => value == null || value >= 0,
       'score must be a positive integer',
       'invalidScore',
+    );
+
+    ruleFor(
+      (request) => request['transport'] as String?,
+      key: 'transport',
+    ).must(
+      (value) => value != null && Transport.values.any((e) => e.value == value),
+      'Transport must be one of ${Transport.values.map((e) => e.value).join(',')}',
+      'invalidTransport',
     );
   }
 }

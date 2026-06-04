@@ -14,6 +14,7 @@ import 'package:meeting_place_control_plane_api/src/api/register_device/request_
 import 'package:meeting_place_control_plane_api/src/api/register_device/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_validator.dart';
+import 'package:meeting_place_control_plane_api/src/core/entity/transport.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer_group/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/update_offers_score/request_model.dart';
@@ -37,6 +38,7 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         score: 10,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -55,6 +57,7 @@ void main() {
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -74,6 +77,7 @@ void main() {
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -93,6 +97,7 @@ void main() {
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -112,6 +117,7 @@ void main() {
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -131,6 +137,7 @@ void main() {
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: -1,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -151,6 +158,7 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         maximumUsage: 0,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -173,6 +181,7 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         validUntil: futureDate,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -194,6 +203,7 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         validUntil: pastDate,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -214,6 +224,7 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         validUntil: '2024-13-45',
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -234,6 +245,7 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         validUntil: '2025-12-31T23:59:59+00:00',
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
@@ -254,11 +266,66 @@ void main() {
         mediatorWSSEndpoint: 'wss://mediator.example.com',
         contactAttributes: 1,
         score: -1,
+        transport: Transport.didcomm,
       );
 
       final result = RegisterOfferRequestValidator().validate(request.toJson());
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'score'), true);
+    });
+
+    test('validates matrix transport', () {
+      final request = RegisterOfferRequest(
+        offerName: 'test',
+        offerDescription: 'description',
+        didcommMessage: 'message',
+        contactCard: 'contactCard',
+        deviceToken: 'token',
+        platformType: PlatformType.PUSH_NOTIFICATION,
+        mediatorDid: 'did:example:123',
+        mediatorEndpoint: 'https://mediator.example.com',
+        mediatorWSSEndpoint: 'wss://mediator.example.com',
+        contactAttributes: 1,
+        transport: Transport.matrix,
+      );
+
+      final result = RegisterOfferRequestValidator().validate(request.toJson());
+      expect(result.isValid, true);
+    });
+
+    test('fails when transport is missing', () {
+      final result = RegisterOfferRequestValidator().validate({
+        'offerName': 'test',
+        'offerDescription': 'description',
+        'didcommMessage': 'message',
+        'contactCard': 'contactCard',
+        'deviceToken': 'token',
+        'platformType': PlatformType.PUSH_NOTIFICATION.name,
+        'mediatorDid': 'did:example:123',
+        'mediatorEndpoint': 'https://mediator.example.com',
+        'mediatorWSSEndpoint': 'wss://mediator.example.com',
+        'contactAttributes': 1,
+      });
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'transport'), true);
+    });
+
+    test('fails when transport is invalid', () {
+      final result = RegisterOfferRequestValidator().validate({
+        'offerName': 'test',
+        'offerDescription': 'description',
+        'didcommMessage': 'message',
+        'contactCard': 'contactCard',
+        'deviceToken': 'token',
+        'platformType': PlatformType.PUSH_NOTIFICATION.name,
+        'mediatorDid': 'did:example:123',
+        'mediatorEndpoint': 'https://mediator.example.com',
+        'mediatorWSSEndpoint': 'wss://mediator.example.com',
+        'contactAttributes': 1,
+        'transport': 'smoke-signal',
+      });
+      expect(result.isValid, false);
+      expect(result.exceptions.any((e) => e.key == 'transport'), true);
     });
   });
 
