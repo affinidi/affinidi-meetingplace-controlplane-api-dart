@@ -24,6 +24,7 @@ RegisterOfferInput _$RegisterOfferInputFromJson(Map<String, dynamic> json) =>
       customPhrase: json['customPhrase'] as String?,
       metadata: json['metadata'] as String?,
       score: (json['score'] as num?)?.toInt(),
+      transport: $enumDecode(_$TransportEnumMap, json['transport']),
     );
 
 Map<String, dynamic> _$RegisterOfferInputToJson(RegisterOfferInput instance) =>
@@ -44,6 +45,7 @@ Map<String, dynamic> _$RegisterOfferInputToJson(RegisterOfferInput instance) =>
       'customPhrase': instance.customPhrase,
       'metadata': instance.metadata,
       'score': instance.score,
+      'transport': _$TransportEnumMap[instance.transport]!,
     };
 
 const _$OfferTypeEnumMap = {
@@ -58,4 +60,9 @@ const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',
   PlatformType.PUSH_NOTIFICATION: 'PUSH_NOTIFICATION',
   PlatformType.NONE: 'NONE',
+};
+
+const _$TransportEnumMap = {
+  Transport.didcomm: 'didcomm',
+  Transport.matrix: 'matrix',
 };

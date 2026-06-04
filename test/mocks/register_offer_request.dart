@@ -1,4 +1,5 @@
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/core/entity/transport.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 
 RegisterOfferRequest getRegisterOfferRequestMock({
@@ -8,6 +9,7 @@ RegisterOfferRequest getRegisterOfferRequestMock({
   int? maximumUsage,
   String? customPhrase,
   int? score,
+  Transport transport = Transport.didcomm,
 }) => RegisterOfferRequest(
   offerName: 'test offer',
   offerDescription: 'offer used in tests',
@@ -23,4 +25,5 @@ RegisterOfferRequest getRegisterOfferRequestMock({
   contactAttributes: 1,
   customPhrase: customPhrase,
   score: score,
+  transport: transport,
 );

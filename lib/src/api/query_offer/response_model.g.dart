@@ -22,6 +22,7 @@ QueryOfferResponse _$QueryOfferResponseFromJson(Map<String, dynamic> json) =>
       contactAttributes: (json['contactAttributes'] as num).toInt(),
       groupId: json['groupId'] as String?,
       groupDid: json['groupDid'] as String?,
+      transport: $enumDecode(_$TransportEnumMap, json['transport']),
       score: (json['score'] as num?)?.toInt(),
     );
 
@@ -42,4 +43,10 @@ Map<String, dynamic> _$QueryOfferResponseToJson(QueryOfferResponse instance) =>
       'groupId': instance.groupId,
       'groupDid': instance.groupDid,
       'score': instance.score,
+      'transport': _$TransportEnumMap[instance.transport]!,
     };
+
+const _$TransportEnumMap = {
+  Transport.didcomm: 'didcomm',
+  Transport.matrix: 'matrix',
+};

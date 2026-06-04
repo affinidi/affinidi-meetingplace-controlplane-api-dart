@@ -15,6 +15,7 @@ import '../core/service/notification/notify_group_membership_finalised_input.dar
 import '../core/service/notification/notify_outreach_input.dart';
 import '../core/service/offer/admin_deregister_offer_input.dart';
 import '../utils/platform_type.dart';
+import '../core/entity/transport.dart';
 import 'accept_offer/request_model.dart';
 import 'accept_offer_group/request_model.dart';
 import 'admin/deregister_offer/request_model.dart';
@@ -183,6 +184,7 @@ class ApplicationFacade {
         contactAttributes: request.contactAttributes,
         customPhrase: request.customPhrase,
         score: request.score,
+        transport: request.transport,
       ),
       authDid,
     );
@@ -244,6 +246,7 @@ class ApplicationFacade {
           deviceToken: request.deviceToken,
           platformType: request.platformType,
           metadata: request.metadata,
+          transport: Transport.matrix,
         ),
         authDid,
       );

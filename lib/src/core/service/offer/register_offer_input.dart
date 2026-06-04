@@ -1,4 +1,5 @@
 import '../../entity/offer.dart';
+import '../../entity/transport.dart';
 import '../../../utils/platform_type.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -18,6 +19,7 @@ class RegisterOfferInput {
     required this.mediatorEndpoint,
     required this.mediatorWSSEndpoint,
     required this.contactAttributes,
+    required this.transport,
     this.validUntil,
     this.maximumUsage,
     this.customPhrase,
@@ -44,4 +46,5 @@ class RegisterOfferInput {
   final String? customPhrase;
   final String? metadata;
   final int? score;
+  final Transport transport;
 }
