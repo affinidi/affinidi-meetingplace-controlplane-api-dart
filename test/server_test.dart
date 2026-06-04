@@ -31,6 +31,7 @@ import 'package:meeting_place_control_plane_api/src/api/register_notification/re
 import 'package:meeting_place_control_plane_api/src/core/config/env_config.dart';
 import 'package:meeting_place_control_plane_api/src/service/did_resolver/cached_did_resolver.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/offer.dart';
+import 'package:meeting_place_control_plane_api/src/core/entity/transport.dart';
 import 'package:meeting_place_control_plane_api/src/utils/date_time.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:didcomm/didcomm.dart';
@@ -1636,8 +1637,47 @@ void main() {
       'groupId': null,
       'groupDid': null,
       'score': null,
+      'transport': Transport.didcomm.value,
     });
   });
+
+  test(
+    'query-offer: returns matrix transport when registered with matrix',
+    () async {
+      final registerOfferRequestMock = getRegisterOfferRequestMock(
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+        transport: Transport.matrix,
+      );
+
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: registerOfferRequestMock.toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      final response = await dio.post(
+        '$apiEndpoint/v1/query-offer',
+        data: QueryOfferRequest(
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': bobAccessToken,
+          },
+        ),
+      );
+
+      expect(response.statusCode, HttpStatus.ok);
+      expect(response.data['transport'], Transport.matrix.value);
+    },
+  );
 
   test('query-offer: group did and group id set if group offer', () async {
     final registerOfferRequestMock = await getRegisterOfferGroupRequestMock(
@@ -1673,6 +1713,7 @@ void main() {
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data['groupId'], isNotEmpty);
     expect(response.data['groupDid'], isNotEmpty);
+    expect(response.data['transport'], Transport.matrix.value);
   });
 
   test('query-offer: fails if offer does not exist', () async {

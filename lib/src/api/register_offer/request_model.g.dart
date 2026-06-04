@@ -23,6 +23,7 @@ RegisterOfferRequest _$RegisterOfferRequestFromJson(
   maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
   customPhrase: json['customPhrase'],
   score: (json['score'] as num?)?.toInt(),
+  transport: $enumDecode(_$TransportEnumMap, json['transport']),
 );
 
 Map<String, dynamic> _$RegisterOfferRequestToJson(
@@ -42,10 +43,16 @@ Map<String, dynamic> _$RegisterOfferRequestToJson(
   'validUntil': instance.validUntil,
   'customPhrase': instance.customPhrase,
   'score': instance.score,
+  'transport': _$TransportEnumMap[instance.transport]!,
 };
 
 const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',
   PlatformType.PUSH_NOTIFICATION: 'PUSH_NOTIFICATION',
   PlatformType.NONE: 'NONE',
+};
+
+const _$TransportEnumMap = {
+  Transport.didcomm: 'didcomm',
+  Transport.matrix: 'matrix',
 };
