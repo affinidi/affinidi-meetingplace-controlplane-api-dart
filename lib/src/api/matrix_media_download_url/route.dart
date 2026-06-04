@@ -31,6 +31,10 @@ Future<Response> matrixMediaDownloadUrl(
     );
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
+  } on TypeError {
+    return Response.badRequest(
+      body: jsonEncode({'error': 'Missing or invalid required fields'}),
+    );
   } on FormatException catch (e) {
     return Response.badRequest(body: jsonEncode({'error': e.message}));
   } on MatrixMediaAccessException catch (e) {
