@@ -63,11 +63,11 @@ class DidDocumentService {
         proofAudience: _proofAudience,
       );
     } on SsiException catch (e) {
+      _logger.error('Unexpected error during proof verification', error: e);
       throw InvalidDidDocumentInput('Proof verification failed: ${e.message}');
     } catch (e) {
-      throw InvalidDidDocumentInput(
-        'Proof verification failed: ${e.toString()}',
-      );
+      _logger.error('Unexpected error during proof verification', error: e);
+      throw InvalidDidDocumentInput('Proof verification failed');
     }
 
     final reservedJti = await _reserveJti(
