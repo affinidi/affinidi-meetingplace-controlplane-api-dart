@@ -792,15 +792,18 @@ void main() {
     test(
       'throws when the proof payload claims do not match each other',
       () async {
+        final now = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
         final controlPayload = _proofPayload(
           didDocument: didDocument,
           authDid: authDid,
-          jti: 'proof-jti-control',
+          iat: now,
+          exp: now + 60,
         );
         final proofPayload = _proofPayload(
           didDocument: didDocument,
           authDid: authDid,
-          jti: 'proof-jti-document',
+          iat: now - 1,
+          exp: now + 59,
         );
         final controlProof = await _buildSignedProof(
           wallet: authWallet,

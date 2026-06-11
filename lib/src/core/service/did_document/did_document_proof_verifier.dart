@@ -374,8 +374,15 @@ class DidDocumentProofVerifier {
     _ParsedJws controlProof,
     _ParsedJws didDocumentProof,
   ) {
-    if (jcsSerializer.serialize(controlProof.payload) !=
-        jcsSerializer.serialize(didDocumentProof.payload)) {
+    final controlPayloadWithoutJti = Map<String, dynamic>.from(
+      controlProof.payload,
+    )..remove('jti');
+    final docProofPayloadWithoutJti = Map<String, dynamic>.from(
+      didDocumentProof.payload,
+    )..remove('jti');
+
+    if (jcsSerializer.serialize(controlPayloadWithoutJti) !=
+        jcsSerializer.serialize(docProofPayloadWithoutJti)) {
       throw InvalidDidDocumentInput(
         'controlProof and proof must use the same proof payload',
       );

@@ -51,6 +51,7 @@ import 'mocks/devices.dart';
 import 'mocks/register_offer_group_request.dart';
 import 'mocks/register_offer_request.dart';
 import 'utils/authorization.dart';
+import 'utils/did_document_proof.dart';
 import 'utils/did_generator.dart';
 import 'utils/recrypt.dart';
 
@@ -3602,5 +3603,107 @@ void main() {
             'Challenge response is invalid or could not be verified.',
       });
     }
+  });
+
+  test('did-document/upload: success', () async {
+    final didWallet = PersistentWallet(InMemoryKeyStore());
+    final didKeyPair = await didWallet.generateKey(keyType: KeyType.p256);
+    final didJwk = keyToJwk(await didWallet.getPublicKey(didKeyPair.id));
+
+    final uri = Uri.parse(apiEndpoint);
+    final hostedDidHost = uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+
+    final didDocument = buildDidWebDocument(
+      host: hostedDidHost,
+      publicKeyJwk: didJwk,
+    );
+    final segment = didDocument['id'].toString().split(':').last;
+
+    final authDidDoc = await aliceDidManager.getDidDocument();
+    final authDid = authDidDoc.id;
+    final authVerificationMethod = authDidDoc.verificationMethod.first.id;
+
+    final proofs = await buildUploadProofs(
+      authWallet: aliceWallet as PersistentWallet,
+      authKeyId: aliceKeyPair.id,
+      authVerificationMethod: authVerificationMethod,
+      didWallet: didWallet,
+      didKeyId: didKeyPair.id,
+      didDocument: didDocument,
+      controlDid: authDid,
+      audience: getEnv('CONTROL_PLANE_DID'),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/did-document/upload',
+      data: jsonEncode({
+        'didDocument': didDocument,
+        'controlProof': proofs.controlProof,
+        'proof': proofs.proof,
+      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    expect(response.statusCode, 200);
+    expect(response.data['did'], didDocument['id']);
+    expect(response.data['segment'], segment);
+    expect(response.data['didDocUrl'], '$apiEndpoint/user/$segment/did.json');
+  });
+
+  test('did-document/upload: document is resolvable after upload', () async {
+    final didWallet = PersistentWallet(InMemoryKeyStore());
+    final didKeyPair = await didWallet.generateKey(keyType: KeyType.p256);
+    final didJwk = keyToJwk(await didWallet.getPublicKey(didKeyPair.id));
+
+    final uri = Uri.parse(apiEndpoint);
+    final hostedDidHost = uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+
+    final didDocument = buildDidWebDocument(
+      host: hostedDidHost,
+      publicKeyJwk: didJwk,
+    );
+    final segment = didDocument['id'].toString().split(':').last;
+
+    final authDidDoc = await aliceDidManager.getDidDocument();
+    final authDid = authDidDoc.id;
+    final authVerificationMethod = authDidDoc.verificationMethod.first.id;
+
+    final proofs = await buildUploadProofs(
+      authWallet: aliceWallet as PersistentWallet,
+      authKeyId: aliceKeyPair.id,
+      authVerificationMethod: authVerificationMethod,
+      didWallet: didWallet,
+      didKeyId: didKeyPair.id,
+      didDocument: didDocument,
+      controlDid: authDid,
+      audience: getEnv('CONTROL_PLANE_DID'),
+    );
+
+    await dio.post(
+      '$apiEndpoint/v1/did-document/upload',
+      data: jsonEncode({
+        'didDocument': didDocument,
+        'controlProof': proofs.controlProof,
+        'proof': proofs.proof,
+      }),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final resolveResponse = await dio.get(
+      '$apiEndpoint/user/$segment/did.json',
+    );
+
+    expect(resolveResponse.statusCode, 200);
+    expect(resolveResponse.data['id'], didDocument['id']);
   });
 }
