@@ -49,15 +49,27 @@ class DidDocumentService {
     required Map<String, dynamic> controlProof,
     required Map<String, dynamic> proof,
   }) async {
-    final did = _extractAndValidateDid(didDocument);
-    final verifiedClaims = await _proofVerifier.verify(
-      authDid: authDid,
-      authVerificationMethod: authVerificationMethod,
-      didDocument: didDocument,
-      controlProofJson: controlProof,
-      proofJson: proof,
-      proofAudience: _proofAudience,
-    );
+    String did;
+    DidDocumentVerifiedProofClaims verifiedClaims;
+
+    try {
+      did = _extractAndValidateDid(didDocument);
+      verifiedClaims = await _proofVerifier.verify(
+        authDid: authDid,
+        authVerificationMethod: authVerificationMethod,
+        didDocument: didDocument,
+        controlProofJson: controlProof,
+        proofJson: proof,
+        proofAudience: _proofAudience,
+      );
+    } on SsiException catch (e) {
+      _logger.error('Unexpected error during proof verification', error: e);
+      throw InvalidDidDocumentInput('Proof verification failed: ${e.message}');
+    } catch (e) {
+      _logger.error('Unexpected error during proof verification', error: e);
+      throw InvalidDidDocumentInput('Proof verification failed');
+    }
+
     final reservedJti = await _reserveJti(
       authDid: authDid,
       verifiedClaims: verifiedClaims,
