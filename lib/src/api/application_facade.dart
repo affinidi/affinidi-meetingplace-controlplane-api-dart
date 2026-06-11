@@ -125,7 +125,7 @@ class ApplicationFacade {
     _didDocumentService = DidDocumentService(
       storage: config.storage,
       didResolver: config.didResolver,
-      proofAudience: getEnv('API_ENDPOINT'),
+      proofAudience: getEnv('CONTROL_PLANE_DID'),
       hostedDidHost: _hostedDidAuthorityFromApiEndpoint(),
       logger: _logger,
       maxProofWindowSeconds:
