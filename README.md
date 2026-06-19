@@ -80,7 +80,7 @@ List of the environment variables required to run the Control Plane API server.
 | DIDCOMM_AUTH_SECRET | Specifies path and filename containing the didcommauth secret (e.g., `secrets/didcommauth.json`)                                                                                                                                                                                                                                                           |
 | HASH_SECRET         | A secret value to enhance the security of hashing operations within the application.                                                                                                                                                                                                                                                                       |
 | DID_DOCUMENT        | Specifies path and filename of the DID document parameter (e.g., `params/did_document.json`.                                                                                                                                                                                                                                                               |
-| MATRIX_TOKEN_EXPIRY_IN_MINUTES | (Optional) Specifies the expiry time in minutes for Matrix login tokens issued by the `/v1/matrix/token` endpoint. Default: `5`.                                                                                                                                                                                            |
+| MATRIX_TOKEN_EXPIRY_IN_MINUTES | (Optional) Sets the JWT `exp` claim duration in minutes for Matrix login tokens issued by the `/v1/matrix/token` endpoint. Default: `5`.                                                                                                                                                                                          |
 
 Configure the following environment variables if AWS is the selected option.
 
@@ -374,7 +374,7 @@ The Control Plane API issues short-lived JWTs that clients use to authenticate w
    }
    ```
 
-   The endpoint returns a challenge bound to the `matrix_token` purpose. This challenge may only be consumed at `/v1/matrix/token`.
+   The endpoint returns a challenge valid for 1 minute, bound to the `matrix_token` purpose. It may only be consumed at `/v1/matrix/token`.
 
    ```json
    {
@@ -403,7 +403,7 @@ The Control Plane API issues short-lived JWTs that clients use to authenticate w
 
 Pass this token to the Matrix homeserver's `/_matrix/client/v3/login` endpoint using the `org.matrix.login.jwt` login type. The homeserver must be configured to trust JWTs issued by this Control Plane (see the homeserver `jwt_secret` configuration).
 
-The Matrix user ID is derived deterministically from the caller's DID and the homeserver's server name: `localpart = sha256(did + "|" + serverName)`. This derivation is consistent across the Control Plane and the SDK; callers must never compute or pass Matrix user IDs directly.
+The Matrix user ID is derived deterministically: `localpart = sha256(did + "|" + hostname)`, where `hostname` is the host component of the homeserver URL (no scheme, no port). This derivation is consistent across the Control Plane and the SDK; callers must never compute or pass Matrix user IDs directly.
 
 ## Secret Manager
 
