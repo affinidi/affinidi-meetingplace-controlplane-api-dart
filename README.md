@@ -25,6 +25,7 @@ The Control Plane API is built on Dart for a high-performance server, which prov
     - [Authentication](#authentication)
     - [Calling Authenticated Endpoint](#calling-authenticated-endpoint)
     - [API References](#api-references)
+    - [Matrix Authentication](#matrix-authentication)
   - [Secret Manager](#secret-manager)
     - [Secrets List](#secrets-list)
     - [Local Secret Manager](#local-secret-manager)
@@ -47,6 +48,8 @@ The Control Plane API is built on Dart for a high-performance server, which prov
 
 - **Group Chat**: Provides group chat functionality, including management of members and sending messages to group members.
 
+- **Matrix Authentication**: Acts as the sole trusted issuer of short-lived JWTs that authorise participants to authenticate directly with a Matrix homeserver. Tokens are cryptographically bound to the caller's DID and the target homeserver using a deterministic derivation, keeping Matrix credentials fully managed server-side.
+
 
 ## Core Concepts
 
@@ -55,6 +58,8 @@ The Control Plane API is built on Dart for a high-performance server, which prov
 - **Out-Of-Band** - The protocol defined in DIDComm enables sharing a DIDComm message or invitation through a transport method other than a direct, established DIDComm channel, such as via a QR code or a URL to create a new connection.
 
 - **Discovery** - The Control Plane API allows participants to create connection offers or invitations that other parties can claim to initiate connection requests and establish a secure communication channel.
+
+- **Matrix Homeserver** - A server that stores and routes messages via the Matrix protocol. The Control Plane acts as the sole trusted JWT issuer for Matrix login; clients authenticate through the challenge-response flow without touching Matrix credentials directly.
 
 ## Requirements
 
@@ -77,6 +82,7 @@ List of the environment variables required to run the Control Plane API server.
 | DIDCOMM_AUTH_SECRET | Specifies path and filename containing the didcommauth secret (e.g., `secrets/didcommauth.json`)                                                                                                                                                                                                                                                           |
 | HASH_SECRET         | A secret value to enhance the security of hashing operations within the application.                                                                                                                                                                                                                                                                       |
 | DID_DOCUMENT        | Specifies path and filename of the DID document parameter (e.g., `params/did_document.json`.                                                                                                                                                                                                                                                               |
+| MATRIX_TOKEN_EXPIRY_IN_MINUTES | (Optional) Sets the JWT `exp` claim duration in minutes for Matrix login tokens issued by the `/v1/matrix/token` endpoint. Default: `5`.                                                                                                                                                                                          |
 
 Configure the following environment variables if AWS is the selected option.
 
@@ -355,6 +361,51 @@ To call the authenticated API endpoints, use the `DIDCommAuthToken` generated fr
 ### API References
 
 Refer to the [list of available](https://github.com/affinidi/affinidi-meetingplace-controlplane-api-dart/blob/main/docs/api_references/) endpoints from the Control Plane API.
+
+### Matrix Authentication
+
+The Control Plane API issues short-lived JWTs that clients use to authenticate with a Matrix homeserver via the `org.matrix.login.jwt` login type. The flow uses the same challenge-response pattern as DIDComm authentication, but the token returned is a Matrix login token, not a Control Plane access token.
+
+1. Request a Matrix challenge by posting the caller's DID.
+
+   ```bash
+   POST /v1/matrix/challenge
+
+   {
+     "did": "did:peer:..."
+   }
+   ```
+
+   The endpoint returns a challenge valid for 1 minute, bound to the `matrix_token` purpose. It may only be consumed at `/v1/matrix/token`.
+
+   ```json
+   {
+     "challenge": "string"
+   }
+   ```
+
+2. Sign the DIDComm message with the challenge and post it along with the target homeserver URL.
+
+   ```bash
+   POST /v1/matrix/token
+
+   {
+     "challenge_response": "string",
+     "homeserver": "https://matrix.yourdomain.com"
+   }
+   ```
+
+   The endpoint returns a short-lived JWT signed with the Control Plane's `didcommauth` key.
+
+   ```json
+   {
+     "token": "string"
+   }
+   ```
+
+Pass this token to the Matrix homeserver's `/_matrix/client/v3/login` endpoint using the `org.matrix.login.jwt` login type. The homeserver must be configured to trust JWTs issued by this Control Plane (see the homeserver [`jwt_secret` configuration](https://element-hq.github.io/synapse/latest/jwt.html)).
+
+The Matrix user ID is derived deterministically: `localpart = sha256(did + "|" + hostname)`, where `hostname` is the host component of the homeserver URL (no scheme, no port). This derivation is consistent across the Control Plane and the SDK; callers must never compute or pass Matrix user IDs directly.
 
 ## Secret Manager
 
