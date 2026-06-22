@@ -6,6 +6,7 @@ import '../core/config/env_config.dart';
 import '../core/config/server_config.dart';
 import '../core/logger/logger.dart';
 import '../core/service/device_notification/device_notification_service.dart';
+import '../core/service/did_document/did_document_service.dart';
 import '../core/service/group/delete_group_input.dart';
 import '../core/service/group/deregister_member_input.dart';
 import '../core/service/group/send_message_input.dart';
@@ -14,6 +15,7 @@ import '../core/service/notification/notify_group_membership_finalised_input.dar
 import '../core/service/notification/notify_outreach_input.dart';
 import '../core/service/offer/admin_deregister_offer_input.dart';
 import '../utils/platform_type.dart';
+import '../core/entity/transport.dart';
 import 'accept_offer/request_model.dart';
 import 'accept_offer_group/request_model.dart';
 import 'admin/deregister_offer/request_model.dart';
@@ -28,6 +30,7 @@ import 'get_pending_notifications/request_model.dart';
 import 'group_add_member/request_model.dart';
 import 'group_delete/request_model.dart';
 import 'group_member_deregister/request_model.dart';
+import 'group_notify_channel/request_model.dart';
 import 'group_send_message/request_model.dart';
 import 'notify_acceptance/request_model.dart';
 import 'notify_acceptance_group/request_model.dart';
@@ -119,6 +122,16 @@ class ApplicationFacade {
       didResolver: config.didResolver,
       logger: _logger,
     );
+    _didDocumentService = DidDocumentService(
+      storage: config.storage,
+      didResolver: config.didResolver,
+      proofAudience: getEnv('CONTROL_PLANE_DID'),
+      hostedDidHost: _hostedDidAuthorityFromApiEndpoint(),
+      logger: _logger,
+      maxProofWindowSeconds:
+          int.tryParse(getEnvOrNull('DID_PROOF_MAX_WINDOW_SECONDS') ?? '') ??
+          300,
+    );
   }
 
   static ApplicationFacade? _instance;
@@ -130,6 +143,7 @@ class ApplicationFacade {
   late final NotificationService _notificationService;
   late final OobService _oobService;
   late final GroupService _groupService;
+  late final DidDocumentService _didDocumentService;
   late final DeviceNotificationService _deviceNotificationService;
   late final Logger _logger;
 
@@ -170,6 +184,7 @@ class ApplicationFacade {
         contactAttributes: request.contactAttributes,
         customPhrase: request.customPhrase,
         score: request.score,
+        transport: request.transport,
       ),
       authDid,
     );
@@ -231,6 +246,7 @@ class ApplicationFacade {
           deviceToken: request.deviceToken,
           platformType: request.platformType,
           metadata: request.metadata,
+          transport: Transport.matrix,
         ),
         authDid,
       );
@@ -561,6 +577,15 @@ class ApplicationFacade {
     );
   }
 
+  Future<void> notifyGroupChannel(GroupNotifyChannel request, String authDid) {
+    return _groupService.notifyChannel(
+      offerLink: request.offerLink,
+      groupDid: request.groupDid,
+      controllingDid: authDid,
+      type: request.type,
+    );
+  }
+
   Future<void> deregisterMemberFromGroup(
     GroupMemberDeregisterRequest request,
     String authDid,
@@ -568,6 +593,7 @@ class ApplicationFacade {
     return _groupService.deregisterMember(
       DeregisterMemberInput(
         groupId: request.groupId,
+        memberDid: request.memberDid,
         controllingDid: authDid,
         messageToRelay: request.messageToRelay,
       ),
@@ -658,4 +684,34 @@ class ApplicationFacade {
     required Object error,
     required StackTrace stackTrace,
   }) => _logger.error(message, error: error, stackTrace: stackTrace);
+
+  Future<Map<String, dynamic>> uploadDidDocument({
+    required String authDid,
+    required String authVerificationMethod,
+    required Map<String, dynamic> didDocument,
+    required Map<String, dynamic> controlProof,
+    required Map<String, dynamic> proof,
+  }) async {
+    final record = await _didDocumentService.upload(
+      authDid: authDid,
+      authVerificationMethod: authVerificationMethod,
+      didDocument: didDocument,
+      controlProof: controlProof,
+      proof: proof,
+    );
+    return {
+      'did': record.did,
+      'segment': record.segment,
+      'didDocUrl': '${getEnv('API_ENDPOINT')}/user/${record.segment}/did.json',
+    };
+  }
+
+  Future<Map<String, dynamic>> resolveDidDocumentBySegment(String segment) {
+    return _didDocumentService.resolveBySegment(segment);
+  }
+
+  String _hostedDidAuthorityFromApiEndpoint() {
+    final uri = Uri.parse(getEnv('API_ENDPOINT'));
+    return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+  }
 }

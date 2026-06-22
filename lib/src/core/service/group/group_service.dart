@@ -176,21 +176,18 @@ class GroupService {
   Future<void> deregisterMember(DeregisterMemberInput input) async {
     final group = await getGroup(input.groupId);
 
-    final groupMember = await getGroupMemberByControllingDid(
-      input.controllingDid,
-      groupId: group.id,
+    final groupMembers = await _getGroupMembers(group.id);
+    final groupMember = groupMembers.firstWhere(
+      (m) => m.memberDid == input.memberDid,
+      orElse: () => throw GroupMemberNotInGroup(groupId: group.id),
     );
 
-    await sendMessage(
-      SendMessageInput(
-        offerLink: group.offerLink,
-        groupDid: group.groupDid,
-        controllingDid: input.controllingDid,
-        messagePayload: input.messageToRelay,
-        incSeqNo: false,
-        notify: false,
-      ),
-    );
+    final isOwner = group.conrollingDid == input.controllingDid;
+    final isSelfDeregister = groupMember.controllingDid == input.controllingDid;
+
+    if (!isOwner && !isSelfDeregister) {
+      throw GroupPermissionDenied();
+    }
 
     await _storage.deleteFromlist(
       GroupMember.entityName,
@@ -305,6 +302,55 @@ class GroupService {
         } catch (e, stackTrace) {
           _logger.error(
             'Message could not be send from group to member: ${e.toString()}',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }).toList(),
+    );
+  }
+
+  Future<void> notifyChannel({
+    required String offerLink,
+    required String groupDid,
+    required String controllingDid,
+    required String type,
+  }) async {
+    final groupId = GroupUtils.generateGroupId(
+      offerLink: offerLink,
+      groupDid: groupDid,
+    );
+
+    await getGroup(groupId);
+
+    final sender = await getGroupMemberByControllingDid(
+      controllingDid,
+      groupId: groupId,
+    );
+
+    final groupMembers = await _getGroupMembers(groupId);
+
+    await Future.wait(
+      groupMembers.map((groupMember) async {
+        if (groupMember.memberDid == sender.memberDid) {
+          return Future.value();
+        }
+
+        try {
+          final recipientDidDoc = await _didResolver.resolveDid(
+            groupMember.memberDid,
+          );
+
+          await _notificationService.notifyChannelGroup(
+            type: type,
+            platformType: groupMember.platformType,
+            platformEndpointArn: groupMember.platformEndpointArn,
+            authDid: controllingDid,
+            recipientDid: recipientDidDoc.id,
+          );
+        } catch (e, stackTrace) {
+          _logger.error(
+            'Notification could not be sent to group member: ${e.toString()}',
             error: e,
             stackTrace: stackTrace,
           );

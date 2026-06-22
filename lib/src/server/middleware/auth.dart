@@ -60,7 +60,10 @@ Middleware authorize(Logger logger, {required bool adminOnly}) =>
         }
 
         request = request.change(
-          context: {'authDid': authTokenVerification.did},
+          context: {
+            'authDid': authTokenVerification.did,
+            'authVerificationMethod': authTokenVerification.verificationMethod,
+          },
         );
 
         return Future.sync(() => innerHandler(request)).then((response) {

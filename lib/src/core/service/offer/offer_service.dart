@@ -119,6 +119,7 @@ class OfferService {
       createdBy: authDid,
       ttl: ttl,
       score: input.score,
+      transport: input.transport,
     );
 
     try {

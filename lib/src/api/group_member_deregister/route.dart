@@ -49,6 +49,10 @@ Future<Response> groupDeregisterMember(
     return Response.forbidden(
       GroupMemberDeregisterErrorResponse.notInGroup().toString(),
     );
+  } on GroupPermissionDenied {
+    return Response.forbidden(
+      GroupMemberDeregisterErrorResponse.permissionDenied().toString(),
+    );
   } catch (e, stackTrace) {
     facade.logError(
       'Error on group member deregister',

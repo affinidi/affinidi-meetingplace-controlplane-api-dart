@@ -5,6 +5,8 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 
+import '../api/matrix_token/route.dart';
+import '../api/matrix_challenge/route.dart';
 import '../api/update_offers_score/route.dart';
 import 'middleware/auth.dart';
 
@@ -14,6 +16,8 @@ import '../api/admin/deregister_offer/route.dart';
 import '../api/check_offer_phrase/route.dart';
 import '../api/application_facade.dart';
 import '../api/create_oob/route.dart';
+import '../api/did_document_resolve/route.dart';
+import '../api/did_document_upload/route.dart';
 import '../api/delete_pending_notifications/route.dart';
 import '../api/deregister_notification/route.dart';
 import '../api/discovery/route.dart';
@@ -21,6 +25,7 @@ import '../api/get_oob/route.dart';
 import '../api/group_add_member/route.dart';
 import '../api/group_delete/route.dart';
 import '../api/group_member_deregister/route.dart';
+import '../api/group_notify_channel/route.dart';
 import '../api/group_send_message/route.dart';
 import '../api/notify_acceptance/route.dart';
 import '../api/notify_acceptance_group/route.dart';
@@ -61,6 +66,13 @@ Router createRouter(ApplicationFacade facade) {
       '/.well-known/did.json',
       (Request req) => _didHandler(req, facade.config.didDocumentManager),
     )
+    ..get('/user/<segment>/did.json', (Request req, String segment) {
+      return publicPipeline(
+        (Request request, ApplicationFacade appFacade) =>
+            didDocumentResolve(request, appFacade, segment),
+        facade,
+      )(req);
+    })
     ..get('/asset/<imageName>', _assertImageHandler)
     ..get('/discover', publicPipeline(discoverApi, facade))
     // authentication routes
@@ -93,6 +105,13 @@ Router createRouter(ApplicationFacade facade) {
     )
     // device routes
     ..post('/v1/register-device', privatePipeline(registerDevice, facade))
+    // matrix specific routes
+    ..post('/v1/matrix/challenge', publicPipeline(matrixChallenge, facade))
+    ..post('/v1/matrix/token', publicPipeline(matrixToken, facade))
+    ..post(
+      '/v1/did-document/upload',
+      privatePipeline(didDocumentUpload, facade),
+    )
     // notification routes
     ..post(
       '/v1/notifications',
@@ -124,6 +143,10 @@ Router createRouter(ApplicationFacade facade) {
       privatePipeline(groupDeregisterMember, facade),
     )
     ..post('/v1/group-send-message', privatePipeline(groupSendMessage, facade))
+    ..post(
+      '/v1/group-notify-channel',
+      privatePipeline(groupNotifyChannel, facade),
+    )
     // outreach
     ..post('/v1/notify-outreach', privatePipeline(notifyOutreach, facade))
     // oob

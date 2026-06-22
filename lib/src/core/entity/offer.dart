@@ -1,4 +1,5 @@
 import 'entity.dart';
+import 'transport.dart';
 import '../../utils/platform_type.dart';
 import '../../utils/date_time.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -65,6 +66,7 @@ class Offer extends Entity {
     this.groupId,
     this.groupDid,
     this.score,
+    this.transport = Transport.didcomm,
   }) {
     createdAt = nowUtc().toIso8601String();
     modifiedAt = nowUtc().toIso8601String();
@@ -101,6 +103,9 @@ class Offer extends Entity {
 
   final String platformEndpointArn;
   final PlatformType platformType;
+
+  @JsonKey(defaultValue: Transport.didcomm)
+  final Transport transport;
 
   final String mediatorDid;
   final String mediatorEndpoint;

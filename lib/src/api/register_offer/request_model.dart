@@ -1,5 +1,6 @@
 import 'dart:convert';
 import '../../utils/platform_type.dart';
+import '../../core/entity/transport.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../request_validation_exception.dart';
@@ -24,6 +25,7 @@ class RegisterOfferRequest {
     this.maximumUsage,
     customPhrase,
     this.score,
+    required this.transport,
   }) : customPhrase = customPhrase == '' ? null : customPhrase;
 
   factory RegisterOfferRequest.fromRequestParams(String requestParams) {
@@ -52,6 +54,7 @@ class RegisterOfferRequest {
   final String? validUntil;
   final String? customPhrase;
   final int? score;
+  final Transport transport;
 
   toJson() => _$RegisterOfferRequestToJson(this);
 }

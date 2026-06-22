@@ -1,5 +1,6 @@
 import 'dart:convert';
 import '../../core/entity/offer.dart';
+import '../../core/entity/transport.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'response_model.g.dart';
@@ -21,6 +22,7 @@ class QueryOfferResponse {
     required this.contactAttributes,
     required this.groupId,
     required this.groupDid,
+    required this.transport,
     this.score,
   });
 
@@ -41,6 +43,7 @@ class QueryOfferResponse {
       groupId: offer.groupId,
       groupDid: offer.groupDid,
       score: offer.score,
+      transport: offer.transport,
     );
   }
 
@@ -59,6 +62,7 @@ class QueryOfferResponse {
   final String? groupId;
   final String? groupDid;
   final int? score;
+  final Transport transport;
 
   @override
   String toString() => jsonEncode(_$QueryOfferResponseToJson(this));

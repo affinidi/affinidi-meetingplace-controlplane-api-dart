@@ -32,6 +32,9 @@ Offer _$OfferFromJson(Map<String, dynamic> json) =>
         groupId: json['groupId'] as String?,
         groupDid: json['groupDid'] as String?,
         score: (json['score'] as num?)?.toInt(),
+        transport:
+            $enumDecodeNullable(_$TransportEnumMap, json['transport']) ??
+            Transport.didcomm,
       )
       ..queryCount = (json['queryCount'] as num).toInt()
       ..claimCount = (json['claimCount'] as num).toInt()
@@ -62,6 +65,7 @@ Map<String, dynamic> _$OfferToJson(Offer instance) => <String, dynamic>{
   'maximumQueries': instance.maximumQueries,
   'platformEndpointArn': instance.platformEndpointArn,
   'platformType': _$PlatformTypeEnumMap[instance.platformType]!,
+  'transport': _$TransportEnumMap[instance.transport]!,
   'mediatorDid': instance.mediatorDid,
   'mediatorEndpoint': instance.mediatorEndpoint,
   'mediatorWSSEndpoint': instance.mediatorWSSEndpoint,
@@ -83,4 +87,9 @@ const _$PlatformTypeEnumMap = {
   PlatformType.DIDCOMM: 'DIDCOMM',
   PlatformType.PUSH_NOTIFICATION: 'PUSH_NOTIFICATION',
   PlatformType.NONE: 'NONE',
+};
+
+const _$TransportEnumMap = {
+  Transport.didcomm: 'didcomm',
+  Transport.matrix: 'matrix',
 };
