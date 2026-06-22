@@ -59,6 +59,8 @@ The Control Plane API is built on Dart for a high-performance server, which prov
 
 - **Discovery** - The Control Plane API allows participants to create connection offers or invitations that other parties can claim to initiate connection requests and establish a secure communication channel.
 
+- **Matrix Homeserver** - A server that stores and routes messages via the Matrix protocol. The Control Plane acts as the sole trusted JWT issuer for Matrix login; clients authenticate through the challenge-response flow without touching Matrix credentials directly.
+
 ## Requirements
 
 - Install Dart SDK ^3.6.0
@@ -362,7 +364,7 @@ Refer to the [list of available](https://github.com/affinidi/affinidi-meetingpla
 
 ### Matrix Authentication
 
-The Control Plane API issues short-lived JWTs that clients use to authenticate with a Matrix homeserver via the `org.matrix.login.jwt` login type. The flow uses the same DIDComm challenge-response pattern as DIDComm authentication, but the token returned is a Matrix login token, not a Control Plane access token.
+The Control Plane API issues short-lived JWTs that clients use to authenticate with a Matrix homeserver via the `org.matrix.login.jwt` login type. The flow uses the same challenge-response pattern as DIDComm authentication, but the token returned is a Matrix login token, not a Control Plane access token.
 
 1. Request a Matrix challenge by posting the caller's DID.
 
@@ -401,7 +403,7 @@ The Control Plane API issues short-lived JWTs that clients use to authenticate w
    }
    ```
 
-Pass this token to the Matrix homeserver's `/_matrix/client/v3/login` endpoint using the `org.matrix.login.jwt` login type. The homeserver must be configured to trust JWTs issued by this Control Plane (see the homeserver `jwt_secret` configuration).
+Pass this token to the Matrix homeserver's `/_matrix/client/v3/login` endpoint using the `org.matrix.login.jwt` login type. The homeserver must be configured to trust JWTs issued by this Control Plane (see the homeserver [`jwt_secret` configuration](https://element-hq.github.io/synapse/latest/jwt.html)).
 
 The Matrix user ID is derived deterministically: `localpart = sha256(did + "|" + hostname)`, where `hostname` is the host component of the homeserver URL (no scheme, no port). This derivation is consistent across the Control Plane and the SDK; callers must never compute or pass Matrix user IDs directly.
 
