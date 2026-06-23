@@ -728,6 +728,61 @@ void main() {
     });
 
     test(
+      'accepts proof with iat slightly in the future (clock skew)',
+      () async {
+        final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+        final proofs = await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
+          didDocument: didDocument,
+          authDid: authDid,
+          iat: nowEpoch + 3,
+          exp: nowEpoch + 3 + 60,
+          jti: 'proof-jti-clock-skew-iat',
+        );
+
+        final record = await service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
+        );
+        expect(record.did, didDocument['id']);
+      },
+    );
+
+    test('throws when iat is far in the future beyond tolerance', () async {
+      final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+      final proofs = await _buildValidProofs(
+        authWallet: authWallet,
+        authKeyId: authKeyId,
+        authVerificationMethod: authVerificationMethod,
+        didWallet: didWallet,
+        didKeyId: didKeyId,
+        didDocument: didDocument,
+        authDid: authDid,
+        iat: nowEpoch + 30,
+        exp: nowEpoch + 30 + 60,
+        jti: 'proof-jti-clock-skew-iat-far',
+      );
+
+      expect(
+        service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
+        ),
+        throwsA(isA<InvalidDidDocumentInput>()),
+      );
+    });
+
+    test(
       'throws when proof window is too large even if exp is still future',
       () async {
         final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
