@@ -235,11 +235,12 @@ class DidDocumentProofVerifier {
     if (exp <= nowEpoch) {
       throw InvalidDidDocumentInput('$fieldName proof has expired');
     }
-    if (iat > nowEpoch) {
+    if (iat > nowEpoch + _clockSkewToleranceSeconds) {
       throw InvalidDidDocumentInput('$fieldName proof iat is in the future');
     }
   }
 
+  static const int _clockSkewToleranceSeconds = 5;
   static const String _uploadOperation = 'did-document/upload';
 
   Map<String, dynamic> _buildExpectedPayloadFields({
