@@ -14,8 +14,6 @@ GroupAddMemberRequest _$GroupAddMemberRequestFromJson(
   groupId: json['groupId'] as String,
   memberDid: json['memberDid'] as String,
   acceptOfferAsDid: json['acceptOfferAsDid'] as String,
-  reencryptionKey: json['reencryptionKey'] as String,
-  publicKey: json['publicKey'] as String,
   contactCard: json['contactCard'] as String,
 );
 
@@ -27,7 +25,5 @@ Map<String, dynamic> _$GroupAddMemberRequestToJson(
   'groupId': instance.groupId,
   'memberDid': instance.memberDid,
   'acceptOfferAsDid': instance.acceptOfferAsDid,
-  'reencryptionKey': instance.reencryptionKey,
-  'publicKey': instance.publicKey,
   'contactCard': instance.contactCard,
 };

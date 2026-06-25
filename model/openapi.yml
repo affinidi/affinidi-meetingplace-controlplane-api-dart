@@ -815,12 +815,6 @@ components:
         acceptOfferAsDid:
           type: string
           description: Decentralised Identifier (DID) of when the member accepted the offer.
-        reencryptionKey:
-          type: string
-          description: The reencryption key for the group chat member.
-        publicKey:
-          type: string
-          description: The public key information of the group chat member.
         contactCard:
           type: string
           description: The ContactCard of the member to add to the group chat.
@@ -829,8 +823,6 @@ components:
         - groupId
         - offerLink
         - memberDid
-        - reencryptionKey
-        - publicKey
         - contactCard
         - acceptOfferAsDid
     RegisterOfferInput:
@@ -972,15 +964,9 @@ components:
         metadata:
           type: string
           description: Metadata containing additional information about the offer.
-        adminReencryptionKey:
-          type: string
-          description: Reencryption key for the group chat admin.
         adminDid:
           type: string
           description: The Decentralised Identifier (DUD) of the group chat admin.
-        adminPublicKey:
-          type: string
-          description: The public key information of the group chat admin.
         memberContactCard:
           type: string
           description: A ContactCard of the group chat member encoded in base64 format.
@@ -995,8 +981,6 @@ components:
         - mediatorWSSEndpoint
         - mediatorDid
         - adminDid
-        - adminPublicKey
-        - adminReencryptionKey
         - memberContactCard
     RegisterDeviceInput:
       type: object

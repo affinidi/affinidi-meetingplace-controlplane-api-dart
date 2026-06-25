@@ -28,10 +28,7 @@ Future<RegisterOfferGroupRequest> getRegisterOfferGroupRequestMock({
     mediatorEndpoint: 'https://mediator.yourdomain.com',
     mediatorWSSEndpoint: 'ws://mediator.yourdomain.com',
     customPhrase: customPhrase,
-    adminReencryptionKey:
-        'a4f9c12e7b38d6f1c0e5a7b49d8235fa17c2e68b94f1d2c3b6e8f7a1c4d9b0e2',
     adminDid: await DidGenerator.generateDidKey(wallet),
-    adminPublicKey: 'qYcKlmOtaVdoj0+KvdX1eaLH16d47EcNlEvAAq4rwm0=',
     memberContactCard: 'eyJuIjp7ImdpdmVuIjoiQm9iIiwic3VybmFtZSI6IkEuIn19',
     metadata: jsonEncode({'group': 'meta'}),
   );
