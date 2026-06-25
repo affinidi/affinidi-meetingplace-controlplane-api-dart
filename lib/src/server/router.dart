@@ -26,7 +26,6 @@ import '../api/group_add_member/route.dart';
 import '../api/group_delete/route.dart';
 import '../api/group_member_deregister/route.dart';
 import '../api/group_notify_channel/route.dart';
-import '../api/group_send_message/route.dart';
 import '../api/notify_acceptance/route.dart';
 import '../api/notify_acceptance_group/route.dart';
 import '../api/notify_outreach/route.dart';
@@ -142,7 +141,6 @@ Router createRouter(ApplicationFacade facade) {
       '/v1/group-member-deregister',
       privatePipeline(groupDeregisterMember, facade),
     )
-    ..post('/v1/group-send-message', privatePipeline(groupSendMessage, facade))
     ..post(
       '/v1/group-notify-channel',
       privatePipeline(groupNotifyChannel, facade),
