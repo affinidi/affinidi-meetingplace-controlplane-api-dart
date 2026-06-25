@@ -14,8 +14,6 @@ class GroupMember extends Entity {
     required this.groupId,
     required this.offerLink,
     required this.memberDid,
-    required this.memberPublicKey,
-    required this.memberReencryptionKey,
     required this.memberContactCard,
     required this.platformEndpointArn,
     required this.platformType,
@@ -28,8 +26,6 @@ class GroupMember extends Entity {
   final String groupId;
   final String offerLink;
   final String memberDid;
-  final String memberPublicKey;
-  final String memberReencryptionKey;
   final String memberContactCard;
   final String platformEndpointArn;
   final PlatformType platformType;

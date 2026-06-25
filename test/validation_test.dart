@@ -339,9 +339,7 @@ void main() {
         mediatorDid: 'did:example:123',
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
         memberContactCard: 'memberContactCard',
       );
 
@@ -349,33 +347,6 @@ void main() {
         request.toJson(),
       );
       expect(result.isValid, true);
-    });
-
-    test('fails when adminReencryptionKey is empty', () {
-      final request = RegisterOfferGroupRequest(
-        offerName: 'test',
-        offerDescription: 'description',
-        didcommMessage: 'message',
-        contactCard: 'contactCard',
-        deviceToken: 'token',
-        platformType: PlatformType.PUSH_NOTIFICATION,
-        mediatorDid: 'did:example:123',
-        mediatorEndpoint: 'https://mediator.example.com',
-        mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: '',
-        adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
-        memberContactCard: 'memberContactCard',
-      );
-
-      final result = RegisterOfferGroupRequestValidator().validate(
-        request.toJson(),
-      );
-      expect(result.isValid, false);
-      expect(
-        result.exceptions.any((e) => e.key == 'adminReencryptionKey'),
-        true,
-      );
     });
 
     test('validates valid ISO8601 UTC date for validUntil', () {
@@ -391,9 +362,7 @@ void main() {
         mediatorDid: 'did:example:123',
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
         memberContactCard: 'memberContactCard',
         validUntil: futureDate,
       );
@@ -417,9 +386,7 @@ void main() {
         mediatorDid: 'did:example:123',
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
         memberContactCard: 'memberContactCard',
         validUntil: pastDate,
       );

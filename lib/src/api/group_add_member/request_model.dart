@@ -27,8 +27,6 @@ class GroupAddMemberRequest {
     required this.groupId,
     required this.memberDid,
     required this.acceptOfferAsDid,
-    required this.reencryptionKey,
-    required this.publicKey,
     required this.contactCard,
   });
   final String offerLink;
@@ -36,8 +34,6 @@ class GroupAddMemberRequest {
   final String groupId;
   final String memberDid;
   final String acceptOfferAsDid;
-  final String reencryptionKey;
-  final String publicKey;
   final String contactCard;
 
   toJson() => _$GroupAddMemberRequestToJson(this);

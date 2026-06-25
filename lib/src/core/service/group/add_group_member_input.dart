@@ -13,8 +13,6 @@ class AddGroupMemberInput {
     required this.groupId,
     required this.offerLink,
     required this.memberDid,
-    required this.memberPublicKey,
-    required this.memberReencryptionKey,
     required this.memberContactCard,
     required this.platformType,
     required this.platformEndpointArn,
@@ -25,8 +23,6 @@ class AddGroupMemberInput {
   final String groupId;
   final String offerLink;
   final String memberDid;
-  final String memberPublicKey;
-  final String memberReencryptionKey;
   final String memberContactCard;
   final PlatformType platformType;
   final String platformEndpointArn;

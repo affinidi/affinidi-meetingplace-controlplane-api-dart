@@ -38,7 +38,6 @@ import 'package:dio/dio.dart';
 import 'package:meeting_place_core/meeting_place_core.dart'
     show MeetingPlaceProtocol;
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
-import 'package:proxy_recrypt/proxy_recrypt.dart';
 import 'package:ssi/ssi.dart' as ssi;
 import 'package:ssi/ssi.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -52,26 +51,9 @@ import 'mocks/register_offer_request.dart';
 import 'utils/authorization.dart';
 import 'utils/did_document_proof.dart';
 import 'utils/did_generator.dart';
-import 'utils/recrypt.dart';
 
 void main() {
   final apiEndpoint = getEnv('API_ENDPOINT');
-  String getEncryptedMessageExample() {
-    final recrypt = Recrypt();
-    final recryptKeyPair = recrypt.generateKeyPair();
-    final result = recrypt.encapsulate(recryptKeyPair.publicKey);
-
-    return base64.encode(
-      utf8.encode(
-        jsonEncode({
-          'ciphertext': 'cipher-sample',
-          'capsule': (result['capsule'] as Capsule).toBase64(),
-          'iv': 'iv-sample',
-          'authentication_tag': 'auth-tag-sample',
-        }),
-      ),
-    );
-  }
 
   late String aliceAccessToken;
   late String bobAccessToken;
@@ -1563,9 +1545,6 @@ void main() {
       }
     });
 
-    final reencryptKeyPair = generateMemberRecryptKeyPair();
-    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
     final response = await dio.post(
       '$apiEndpoint/v1/group-add-member',
       data: GroupAddMemberRequest(
@@ -1574,8 +1553,6 @@ void main() {
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-        reencryptionKey: reencryptionKey.toBase64(),
-        publicKey: reencryptKeyPair.publicKeyToBase64(),
         contactCard: '',
       ).toJson(),
       options: Options(
@@ -2097,9 +2074,6 @@ void main() {
       ),
     );
 
-    final reencryptKeyPair = generateMemberRecryptKeyPair();
-    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
     await dio.post(
       '$apiEndpoint/v1/group-add-member',
       data: GroupAddMemberRequest(
@@ -2108,8 +2082,6 @@ void main() {
         groupId: registerOfferResponse.data['groupId'],
         memberDid: BobDevice.offerAcceptanceDid,
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-        reencryptionKey: reencryptionKey.toBase64(),
-        publicKey: reencryptKeyPair.publicKeyToBase64(),
         contactCard: '',
       ).toJson(),
       options: Options(
@@ -2322,7 +2294,7 @@ void main() {
       '$apiEndpoint/v1/group-delete',
       data: GroupDeleteRequest(
         groupId: registerOfferResponse.data['groupId'],
-        messageToRelay: getEncryptedMessageExample(),
+        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -2471,9 +2443,6 @@ void main() {
     await didManager.addVerificationMethod(keyPair.id);
     final bobDidDoc = await didManager.getDidDocument();
 
-    final reencryptKeyPair = generateMemberRecryptKeyPair();
-    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
     expect(
       () => dio.post(
         '$apiEndpoint/v1/group-add-member',
@@ -2483,8 +2452,6 @@ void main() {
           groupId: registerOfferResponse.data['groupId'],
           memberDid: bobDidDoc.id,
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-          reencryptionKey: reencryptionKey.toBase64(),
-          publicKey: reencryptKeyPair.publicKeyToBase64(),
           contactCard: '',
         ).toJson(),
         options: Options(
@@ -2552,9 +2519,6 @@ void main() {
     await didManager.addVerificationMethod(keyPair.id);
     final bobDidDoc = await didManager.getDidDocument();
 
-    final reencryptKeyPair = generateMemberRecryptKeyPair();
-    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
     await dio.post(
       '$apiEndpoint/v1/group-add-member',
       data: GroupAddMemberRequest(
@@ -2563,8 +2527,6 @@ void main() {
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-        reencryptionKey: reencryptionKey.toBase64(),
-        publicKey: reencryptKeyPair.publicKeyToBase64(),
         contactCard: '',
       ).toJson(),
       options: Options(
@@ -2580,7 +2542,7 @@ void main() {
       data: GroupMemberDeregisterRequest(
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
-        messageToRelay: getEncryptedMessageExample(),
+        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -2641,9 +2603,6 @@ void main() {
     await didManager.addVerificationMethod(keyPair.id);
     final bobDidDoc = await didManager.getDidDocument();
 
-    final reencryptKeyPair = generateMemberRecryptKeyPair();
-    final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
     await dio.post(
       '$apiEndpoint/v1/group-add-member',
       data: GroupAddMemberRequest(
@@ -2652,8 +2611,6 @@ void main() {
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
         acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-        reencryptionKey: reencryptionKey.toBase64(),
-        publicKey: reencryptKeyPair.publicKeyToBase64(),
         contactCard: '',
       ).toJson(),
       options: Options(
@@ -2669,7 +2626,7 @@ void main() {
       data: GroupMemberDeregisterRequest(
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
-        messageToRelay: getEncryptedMessageExample(),
+        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -2730,9 +2687,6 @@ void main() {
       await didManager.addVerificationMethod(keyPair.id);
       final bobDidDoc = await didManager.getDidDocument();
 
-      final reencryptKeyPair = generateMemberRecryptKeyPair();
-      final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
       await dio.post(
         '$apiEndpoint/v1/group-add-member',
         data: GroupAddMemberRequest(
@@ -2741,8 +2695,6 @@ void main() {
           groupId: registerOfferResponse.data['groupId'],
           memberDid: bobDidDoc.id,
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-          reencryptionKey: reencryptionKey.toBase64(),
-          publicKey: reencryptKeyPair.publicKeyToBase64(),
           contactCard: '',
         ).toJson(),
         options: Options(
@@ -2759,7 +2711,7 @@ void main() {
           data: GroupMemberDeregisterRequest(
             groupId: registerOfferResponse.data['groupId'],
             memberDid: registerOfferRequest.adminDid,
-            messageToRelay: getEncryptedMessageExample(),
+            messageToRelay: 'test-payload',
           ).toJson(),
           options: Options(
             headers: {
@@ -2828,9 +2780,6 @@ void main() {
       await bobMemberDidManager.addVerificationMethod(bobMemberKeyPair.id);
       final bobDidDoc = await bobMemberDidManager.getDidDocument();
 
-      final bobReencryptKeyPair = generateMemberRecryptKeyPair();
-      final bobReencryptionKey = generateReEncryptionKey(bobReencryptKeyPair);
-
       await dio.post(
         '$apiEndpoint/v1/group-add-member',
         data: GroupAddMemberRequest(
@@ -2839,8 +2788,6 @@ void main() {
           groupId: registerOfferResponse.data['groupId'],
           memberDid: bobDidDoc.id,
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-          reencryptionKey: bobReencryptionKey.toBase64(),
-          publicKey: bobReencryptKeyPair.publicKeyToBase64(),
           contactCard: '',
         ).toJson(),
         options: Options(
@@ -2912,11 +2859,6 @@ void main() {
       );
       final charlieDidDoc = await charlieMemberDidManager.getDidDocument();
 
-      final charlieReencryptKeyPair = generateMemberRecryptKeyPair();
-      final charlieReencryptionKey = generateReEncryptionKey(
-        charlieReencryptKeyPair,
-      );
-
       await dio.post(
         '$apiEndpoint/v1/group-add-member',
         data: GroupAddMemberRequest(
@@ -2925,8 +2867,6 @@ void main() {
           groupId: registerOfferResponse.data['groupId'],
           memberDid: charlieDidDoc.id,
           acceptOfferAsDid: charlieOfferAcceptanceDid,
-          reencryptionKey: charlieReencryptionKey.toBase64(),
-          publicKey: charlieReencryptKeyPair.publicKeyToBase64(),
           contactCard: '',
         ).toJson(),
         options: Options(
@@ -2944,7 +2884,7 @@ void main() {
           data: GroupMemberDeregisterRequest(
             groupId: registerOfferResponse.data['groupId'],
             memberDid: charlieDidDoc.id,
-            messageToRelay: getEncryptedMessageExample(),
+            messageToRelay: 'test-payload',
           ).toJson(),
           options: Options(
             headers: {
@@ -3012,9 +2952,6 @@ void main() {
       await didManager.addVerificationMethod(keyPair.id);
       final bobDidDoc = await didManager.getDidDocument();
 
-      final reencryptKeyPair = generateMemberRecryptKeyPair();
-      final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
       await dio.post(
         '$apiEndpoint/v1/group-add-member',
         data: GroupAddMemberRequest(
@@ -3023,8 +2960,6 @@ void main() {
           groupId: registerOfferResponse.data['groupId'],
           memberDid: bobDidDoc.id,
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-          reencryptionKey: reencryptionKey.toBase64(),
-          publicKey: reencryptKeyPair.toBase64(),
           contactCard: '',
         ).toJson(),
         options: Options(
@@ -3039,7 +2974,7 @@ void main() {
         '$apiEndpoint/v1/group-delete',
         data: GroupDeleteRequest(
           groupId: registerOfferResponse.data['groupId'],
-          messageToRelay: getEncryptedMessageExample(),
+          messageToRelay: 'test-payload',
         ).toJson(),
         options: Options(
           headers: {
@@ -3055,7 +2990,7 @@ void main() {
           data: GroupMemberDeregisterRequest(
             groupId: registerOfferResponse.data['groupId'],
             memberDid: bobDidDoc.id,
-            messageToRelay: getEncryptedMessageExample(),
+            messageToRelay: 'test-payload',
           ).toJson(),
           options: Options(
             headers: {
@@ -3100,7 +3035,7 @@ void main() {
       '$apiEndpoint/v1/group-delete',
       data: GroupDeleteRequest(
         groupId: response.data!['groupId'],
-        messageToRelay: getEncryptedMessageExample(),
+        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -3118,7 +3053,7 @@ void main() {
         '$apiEndpoint/v1/group-delete',
         data: GroupDeleteRequest(
           groupId: response.data!['groupId'],
-          messageToRelay: getEncryptedMessageExample(),
+          messageToRelay: 'test-payload',
         ).toJson(),
         options: Options(
           headers: {
@@ -3163,7 +3098,7 @@ void main() {
         '$apiEndpoint/v1/group-delete',
         data: GroupDeleteRequest(
           groupId: response.data!['groupId'],
-          messageToRelay: getEncryptedMessageExample(),
+          messageToRelay: 'test-payload',
         ).toJson(),
         options: Options(
           headers: {
