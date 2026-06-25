@@ -399,6 +399,7 @@ class ApplicationFacade {
         notificationChannelId: request.notificationChannelId,
         did: request.did,
         type: request.type,
+        mediaType: request.mediaType,
       ),
       authDid,
     );

@@ -12,6 +12,7 @@ class NotifyChannelRequest {
     required this.notificationChannelId,
     required this.did,
     required this.type,
+    this.mediaType,
   });
 
   factory NotifyChannelRequest.fromRequestParams(String requestParams) {
@@ -28,6 +29,8 @@ class NotifyChannelRequest {
   final String notificationChannelId;
   final String did;
   final String type;
+  @JsonKey(includeIfNull: false)
+  final String? mediaType;
 
   toJson() => _$NotifyChannelRequestToJson(this);
 }

@@ -92,6 +92,7 @@ ChannelActivityPayload _$ChannelActivityPayloadFromJson(
   pendingCount: (json['pendingCount'] as num).toInt(),
   did: json['did'] as String,
   type: json['type'] as String,
+  mediaType: json['mediaType'] as String?,
 );
 
 Map<String, dynamic> _$ChannelActivityPayloadToJson(
@@ -102,6 +103,7 @@ Map<String, dynamic> _$ChannelActivityPayloadToJson(
   'pendingCount': instance.pendingCount,
   'did': instance.did,
   'type': instance.type,
+  'mediaType': ?instance.mediaType,
 };
 
 OfferFinalisedPayload _$OfferFinalisedPayloadFromJson(

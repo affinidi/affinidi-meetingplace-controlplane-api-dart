@@ -1471,6 +1471,44 @@ void main() {
     expect(response.data['notificationId'] != null, true);
   });
 
+  test('#notify-channel: success with optional mediaType', () async {
+    final registerNotificationResponse = await dio.post(
+      '$apiEndpoint/v1/register-notification',
+      data: RegisterNotificationRequest(
+        myDid: await DidGenerator.generateDidKey(aliceWallet),
+        theirDid: await DidGenerator.generateDidKey(bobWallet),
+        deviceToken: AliceDevice.deviceToken,
+        platformType: AliceDevice.platformType,
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': aliceAccessToken,
+        },
+      ),
+    );
+
+    final response = await dio.post(
+      '$apiEndpoint/v1/notify-channel',
+      data: NotifyChannelRequest(
+        notificationChannelId:
+            registerNotificationResponse.data['notificationToken'],
+        did: await DidGenerator.generateDidKey(bobWallet),
+        type: 'call-invite',
+        mediaType: 'audio',
+      ).toJson(),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: 'application/json',
+          'authorization': bobAccessToken,
+        },
+      ),
+    );
+
+    expect(response.statusCode, HttpStatus.ok);
+    expect(response.data['notificationId'] != null, true);
+  });
+
   test('notify-acceptance: fails if user is not authorized', () async {
     try {
       await dio.post(

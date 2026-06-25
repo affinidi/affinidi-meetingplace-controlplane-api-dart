@@ -172,6 +172,7 @@ class NotificationService {
         consumerAuthDid: authDid,
         acceptChannelDid: input.did,
         type: input.type,
+        mediaType: input.mediaType,
         payload: notificationData,
       ),
     );

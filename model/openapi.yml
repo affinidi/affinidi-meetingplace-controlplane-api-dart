@@ -718,6 +718,9 @@ components:
         type:
           type: string
           description: The type of activity.
+        mediaType:
+          type: string
+          description: Optional media type for call-invite activities (audio or video).
       required:
         - notificationChannelId
         - did

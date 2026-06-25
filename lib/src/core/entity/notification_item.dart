@@ -114,9 +114,12 @@ class ChannelActivityPayload extends NotificationItemPayload {
     required super.pendingCount,
     required this.did,
     required this.type,
+    this.mediaType,
   });
   final String did;
   final String type;
+  @JsonKey(includeIfNull: false)
+  final String? mediaType;
 
   @override
   String toString() => JsonEncoder().convert({
@@ -232,6 +235,7 @@ class NotificationItem extends Entity {
     required String consumerAuthDid,
     required String acceptChannelDid,
     required DeviceNotificationData payload,
+    String? mediaType,
   }) => NotificationItem(
     id: id,
     type: NotificationItemType.channelActivity,
@@ -244,6 +248,7 @@ class NotificationItem extends Entity {
       pendingCount: payload.pendingCount,
       did: acceptChannelDid,
       type: type,
+      mediaType: mediaType,
     ).toString(),
   );
 

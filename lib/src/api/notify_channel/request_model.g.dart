@@ -12,6 +12,7 @@ NotifyChannelRequest _$NotifyChannelRequestFromJson(
   notificationChannelId: json['notificationChannelId'] as String,
   did: json['did'] as String,
   type: json['type'] as String,
+  mediaType: json['mediaType'] as String?,
 );
 
 Map<String, dynamic> _$NotifyChannelRequestToJson(
@@ -20,4 +21,5 @@ Map<String, dynamic> _$NotifyChannelRequestToJson(
   'notificationChannelId': instance.notificationChannelId,
   'did': instance.did,
   'type': instance.type,
+  'mediaType': ?instance.mediaType,
 };

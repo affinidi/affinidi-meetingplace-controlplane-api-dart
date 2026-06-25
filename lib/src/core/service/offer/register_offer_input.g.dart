@@ -19,12 +19,12 @@ RegisterOfferInput _$RegisterOfferInputFromJson(Map<String, dynamic> json) =>
       mediatorEndpoint: json['mediatorEndpoint'] as String,
       mediatorWSSEndpoint: json['mediatorWSSEndpoint'] as String,
       contactAttributes: (json['contactAttributes'] as num).toInt(),
+      transport: $enumDecode(_$TransportEnumMap, json['transport']),
       validUntil: json['validUntil'] as String?,
       maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
       customPhrase: json['customPhrase'] as String?,
       metadata: json['metadata'] as String?,
       score: (json['score'] as num?)?.toInt(),
-      transport: $enumDecode(_$TransportEnumMap, json['transport']),
     );
 
 Map<String, dynamic> _$RegisterOfferInputToJson(RegisterOfferInput instance) =>
