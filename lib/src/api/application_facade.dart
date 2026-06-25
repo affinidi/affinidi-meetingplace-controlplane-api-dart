@@ -9,7 +9,6 @@ import '../core/service/device_notification/device_notification_service.dart';
 import '../core/service/did_document/did_document_service.dart';
 import '../core/service/group/delete_group_input.dart';
 import '../core/service/group/deregister_member_input.dart';
-import '../core/service/group/send_message_input.dart';
 import '../core/entity/group.dart';
 import '../core/service/notification/notify_group_membership_finalised_input.dart';
 import '../core/service/notification/notify_outreach_input.dart';
@@ -31,7 +30,6 @@ import 'group_add_member/request_model.dart';
 import 'group_delete/request_model.dart';
 import 'group_member_deregister/request_model.dart';
 import 'group_notify_channel/request_model.dart';
-import 'group_send_message/request_model.dart';
 import 'notify_acceptance/request_model.dart';
 import 'notify_acceptance_group/request_model.dart';
 import 'notify_channel/request_model.dart';
@@ -560,19 +558,6 @@ class ApplicationFacade {
         acceptOfferAsDid: request.acceptOfferAsDid,
         authDid: authDid,
         startSeqNo: group.seqNo,
-      ),
-    );
-  }
-
-  Future<void> sendGroupMessage(GroupSendMessage request, String authDid) {
-    return _groupService.sendMessage(
-      SendMessageInput(
-        offerLink: request.offerLink,
-        groupDid: request.groupDid,
-        controllingDid: authDid,
-        messagePayload: request.payload,
-        incSeqNo: request.incSeqNo,
-        notify: request.notify,
       ),
     );
   }
