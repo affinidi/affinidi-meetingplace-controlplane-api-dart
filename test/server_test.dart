@@ -2294,7 +2294,6 @@ void main() {
       '$apiEndpoint/v1/group-delete',
       data: GroupDeleteRequest(
         groupId: registerOfferResponse.data['groupId'],
-        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -2542,7 +2541,6 @@ void main() {
       data: GroupMemberDeregisterRequest(
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
-        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -2626,7 +2624,6 @@ void main() {
       data: GroupMemberDeregisterRequest(
         groupId: registerOfferResponse.data['groupId'],
         memberDid: bobDidDoc.id,
-        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -2711,7 +2708,6 @@ void main() {
           data: GroupMemberDeregisterRequest(
             groupId: registerOfferResponse.data['groupId'],
             memberDid: registerOfferRequest.adminDid,
-            messageToRelay: 'test-payload',
           ).toJson(),
           options: Options(
             headers: {
@@ -2884,7 +2880,6 @@ void main() {
           data: GroupMemberDeregisterRequest(
             groupId: registerOfferResponse.data['groupId'],
             memberDid: charlieDidDoc.id,
-            messageToRelay: 'test-payload',
           ).toJson(),
           options: Options(
             headers: {
@@ -2974,7 +2969,6 @@ void main() {
         '$apiEndpoint/v1/group-delete',
         data: GroupDeleteRequest(
           groupId: registerOfferResponse.data['groupId'],
-          messageToRelay: 'test-payload',
         ).toJson(),
         options: Options(
           headers: {
@@ -2990,7 +2984,6 @@ void main() {
           data: GroupMemberDeregisterRequest(
             groupId: registerOfferResponse.data['groupId'],
             memberDid: bobDidDoc.id,
-            messageToRelay: 'test-payload',
           ).toJson(),
           options: Options(
             headers: {
@@ -3035,7 +3028,6 @@ void main() {
       '$apiEndpoint/v1/group-delete',
       data: GroupDeleteRequest(
         groupId: response.data!['groupId'],
-        messageToRelay: 'test-payload',
       ).toJson(),
       options: Options(
         headers: {
@@ -3053,7 +3045,6 @@ void main() {
         '$apiEndpoint/v1/group-delete',
         data: GroupDeleteRequest(
           groupId: response.data!['groupId'],
-          messageToRelay: 'test-payload',
         ).toJson(),
         options: Options(
           headers: {
@@ -3098,7 +3089,6 @@ void main() {
         '$apiEndpoint/v1/group-delete',
         data: GroupDeleteRequest(
           groupId: response.data!['groupId'],
-          messageToRelay: 'test-payload',
         ).toJson(),
         options: Options(
           headers: {
