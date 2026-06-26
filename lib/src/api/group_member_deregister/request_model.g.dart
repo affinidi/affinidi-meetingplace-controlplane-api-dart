@@ -11,7 +11,6 @@ GroupMemberDeregisterRequest _$GroupMemberDeregisterRequestFromJson(
 ) => GroupMemberDeregisterRequest(
   groupId: json['groupId'] as String,
   memberDid: json['memberDid'] as String,
-  messageToRelay: json['messageToRelay'] as String,
 );
 
 Map<String, dynamic> _$GroupMemberDeregisterRequestToJson(
@@ -19,5 +18,4 @@ Map<String, dynamic> _$GroupMemberDeregisterRequestToJson(
 ) => <String, dynamic>{
   'groupId': instance.groupId,
   'memberDid': instance.memberDid,
-  'messageToRelay': instance.messageToRelay,
 };

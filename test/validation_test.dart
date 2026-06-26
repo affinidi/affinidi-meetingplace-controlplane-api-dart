@@ -8,8 +8,6 @@ import 'package:meeting_place_control_plane_api/src/api/delete_pending_notificat
 import 'package:meeting_place_control_plane_api/src/api/delete_pending_notifications/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/deregister_notification/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/deregister_notification/request_validator.dart';
-import 'package:meeting_place_control_plane_api/src/api/group_send_message/request_model.dart';
-import 'package:meeting_place_control_plane_api/src/api/group_send_message/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_device/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_device/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/register_offer/request_model.dart';
@@ -341,9 +339,7 @@ void main() {
         mediatorDid: 'did:example:123',
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
         memberContactCard: 'memberContactCard',
       );
 
@@ -351,33 +347,6 @@ void main() {
         request.toJson(),
       );
       expect(result.isValid, true);
-    });
-
-    test('fails when adminReencryptionKey is empty', () {
-      final request = RegisterOfferGroupRequest(
-        offerName: 'test',
-        offerDescription: 'description',
-        didcommMessage: 'message',
-        contactCard: 'contactCard',
-        deviceToken: 'token',
-        platformType: PlatformType.PUSH_NOTIFICATION,
-        mediatorDid: 'did:example:123',
-        mediatorEndpoint: 'https://mediator.example.com',
-        mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: '',
-        adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
-        memberContactCard: 'memberContactCard',
-      );
-
-      final result = RegisterOfferGroupRequestValidator().validate(
-        request.toJson(),
-      );
-      expect(result.isValid, false);
-      expect(
-        result.exceptions.any((e) => e.key == 'adminReencryptionKey'),
-        true,
-      );
     });
 
     test('validates valid ISO8601 UTC date for validUntil', () {
@@ -393,9 +362,7 @@ void main() {
         mediatorDid: 'did:example:123',
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
         memberContactCard: 'memberContactCard',
         validUntil: futureDate,
       );
@@ -419,9 +386,7 @@ void main() {
         mediatorDid: 'did:example:123',
         mediatorEndpoint: 'https://mediator.example.com',
         mediatorWSSEndpoint: 'wss://mediator.example.com',
-        adminReencryptionKey: 'key',
         adminDid: 'did:example:admin',
-        adminPublicKey: 'publickey',
         memberContactCard: 'memberContactCard',
         validUntil: pastDate,
       );
@@ -676,90 +641,6 @@ void main() {
       );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'notificationToken'), true);
-    });
-  });
-
-  group('GroupSendMessageValidator', () {
-    test('validates valid request', () {
-      final request = GroupSendMessage(
-        offerLink: 'link123',
-        groupDid: 'did:example:group',
-        payload: 'message payload',
-        ephemeral: true,
-        expiresTime: null,
-      );
-
-      final result = GroupSendMessageValidator().validate(request.toJson());
-      expect(result.isValid, true);
-    });
-
-    test('fails when offerLink is empty', () {
-      final request = GroupSendMessage(
-        offerLink: '',
-        groupDid: 'did:example:group',
-        payload: 'message payload',
-        ephemeral: true,
-        expiresTime: null,
-      );
-
-      final result = GroupSendMessageValidator().validate(request.toJson());
-      expect(result.isValid, false);
-      expect(result.exceptions.any((e) => e.key == 'offerLink'), true);
-    });
-
-    test('fails when groupDid is empty', () {
-      final request = GroupSendMessage(
-        offerLink: 'link123',
-        groupDid: '',
-        payload: 'message payload',
-        ephemeral: true,
-        expiresTime: null,
-      );
-
-      final result = GroupSendMessageValidator().validate(request.toJson());
-      expect(result.isValid, false);
-      expect(result.exceptions.any((e) => e.key == 'groupDid'), true);
-    });
-
-    test('fails when payload is empty', () {
-      final request = GroupSendMessage(
-        offerLink: 'link123',
-        groupDid: 'did:example:group',
-        payload: '',
-        ephemeral: true,
-        expiresTime: null,
-      );
-
-      final result = GroupSendMessageValidator().validate(request.toJson());
-      expect(result.isValid, false);
-      expect(result.exceptions.any((e) => e.key == 'payload'), true);
-    });
-
-    test('validates request with expiresTime', () {
-      final request = GroupSendMessage(
-        offerLink: 'link123',
-        groupDid: 'did:example:group',
-        payload: 'message payload',
-        ephemeral: false,
-        expiresTime: '2025-12-31T23:59:59Z',
-      );
-
-      final result = GroupSendMessageValidator().validate(request.toJson());
-      expect(result.isValid, true);
-    });
-
-    test('fails when expiresTime is empty string', () {
-      final request = GroupSendMessage(
-        offerLink: 'link123',
-        groupDid: 'did:example:group',
-        payload: 'message payload',
-        ephemeral: false,
-        expiresTime: '',
-      );
-
-      final result = GroupSendMessageValidator().validate(request.toJson());
-      expect(result.isValid, false);
-      expect(result.exceptions.any((e) => e.key == 'expiresTime'), true);
     });
   });
 

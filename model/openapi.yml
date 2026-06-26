@@ -178,13 +178,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DidChallenge"
-    GroupSendMessage:
-      description: List of required and optional parameters to send a group chat message.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/GroupSendMessage"
     GroupMemberDeregisterInput:
       description: List of required and optional parameters to remove a member from the group chat.
       required: true
@@ -372,12 +365,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/GroupMemberDeregisterOK"
-    GroupSendMessageOK:
-      description: GroupSendMessageOK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/GroupSendMessageOK"
     GroupNotifyChannelOK:
       description: GroupNotifyChannelOK
       content:
@@ -828,12 +815,6 @@ components:
         acceptOfferAsDid:
           type: string
           description: Decentralised Identifier (DID) of when the member accepted the offer.
-        reencryptionKey:
-          type: string
-          description: The reencryption key for the group chat member.
-        publicKey:
-          type: string
-          description: The public key information of the group chat member.
         contactCard:
           type: string
           description: The ContactCard of the member to add to the group chat.
@@ -842,8 +823,6 @@ components:
         - groupId
         - offerLink
         - memberDid
-        - reencryptionKey
-        - publicKey
         - contactCard
         - acceptOfferAsDid
     RegisterOfferInput:
@@ -985,15 +964,9 @@ components:
         metadata:
           type: string
           description: Metadata containing additional information about the offer.
-        adminReencryptionKey:
-          type: string
-          description: Reencryption key for the group chat admin.
         adminDid:
           type: string
           description: The Decentralised Identifier (DUD) of the group chat admin.
-        adminPublicKey:
-          type: string
-          description: The public key information of the group chat admin.
         memberContactCard:
           type: string
           description: A ContactCard of the group chat member encoded in base64 format.
@@ -1008,8 +981,6 @@ components:
         - mediatorWSSEndpoint
         - mediatorDid
         - adminDid
-        - adminPublicKey
-        - adminReencryptionKey
         - memberContactCard
     RegisterDeviceInput:
       type: object
@@ -1664,14 +1635,6 @@ components:
           description: The notification identifier
       required:
         - notificationId
-    GroupSendMessageOK:
-      type: object
-      additionalProperties: false
-      properties:
-        status:
-          type: string
-        message:
-          type: string
     DeletePendingNotificationsOK:
       type: object
       additionalProperties: false
@@ -1765,12 +1728,8 @@ components:
         groupId:
           type: string
           description: Unique identifier of the group chat to delete.
-        messageToRelay:
-          type: string
-          description: Message to send to the group chat members upon deletion.
       required:
         - groupId
-        - messageToRelay
     GroupDeregisterMemberInput:
       description: List of required and optional parameters to remove a member from the group chat. The caller must be either the group owner or the controller of the target member.
       type: object
@@ -1782,49 +1741,9 @@ components:
         groupId:
           type: string
           description: The unique identifier of the group chat to remove the member from.
-        messageToRelay:
-          type: string
-          description: An encrypted DIDComm message to send to the remaining group chat members in base64 format.
       required:
         - memberDid
         - groupId
-    GroupSendMessage:
-      description: List of required and optional parameters to send a group chat message.
-      type: object
-      additionalProperties: false
-      properties:
-        offerLink:
-          type: string
-          description: The Offer link associated with the group chat.
-        fromDid:
-          type: string
-          description: The Decentralised Identifier (DID) of the message sender.
-        groupDid:
-          type: string
-          description: The channel DID for the group chat.
-        payload:
-          type: string
-          description: Input payload containing the message to send to the group chat.
-        ephemeral:
-          type: boolean
-          description: Indicates whether the message is ephemeral and should not be stored persistently.
-        expiresTime:
-          type: string
-          description: >-
-            The date and time of when the message expires in ISO-8601 format, e.g.,
-            2023-09-20T07:12:13.
-        notify:
-          type: boolean
-          description: >-
-            Indicates whether to send a notification to the group chat members using push notification.
-        incSeqNo:
-          type: boolean
-          description: Indicates whether to increment the sequence number of the message in the group chat.
-      required:
-        - offerLink
-        - fromDid
-        - groupDid
-        - payload
     GroupNotifyChannelInput:
       description: List of required parameters to notify all members of a group chat.
       type: object
@@ -2331,18 +2250,6 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/MatrixChallengeOK"
-  /v1/group-send-message:
-    post:
-      operationId: groupSendMessage
-      description: Sends a message to the group chat.
-      security:
-        - DidCommTokenAuth: []
-      parameters: []
-      requestBody:
-        $ref: "#/components/requestBodies/GroupSendMessage"
-      responses:
-        "200":
-          $ref: "#/components/responses/GroupSendMessageOK"
   /v1/group-delete:
     post:
       operationId: groupDelete

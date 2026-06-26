@@ -9,7 +9,6 @@ import '../core/service/device_notification/device_notification_service.dart';
 import '../core/service/did_document/did_document_service.dart';
 import '../core/service/group/delete_group_input.dart';
 import '../core/service/group/deregister_member_input.dart';
-import '../core/service/group/send_message_input.dart';
 import '../core/entity/group.dart';
 import '../core/service/notification/notify_group_membership_finalised_input.dart';
 import '../core/service/notification/notify_outreach_input.dart';
@@ -31,7 +30,6 @@ import 'group_add_member/request_model.dart';
 import 'group_delete/request_model.dart';
 import 'group_member_deregister/request_model.dart';
 import 'group_notify_channel/request_model.dart';
-import 'group_send_message/request_model.dart';
 import 'notify_acceptance/request_model.dart';
 import 'notify_acceptance_group/request_model.dart';
 import 'notify_channel/request_model.dart';
@@ -267,8 +265,6 @@ class ApplicationFacade {
           groupId: group.id,
           offerLink: offer.offerLink,
           memberDid: request.adminDid,
-          memberPublicKey: request.adminPublicKey,
-          memberReencryptionKey: request.adminReencryptionKey,
           memberContactCard: request.memberContactCard,
           platformType: request.platformType,
           platformEndpointArn: deviceTokenMapping.platformEndpointArn,
@@ -543,8 +539,6 @@ class ApplicationFacade {
         groupId: request.groupId,
         offerLink: request.offerLink,
         memberDid: request.memberDid,
-        memberPublicKey: request.publicKey,
-        memberReencryptionKey: request.reencryptionKey,
         memberContactCard: request.contactCard,
         platformType: acceptance.platformType,
         platformEndpointArn: acceptance.platformEndpointArn,
@@ -560,19 +554,6 @@ class ApplicationFacade {
         acceptOfferAsDid: request.acceptOfferAsDid,
         authDid: authDid,
         startSeqNo: group.seqNo,
-      ),
-    );
-  }
-
-  Future<void> sendGroupMessage(GroupSendMessage request, String authDid) {
-    return _groupService.sendMessage(
-      SendMessageInput(
-        offerLink: request.offerLink,
-        groupDid: request.groupDid,
-        controllingDid: authDid,
-        messagePayload: request.payload,
-        incSeqNo: request.incSeqNo,
-        notify: request.notify,
       ),
     );
   }
@@ -595,18 +576,13 @@ class ApplicationFacade {
         groupId: request.groupId,
         memberDid: request.memberDid,
         controllingDid: authDid,
-        messageToRelay: request.messageToRelay,
       ),
     );
   }
 
   Future<void> deleteGroup(GroupDeleteRequest request, String authDid) async {
     await _groupService.deleteGroup(
-      DeleteGroupInput(
-        groupId: request.groupId,
-        messageToRelay: request.messageToRelay,
-        controllingDid: authDid,
-      ),
+      DeleteGroupInput(groupId: request.groupId, controllingDid: authDid),
     );
   }
 

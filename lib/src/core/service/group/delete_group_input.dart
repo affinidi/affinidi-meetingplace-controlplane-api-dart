@@ -6,7 +6,6 @@ part 'delete_group_input.g.dart';
 class DeleteGroupInput {
   DeleteGroupInput({
     required this.groupId,
-    required this.messageToRelay,
     required this.controllingDid,
   });
 
@@ -14,6 +13,5 @@ class DeleteGroupInput {
       _$DeleteGroupInputFromJson(json);
 
   final String groupId;
-  final String messageToRelay;
   final String controllingDid;
 }

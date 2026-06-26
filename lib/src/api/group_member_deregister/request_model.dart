@@ -26,12 +26,10 @@ class GroupMemberDeregisterRequest {
   GroupMemberDeregisterRequest({
     required this.groupId,
     required this.memberDid,
-    required this.messageToRelay,
   });
 
   final String groupId;
   final String memberDid;
-  final String messageToRelay;
 
   toJson() => _$GroupMemberDeregisterRequestToJson(this);
 }

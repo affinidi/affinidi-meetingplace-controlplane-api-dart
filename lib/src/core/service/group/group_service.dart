@@ -1,8 +1,5 @@
-import 'package:meeting_place_core/meeting_place_core.dart' show GroupMessage;
 import 'package:mutex/mutex.dart';
-import 'dart:convert';
 
-import 'package:didcomm/didcomm.dart';
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:ssi/ssi.dart';
 
@@ -11,14 +8,12 @@ import '../../entity/group.dart';
 import '../../entity/group_member.dart';
 import '../../logger/logger.dart';
 import '../notification/notification_service.dart';
-import '../recrypt/recrypt_service.dart';
 import 'add_group_member_input.dart';
 import 'create_group_input.dart';
 import '../../storage/storage.dart';
 import 'delete_group_input.dart';
 import 'deregister_member_input.dart';
 import 'group_utils.dart';
-import 'send_message_input.dart';
 
 class GroupCreationFailed implements Exception {}
 
@@ -60,8 +55,7 @@ class GroupService {
   final Storage _storage;
   final NotificationService _notificationService;
   final GroupDidManager _groupDidManager;
-  final RecryptService _recryptService = RecryptService.getInstance();
-  final DidResolver _didResolver;
+final DidResolver _didResolver;
   final Logger _logger;
 
   final mutex = Mutex();
@@ -128,8 +122,6 @@ class GroupService {
           groupId: input.groupId,
           offerLink: input.offerLink,
           memberDid: input.memberDid,
-          memberPublicKey: input.memberPublicKey,
-          memberReencryptionKey: input.memberReencryptionKey,
           memberContactCard: input.memberContactCard,
           platformEndpointArn: input.platformEndpointArn,
           platformType: input.platformType,
@@ -197,119 +189,6 @@ class GroupService {
     );
   }
 
-  Future<void> sendMessage(SendMessageInput input) async {
-    final groupId = GroupUtils.generateGroupId(
-      offerLink: input.offerLink,
-      groupDid: input.groupDid,
-    );
-
-    final groupDidManager = await _groupDidManager.get(groupId);
-
-    // ensure group exists / not deleted
-    await getGroup(groupId);
-
-    final group = await _storage.updateWithCondition(
-      Group.entityName,
-      groupId,
-      Group.fromJson,
-      updateFn: (group) {
-        if (input.incSeqNo) group.incrementSeqNo();
-        return group;
-      },
-      conditionFn: (group) => group.status != GroupStatus.deleted,
-    );
-
-    if (group == null) {
-      throw GroupNotFound(groupId: groupId);
-    }
-
-    // Authenticate to mediator before iterating members to use cached access
-    // when running in paralell
-    final mediatorSDK = MeetingPlaceMediatorSDK(
-      mediatorDid: group.mediatorDid,
-      didResolver: _didResolver,
-    );
-
-    final sender = await getGroupMemberByControllingDid(
-      input.controllingDid,
-      groupId: groupId,
-    );
-
-    final groupMembers = await _getGroupMembers(groupId);
-
-    await Future.wait(
-      groupMembers.map((groupMember) async {
-        // Skip sender
-        if (groupMember.memberDid == sender.memberDid) {
-          return Future.value();
-        }
-
-        final recipientDidDoc = await _didResolver.resolveDid(
-          groupMember.memberDid,
-        );
-
-        final payload = jsonDecode(
-          utf8.decode(base64.decode(input.messagePayload)),
-        );
-
-        final messageToSend = GroupMessage.create(
-          from: group.groupDid,
-          to: [recipientDidDoc.id],
-          ciphertext: payload['ciphertext'],
-          iv: payload['iv'],
-          authenticationTag: payload['authentication_tag'],
-          preCapsule: _recryptService
-              .reEncryptCapsule(
-                payload['capsule'],
-                reencryptionKeyBase64: groupMember.memberReencryptionKey,
-              )
-              .toBase64(),
-          fromDid: sender.memberDid,
-          seqNo: group.seqNo,
-        );
-
-        try {
-          await mediatorSDK.sendMessage(
-            messageToSend.toPlainTextMessage(),
-            senderDidManager: groupDidManager,
-            recipientDidDocument: recipientDidDoc,
-            mediatorDid: group.mediatorDid,
-          );
-
-          if (input.notify) {
-            await _notificationService.notifyChannelGroup(
-              type: 'chat-activity',
-              platformType: groupMember.platformType,
-              platformEndpointArn: groupMember.platformEndpointArn,
-              authDid: input.controllingDid,
-              recipientDid: recipientDidDoc.id,
-            );
-          }
-        } on MeetingPlaceMediatorSDKException catch (e, stackTrace) {
-          final clientException = e.innerException;
-          if (clientException is MediatorClientException) {
-            _logger.error(
-              clientException.innerMessage,
-              error: clientException,
-              stackTrace: stackTrace,
-            );
-          }
-          _logger.error(
-            'Message could not be send from group to member: ${e.message}',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        } catch (e, stackTrace) {
-          _logger.error(
-            'Message could not be send from group to member: ${e.toString()}',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        }
-      }).toList(),
-    );
-  }
-
   Future<void> notifyChannel({
     required String offerLink,
     required String groupDid,
@@ -373,17 +252,6 @@ class GroupService {
     if (group.createdBy != input.controllingDid) {
       throw GroupPermissionDenied();
     }
-
-    await sendMessage(
-      SendMessageInput(
-        offerLink: group.offerLink,
-        groupDid: group.groupDid,
-        controllingDid: input.controllingDid,
-        messagePayload: input.messageToRelay,
-        incSeqNo: false,
-        notify: false,
-      ),
-    );
 
     group.status = GroupStatus.deleted;
     await _storage.update(group);
