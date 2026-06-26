@@ -1728,12 +1728,8 @@ components:
         groupId:
           type: string
           description: Unique identifier of the group chat to delete.
-        messageToRelay:
-          type: string
-          description: Message to send to the group chat members upon deletion.
       required:
         - groupId
-        - messageToRelay
     GroupDeregisterMemberInput:
       description: List of required and optional parameters to remove a member from the group chat. The caller must be either the group owner or the controller of the target member.
       type: object
@@ -1745,9 +1741,6 @@ components:
         groupId:
           type: string
           description: The unique identifier of the group chat to remove the member from.
-        messageToRelay:
-          type: string
-          description: An encrypted DIDComm message to send to the remaining group chat members in base64 format.
       required:
         - memberDid
         - groupId

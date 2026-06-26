@@ -6,10 +6,5 @@ class GroupDeleteRequestValidator extends LucidValidator {
       (request) => request['groupId'] as String?,
       key: 'groupId',
     ).notEmptyOrNull();
-
-    ruleFor(
-      (request) => request['messageToRelay'] as String?,
-      key: 'messageToRelay',
-    ).notEmptyOrNull();
   }
 }

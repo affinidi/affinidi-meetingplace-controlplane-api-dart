@@ -576,18 +576,13 @@ class ApplicationFacade {
         groupId: request.groupId,
         memberDid: request.memberDid,
         controllingDid: authDid,
-        messageToRelay: request.messageToRelay,
       ),
     );
   }
 
   Future<void> deleteGroup(GroupDeleteRequest request, String authDid) async {
     await _groupService.deleteGroup(
-      DeleteGroupInput(
-        groupId: request.groupId,
-        messageToRelay: request.messageToRelay,
-        controllingDid: authDid,
-      ),
+      DeleteGroupInput(groupId: request.groupId, controllingDid: authDid),
     );
   }
 

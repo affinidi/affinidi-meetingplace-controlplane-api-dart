@@ -11,10 +11,5 @@ class GroupMemberDeregisterRequestValidator extends LucidValidator {
       (request) => request['memberDid'] as String?,
       key: 'memberDid',
     ).notEmptyOrNull();
-
-    ruleFor(
-      (request) => request['messageToRelay'] as String?,
-      key: 'messageToRelay',
-    ).notEmptyOrNull();
   }
 }
