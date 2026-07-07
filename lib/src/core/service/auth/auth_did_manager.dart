@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:ssi/ssi.dart';
+// TODO: use DIDWebManager provided by SSI
+import 'package:ssi/ssi.dart' hide DidWebManager;
 
 import '../../web_manager/did_web_manager.dart';
 

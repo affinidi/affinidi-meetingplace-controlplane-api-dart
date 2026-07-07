@@ -35,7 +35,7 @@ dependencies:
   shelf: ^1.4.0
   shelf_router: ^1.1.0
   shelf_static: ^1.1.3
-  ssi: ^2.19.1
+  ssi: ^3.9.4
   uuid: ^4.5.1
   yaml: ^3.1.3
 
@@ -49,6 +49,12 @@ dev_dependencies:
   lints: ^5.0.0
   melos: ^7.1.0
   test: ^1.24.0
+
+dependency_overrides: 
+  didcomm:
+    git:
+      url: https://github.com/affinidi/affinidi-didcomm-dart.git
+      ref: 1ef27e70d12470f10fb84d284b5e53e95e8c6067
 
 melos:
   scripts:
