@@ -315,6 +315,7 @@ class GroupService {
     required String groupDid,
     required String controllingDid,
     required String type,
+    String? memberDid,
   }) async {
     final groupId = GroupUtils.generateGroupId(
       offerLink: offerLink,
@@ -330,12 +331,17 @@ class GroupService {
 
     final groupMembers = await _getGroupMembers(groupId);
 
-    await Future.wait(
-      groupMembers.map((groupMember) async {
-        if (groupMember.memberDid == sender.memberDid) {
-          return Future.value();
-        }
+    final recipients = memberDid == null
+        ? groupMembers.where((m) => m.memberDid != sender.memberDid)
+        : [
+            groupMembers.firstWhere(
+              (m) => m.memberDid == memberDid,
+              orElse: () => throw GroupMemberNotInGroup(groupId: groupId),
+            ),
+          ];
 
+    await Future.wait(
+      recipients.map((groupMember) async {
         try {
           final recipientDidDoc = await _didResolver.resolveDid(
             groupMember.memberDid,
