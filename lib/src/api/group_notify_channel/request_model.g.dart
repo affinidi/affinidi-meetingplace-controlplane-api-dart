@@ -11,6 +11,7 @@ GroupNotifyChannel _$GroupNotifyChannelFromJson(Map<String, dynamic> json) =>
       offerLink: json['offerLink'] as String,
       groupDid: json['groupDid'] as String,
       type: json['type'] as String,
+      memberDid: json['memberDid'] as String?,
     );
 
 Map<String, dynamic> _$GroupNotifyChannelToJson(GroupNotifyChannel instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$GroupNotifyChannelToJson(GroupNotifyChannel instance) =>
       'offerLink': instance.offerLink,
       'groupDid': instance.groupDid,
       'type': instance.type,
+      'memberDid': instance.memberDid,
     };

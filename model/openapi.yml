@@ -1839,6 +1839,11 @@ components:
         type:
           type: string
           description: The notification type to send to group members.
+        memberDid:
+          type: string
+          description: >-
+            Optional. When set, notify only this single group member
+            instead of all members.
       required:
         - offerLink
         - groupDid

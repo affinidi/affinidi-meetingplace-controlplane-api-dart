@@ -583,6 +583,7 @@ class ApplicationFacade {
       groupDid: request.groupDid,
       controllingDid: authDid,
       type: request.type,
+      memberDid: request.memberDid,
     );
   }
 
