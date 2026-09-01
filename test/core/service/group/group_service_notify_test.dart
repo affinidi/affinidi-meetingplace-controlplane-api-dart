@@ -105,8 +105,6 @@ GroupMember _member({
   groupId: 'group-1',
   offerLink: 'offer-1',
   memberDid: memberDid,
-  memberPublicKey: 'pk',
-  memberReencryptionKey: 'rk',
   memberContactCard: '',
   platformEndpointArn: 'arn:$memberDid',
   platformType: PlatformType.PUSH_NOTIFICATION,

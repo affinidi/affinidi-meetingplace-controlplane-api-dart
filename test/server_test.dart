@@ -2151,9 +2151,6 @@ void main() {
         ),
       );
 
-      final reencryptKeyPair = generateMemberRecryptKeyPair();
-      final reencryptionKey = generateReEncryptionKey(reencryptKeyPair);
-
       await dio.post(
         '$apiEndpoint/v1/group-add-member',
         data: GroupAddMemberRequest(
@@ -2162,8 +2159,6 @@ void main() {
           groupId: registerOfferResponse.data['groupId'],
           memberDid: BobDevice.offerAcceptanceDid,
           acceptOfferAsDid: BobDevice.offerAcceptanceDid,
-          reencryptionKey: reencryptionKey.toBase64(),
-          publicKey: reencryptKeyPair.publicKeyToBase64(),
           contactCard: '',
         ).toJson(),
         options: Options(
