@@ -21,10 +21,9 @@ class GroupDeleteRequest {
     return _$GroupDeleteRequestFromJson(params);
   }
 
-  GroupDeleteRequest({required this.groupId, required this.messageToRelay});
+  GroupDeleteRequest({required this.groupId});
 
   final String groupId;
-  final String messageToRelay;
 
   toJson() => _$GroupDeleteRequestToJson(this);
 }

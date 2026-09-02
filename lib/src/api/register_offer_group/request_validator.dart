@@ -67,18 +67,8 @@ class RegisterOfferGroupRequestValidator extends LucidValidator {
     );
 
     ruleFor(
-      (request) => request['adminReencryptionKey'] as String?,
-      key: 'adminReencryptionKey',
-    ).notEmptyOrNull();
-
-    ruleFor(
       (request) => request['adminDid'] as String?,
       key: 'adminDid',
-    ).notEmptyOrNull();
-
-    ruleFor(
-      (request) => request['adminPublicKey'] as String?,
-      key: 'adminPublicKey',
     ).notEmptyOrNull();
 
     ruleFor(

@@ -17,8 +17,6 @@
 | **customPhrase** | **String** | A custom phrase to find and claim the offer by another user. |   |
 | **isSearchable** | **Boolean** | Indicates whether the offer is searchable by other users. |   |
 | **metadata** | **String** | Metadata containing additional information about the offer. |   |
-| **adminReencryptionKey** | **String** | Reencryption key for the group chat admin. | **`Required`**   |
 | **adminDid** | **String** | The Decentralised Identifier (DUD) of the group chat admin. | **`Required`**   |
-| **adminPublicKey** | **String** | The public key information of the group chat admin. | **`Required`**   |
 | **memberContactCard** | **String** | A ContactCard of the group chat member encoded in base64 format. | **`Required`**   |
 

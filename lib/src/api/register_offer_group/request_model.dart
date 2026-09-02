@@ -32,9 +32,7 @@ class RegisterOfferGroupRequest {
     required this.mediatorDid,
     required this.mediatorEndpoint,
     required this.mediatorWSSEndpoint,
-    required this.adminReencryptionKey,
     required this.adminDid,
-    required this.adminPublicKey,
     required this.memberContactCard,
     this.validUntil,
     this.maximumUsage,
@@ -53,9 +51,7 @@ class RegisterOfferGroupRequest {
   final String mediatorDid;
   final String mediatorEndpoint;
   final String mediatorWSSEndpoint;
-  final String adminReencryptionKey;
   final String adminDid;
-  final String adminPublicKey;
   final String memberContactCard;
 
   String? customPhrase;
