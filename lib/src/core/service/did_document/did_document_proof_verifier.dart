@@ -232,7 +232,7 @@ class DidDocumentProofVerifier {
       );
     }
     final nowEpoch = nowUtc().millisecondsSinceEpoch ~/ 1000;
-    if (exp <= nowEpoch) {
+    if (exp + _clockSkewToleranceSeconds <= nowEpoch) {
       throw InvalidDidDocumentInput('$fieldName proof has expired');
     }
     if (iat > nowEpoch + _clockSkewToleranceSeconds) {

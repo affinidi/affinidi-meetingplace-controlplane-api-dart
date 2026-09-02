@@ -728,6 +728,34 @@ void main() {
     });
 
     test(
+      'accepts proof with exp slightly in the past (clock skew)',
+      () async {
+        final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+        final proofs = await _buildValidProofs(
+          authWallet: authWallet,
+          authKeyId: authKeyId,
+          authVerificationMethod: authVerificationMethod,
+          didWallet: didWallet,
+          didKeyId: didKeyId,
+          didDocument: didDocument,
+          authDid: authDid,
+          iat: nowEpoch - 63,
+          exp: nowEpoch - 3,
+          jti: 'proof-jti-clock-skew-exp',
+        );
+
+        final record = await service.upload(
+          authDid: authDid,
+          authVerificationMethod: authVerificationMethod,
+          didDocument: didDocument,
+          controlProof: proofs.controlProof,
+          proof: proofs.proof,
+        );
+        expect(record.did, didDocument['id']);
+      },
+    );
+
+    test(
       'accepts proof with iat slightly in the future (clock skew)',
       () async {
         final nowEpoch = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
