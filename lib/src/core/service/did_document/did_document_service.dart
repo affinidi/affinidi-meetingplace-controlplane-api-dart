@@ -62,6 +62,9 @@ class DidDocumentService {
         proofJson: proof,
         proofAudience: _proofAudience,
       );
+    } on InvalidDidDocumentInput catch (e) {
+      _logger.error('Proof verification failed', error: e);
+      rethrow;
     } on SsiException catch (e) {
       _logger.error('Unexpected error during proof verification', error: e);
       throw InvalidDidDocumentInput('Proof verification failed: ${e.message}');

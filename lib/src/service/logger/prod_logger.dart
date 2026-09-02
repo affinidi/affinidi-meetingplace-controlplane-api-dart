@@ -7,6 +7,17 @@ class ProdLogger implements Logger {
     logging.Logger.root.onRecord.listen((record) {
       // ignore: avoid_print
       print('${record.level.name}: ${record.time}: ${record.message}');
+      if (record.error != null) {
+        // ignore: avoid_print
+        print('${record.level.name}: ${record.time}: Error: ${record.error}');
+      }
+      if (record.stackTrace != null) {
+        // ignore: avoid_print
+        print(
+          '${record.level.name}: ${record.time}: '
+          'StackTrace: ${record.stackTrace}',
+        );
+      }
     });
   }
 
