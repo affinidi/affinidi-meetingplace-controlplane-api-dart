@@ -483,12 +483,18 @@ class ApplicationFacade {
 
   Future<Map> deletePendingNotifications(
     DeletePendingNotificationsRequest request,
+    String authDid,
   ) async {
     final deviceTokenMapping = await _deviceTokenMappingService
         .getDeviceTokenMapping(
           devicePlatform: request.platformType,
           deviceToken: request.deviceToken,
         );
+
+    if (deviceTokenMapping.createdBy != null &&
+        deviceTokenMapping.createdBy != authDid) {
+      throw NotAuthorizedException();
+    }
 
     String deviceHash = _deviceTokenMappingService.generateDeviceHash(
       deviceTokenMapping.platformEndpointArn,
