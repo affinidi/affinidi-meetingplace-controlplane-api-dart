@@ -1,12 +1,10 @@
 import 'dart:convert';
 
 import 'package:meeting_place_control_plane_api/src/core/config/config.dart';
-import 'package:meeting_place_control_plane_api/src/core/did_manager/group_did_manager.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/entity.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/group.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/group_member.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/notification_item.dart';
-import 'package:meeting_place_control_plane_api/src/core/logger/logger.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/group/group_service.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/notification/notification_service.dart';
 import 'package:meeting_place_control_plane_api/src/core/storage/storage.dart';
@@ -14,21 +12,7 @@ import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:ssi/ssi.dart';
 import 'package:test/test.dart';
 
-class _NoOpLogger implements Logger {
-  @override
-  void debug(String message, {Object? error, StackTrace? stackTrace}) {}
-  @override
-  void info(String message, {Object? error, StackTrace? stackTrace}) {}
-  @override
-  void warn(String message, {Object? error, StackTrace? stackTrace}) {}
-  @override
-  void error(String message, {Object? error, StackTrace? stackTrace}) {}
-}
-
-class _FakeGroupDidManager implements GroupDidManager {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
+import 'group_service_fakes.dart';
 
 class _FakeNotificationItem implements NotificationItem {
   @override
@@ -147,9 +131,9 @@ void main() {
     return GroupService(
       storage: _FakeStorage(group: _group(), members: [alice, bob, carol]),
       notificationService: notificationService,
-      groupDidManager: _FakeGroupDidManager(),
+      groupDidManager: FakeGroupDidManager(),
       didResolver: _FakeDidResolver(),
-      logger: _NoOpLogger(),
+      logger: NoOpLogger(),
     );
   }
 
