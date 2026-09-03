@@ -1,5 +1,8 @@
+import '../../core/service/offer/offer_service.dart';
+import '../../server/utils.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
+import 'response_error_model.dart';
 import 'response_model.dart';
 import '../application_facade.dart';
 import 'package:shelf/shelf.dart';
@@ -16,6 +19,7 @@ Future<Response> getPendingNotifications(
 
     final pendingNotifications = await facade.getPendingNotifications(
       getPendingNotificationsRequest,
+      getAuthDid(request),
     );
 
     facade.logInfo('Found ${pendingNotifications.length} notifications');
@@ -26,6 +30,10 @@ Future<Response> getPendingNotifications(
     );
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
+  } on NotAuthorizedException {
+    return Response.forbidden(
+      GetPendingNotificationsErrorResponse.permissionDenied().toString(),
+    );
   } catch (e, stackTrace) {
     facade.logError(
       'Error while getting pending notifications: $e',

@@ -13,6 +13,7 @@ import 'package:meeting_place_control_plane_api/src/api/deregister_notification/
 import 'package:meeting_place_control_plane_api/src/api/deregister_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/finalise_acceptance/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/get_pending_notifications/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/get_pending_notifications/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_add_member/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_add_member/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_delete/request_model.dart';
@@ -1274,6 +1275,37 @@ void main() {
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data['notifications'].length > 0, true);
   });
+
+  test(
+    '''get-pending-notifications: fails with permission denied if requester does not own the device token''',
+    () async {
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/notifications',
+          data: GetPendingNotificationsRequest(
+            deviceToken: AliceDevice.deviceToken,
+            platformType: AliceDevice.platformType,
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate((e) {
+            return e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] ==
+                    GetPendingNotificationsErrorCodes.permissionDenied.value &&
+                e.response?.data['errorMessage'] ==
+                    'Requester is not allowed to access this device token mapping';
+          }),
+        ),
+      );
+    },
+  );
 
   test('#notify-acceptance: success', () async {
     final registerOfferResponse = await dio.post(

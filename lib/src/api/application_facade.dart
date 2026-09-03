@@ -458,6 +458,7 @@ class ApplicationFacade {
 
   Future<List<NotificationItem>> getPendingNotifications(
     GetPendingNotificationsRequest request,
+    String authDid,
   ) async {
     final deviceTokenMapping = await _deviceTokenMappingService
         .getDeviceTokenMapping(
@@ -465,8 +466,12 @@ class ApplicationFacade {
           deviceToken: request.deviceToken,
         );
 
+    if (deviceTokenMapping.createdBy != null &&
+        deviceTokenMapping.createdBy != authDid) {
+      throw NotAuthorizedException();
+    }
+
     _logger.info('device token mapping found:');
-    _logger.info('- [endpoint] ${deviceTokenMapping.platformEndpointArn}');
     _logger.info('- [platform type] ${deviceTokenMapping.platformType}');
 
     final deviceHash = _deviceTokenMappingService.generateDeviceHash(
