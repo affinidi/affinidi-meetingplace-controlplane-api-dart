@@ -1,6 +1,9 @@
+import '../../core/service/offer/offer_service.dart';
+import '../../server/utils.dart';
 import '../application_facade.dart';
 import '../request_validation_exception.dart';
 import 'request_model.dart';
+import 'response_error_model.dart';
 import 'response_model.dart';
 import 'package:shelf/shelf.dart';
 
@@ -16,6 +19,7 @@ Future<Response> deletePendingNotifications(
 
     final result = await facade.deletePendingNotifications(
       deletePendingNotificationsRequest,
+      getAuthDid(request),
     );
 
     return Response.ok(
@@ -37,6 +41,10 @@ Future<Response> deletePendingNotifications(
     );
   } on RequestValidationException catch (e) {
     return Response.badRequest(body: e.toString());
+  } on NotAuthorizedException {
+    return Response.forbidden(
+      DeletePendingNotificationsErrorResponse.permissionDenied().toString(),
+    );
   } catch (e, stackTrace) {
     facade.logError(
       'Error deleting pending notifications: $e',

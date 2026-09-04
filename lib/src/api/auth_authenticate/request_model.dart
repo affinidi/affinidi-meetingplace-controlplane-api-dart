@@ -25,4 +25,6 @@ class AuthAuthenticateRequest {
   }
   @JsonKey(name: 'challenge_response')
   final String challengeResponse;
+
+  toJson() => _$AuthAuthenticateRequestToJson(this);
 }

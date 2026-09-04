@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
-import 'package:mutex/mutex.dart';
 import '../core/config/env_config.dart';
 import '../core/config/server_config.dart';
 import '../core/logger/logger.dart';
@@ -211,11 +210,8 @@ class ApplicationFacade {
   Future<(Offer, Group)> registerOfferGroup(
     RegisterOfferGroupRequest request,
     String authDid,
-  ) async {
-    final lock = Mutex();
-    try {
-      await lock.acquire();
-
+  ) {
+    return _groupService.synchronizeGroupCreation(() async {
       final groupCount = await _groupService.countGroups();
       if (groupCount >= int.parse(getEnv('GROUP_COUNT_LIMIT'))) {
         throw GroupCountLimitExceeded();
@@ -278,12 +274,8 @@ class ApplicationFacade {
 
       await _offerService.updateOffer(offer);
 
-      lock.release();
       return (offer, group);
-    } catch (e) {
-      lock.release();
-      rethrow;
-    }
+    });
   }
 
   Future<Offer?> queryOffer(QueryOfferRequest request, String authDid) async {
@@ -466,6 +458,7 @@ class ApplicationFacade {
 
   Future<List<NotificationItem>> getPendingNotifications(
     GetPendingNotificationsRequest request,
+    String authDid,
   ) async {
     final deviceTokenMapping = await _deviceTokenMappingService
         .getDeviceTokenMapping(
@@ -473,9 +466,10 @@ class ApplicationFacade {
           deviceToken: request.deviceToken,
         );
 
-    _logger.info('device token mapping found:');
-    _logger.info('- [endpoint] ${deviceTokenMapping.platformEndpointArn}');
-    _logger.info('- [platform type] ${deviceTokenMapping.platformType}');
+    if (deviceTokenMapping.createdBy != null &&
+        deviceTokenMapping.createdBy != authDid) {
+      throw NotAuthorizedException();
+    }
 
     final deviceHash = _deviceTokenMappingService.generateDeviceHash(
       deviceTokenMapping.platformEndpointArn,
@@ -486,12 +480,18 @@ class ApplicationFacade {
 
   Future<Map> deletePendingNotifications(
     DeletePendingNotificationsRequest request,
+    String authDid,
   ) async {
     final deviceTokenMapping = await _deviceTokenMappingService
         .getDeviceTokenMapping(
           devicePlatform: request.platformType,
           deviceToken: request.deviceToken,
         );
+
+    if (deviceTokenMapping.createdBy != null &&
+        deviceTokenMapping.createdBy != authDid) {
+      throw NotAuthorizedException();
+    }
 
     String deviceHash = _deviceTokenMappingService.generateDeviceHash(
       deviceTokenMapping.platformEndpointArn,

@@ -9,10 +9,12 @@ import 'package:meeting_place_control_plane_api/src/api/admin/deregister_offer/r
 import 'package:meeting_place_control_plane_api/src/api/check_offer_phrase/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/create_oob/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/delete_pending_notifications/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/delete_pending_notifications/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/deregister_notification/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/deregister_offer/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/finalise_acceptance/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/get_pending_notifications/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/get_pending_notifications/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_add_member/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_add_member/response_error_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/group_delete/request_model.dart';
@@ -734,6 +736,128 @@ void main() {
     expect(response.data['notifications'] != null, true);
   });
 
+  test(
+    '''#delete-pending-notifications: fails with permission denied if requester does not own the device token''',
+    () async {
+      final registerOfferResponse = await dio.post(
+        '$apiEndpoint/v1/register-offer',
+        data: getRegisterOfferRequestMock(
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/accept-offer',
+        data: getAcceptOfferRequest(
+          did: BobDevice.offerAcceptanceDid,
+          deviceToken: BobDevice.deviceToken,
+          platformType: BobDevice.platformType,
+          mnemonic: registerOfferResponse.data['mnemonic'],
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      await dio.post(
+        '$apiEndpoint/v1/notify-acceptance',
+        data: NotifyAcceptanceRequest(
+          did: BobDevice.offerAcceptanceDid,
+          offerLink: registerOfferResponse.data['offerLink'],
+          mnemonic: registerOfferResponse.data['mnemonic'],
+          senderInfo: 'Anonymous',
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      final getPendingNotificationsResponse = await dio.post(
+        '$apiEndpoint/v1/notifications',
+        data: GetPendingNotificationsRequest(
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      final notificationIds = getPendingNotificationsResponse
+          .data['notifications']
+          .map((n) => n['id'])
+          .toList()
+          .cast<String>();
+
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/delete-notifications',
+          data: DeletePendingNotificationsRequest(
+            deviceToken: AliceDevice.deviceToken,
+            platformType: AliceDevice.platformType,
+            notificationIds: notificationIds,
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate((e) {
+            return e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] ==
+                    DeletePendingNotificationsErrorCodes
+                        .permissionDenied
+                        .value &&
+                e.response?.data['errorMessage'] ==
+                    'Requester is not allowed to access this device token mapping';
+          }),
+        ),
+      );
+
+      final remainingResponse = await dio.post(
+        '$apiEndpoint/v1/notifications',
+        data: GetPendingNotificationsRequest(
+          deviceToken: AliceDevice.deviceToken,
+          platformType: AliceDevice.platformType,
+        ).toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            'authorization': aliceAccessToken,
+          },
+        ),
+      );
+
+      expect(
+        remainingResponse.data['notifications']
+            .map((n) => n['id'])
+            .toSet()
+            .containsAll(notificationIds),
+        true,
+      );
+    },
+  );
+
   test('#deregister-notification: success', () async {
     final registerNotificationResponse = await dio.post(
       '$apiEndpoint/v1/register-notification',
@@ -1274,6 +1398,37 @@ void main() {
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data['notifications'].length > 0, true);
   });
+
+  test(
+    '''get-pending-notifications: fails with permission denied if requester does not own the device token''',
+    () async {
+      expect(
+        () => dio.post(
+          '$apiEndpoint/v1/notifications',
+          data: GetPendingNotificationsRequest(
+            deviceToken: AliceDevice.deviceToken,
+            platformType: AliceDevice.platformType,
+          ).toJson(),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: 'application/json',
+              'authorization': bobAccessToken,
+            },
+          ),
+        ),
+        throwsA(
+          predicate((e) {
+            return e is DioException &&
+                e.response?.statusCode == HttpStatus.forbidden &&
+                e.response?.data['errorCode'] ==
+                    GetPendingNotificationsErrorCodes.permissionDenied.value &&
+                e.response?.data['errorMessage'] ==
+                    'Requester is not allowed to access this device token mapping';
+          }),
+        ),
+      );
+    },
+  );
 
   test('#notify-acceptance: success', () async {
     final registerOfferResponse = await dio.post(
