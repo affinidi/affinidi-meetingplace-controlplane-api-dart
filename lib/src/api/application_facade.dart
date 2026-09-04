@@ -471,9 +471,6 @@ class ApplicationFacade {
       throw NotAuthorizedException();
     }
 
-    _logger.info('device token mapping found:');
-    _logger.info('- [platform type] ${deviceTokenMapping.platformType}');
-
     final deviceHash = _deviceTokenMappingService.generateDeviceHash(
       deviceTokenMapping.platformEndpointArn,
     );
