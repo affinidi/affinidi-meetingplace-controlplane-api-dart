@@ -2,6 +2,8 @@ import 'package:meeting_place_control_plane_api/src/api/accept_offer/request_mod
 import 'package:meeting_place_control_plane_api/src/api/accept_offer/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/accept_offer_group/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/accept_offer_group/request_validator.dart';
+import 'package:meeting_place_control_plane_api/src/api/auth_authenticate/request_model.dart';
+import 'package:meeting_place_control_plane_api/src/api/auth_authenticate/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/check_offer_phrase/request_model.dart';
 import 'package:meeting_place_control_plane_api/src/api/check_offer_phrase/request_validator.dart';
 import 'package:meeting_place_control_plane_api/src/api/delete_pending_notifications/request_model.dart';
@@ -641,6 +643,32 @@ void main() {
       );
       expect(result.isValid, false);
       expect(result.exceptions.any((e) => e.key == 'notificationToken'), true);
+    });
+  });
+
+  group('AuthAuthenticateRequestValidator', () {
+    test('validates valid request', () {
+      final request = AuthAuthenticateRequest(
+        challengeResponse: 'some-response',
+      );
+
+      final result = AuthAuthenticateRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, true);
+    });
+
+    test('fails when challenge_response is empty', () {
+      final request = AuthAuthenticateRequest(challengeResponse: '');
+
+      final result = AuthAuthenticateRequestValidator().validate(
+        request.toJson(),
+      );
+      expect(result.isValid, false);
+      expect(
+        result.exceptions.any((e) => e.key == 'challenge_response'),
+        true,
+      );
     });
   });
 

@@ -58,7 +58,12 @@ class GroupService {
 final DidResolver _didResolver;
   final Logger _logger;
 
-  final mutex = Mutex();
+  final _groupCreationMutex = Mutex();
+
+  /// Serializes group-creation critical sections (e.g. the group-count limit
+  /// check-then-create) across concurrent requests within this process.
+  Future<T> synchronizeGroupCreation<T>(Future<T> Function() action) =>
+      _groupCreationMutex.protect(action);
 
   Future<Group> createGroup(CreateGroupInput input) async {
     final groupDidDoc = await _groupDidManager.createDid(input.offerLink);

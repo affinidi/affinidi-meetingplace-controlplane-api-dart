@@ -12,7 +12,6 @@ void main(List<String> args) async {
   final ip = InternetAddress.anyIPv4;
 
   final logger = BasicLogger();
-  logger.info('Environment LOG: ${jsonEncode(Platform.environment)}');
 
   // Load globally available config
   Config config = await Config().loadConfig(getEnv('ENV'));
