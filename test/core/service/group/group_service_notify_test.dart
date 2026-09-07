@@ -140,7 +140,7 @@ void main() {
       final service = buildService();
 
       await service.notifyChannel(
-        offerLink: 'offer-1',
+        groupId: 'group-1',
         controllingDid: 'did:alice-ctrl',
         type: 'chat-activity',
       );
@@ -155,7 +155,7 @@ void main() {
       final service = buildService();
 
       await service.notifyChannel(
-        offerLink: 'offer-1',
+        groupId: 'group-1',
         controllingDid: 'did:alice-ctrl',
         type: 'chat-activity',
         memberDid: 'did:bob',
@@ -169,7 +169,7 @@ void main() {
 
       expect(
         () => service.notifyChannel(
-          offerLink: 'offer-1',
+          groupId: 'group-1',
           controllingDid: 'did:alice-ctrl',
           type: 'chat-activity',
           memberDid: 'did:not-a-member',

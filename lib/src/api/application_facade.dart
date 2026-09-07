@@ -558,7 +558,7 @@ class ApplicationFacade {
 
   Future<void> notifyGroupChannel(GroupNotifyChannel request, String authDid) {
     return _groupService.notifyChannel(
-      offerLink: request.offerLink,
+      groupId: request.groupId,
       controllingDid: authDid,
       type: request.type,
       memberDid: request.memberDid,

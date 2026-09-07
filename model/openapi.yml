@@ -1060,13 +1060,10 @@ components:
           type: string
         groupId:
           type: string
-        groupDid:
-          type: string
       required:
         - mnemonic
         - offerLink
         - groupId
-        - groupDid
         - memberContactCard
     DeregisterOfferOK:
       type: object
@@ -1246,8 +1243,6 @@ components:
             maximum number of times this offer can be claimed, or 0 for
             unlimited
         groupId:
-          type: string
-        groupDid:
           type: string
         score:
           type: integer
@@ -1749,12 +1744,9 @@ components:
       type: object
       additionalProperties: false
       properties:
-        offerLink:
+        groupId:
           type: string
-          description: The Offer link associated with the group chat.
-        groupDid:
-          type: string
-          description: The channel DID for the group chat.
+          description: The unique identifier of the group chat to notify.
         type:
           type: string
           description: The notification type to send to group members.
@@ -1764,8 +1756,7 @@ components:
             Optional. When set, notify only this single group member
             instead of all members.
       required:
-        - offerLink
-        - groupDid
+        - groupId
         - type
     DidChallenge:
       description: List of required parameters to initiate authentication process.

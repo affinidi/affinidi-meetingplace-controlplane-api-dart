@@ -3,8 +3,8 @@ import 'package:lucid_validation/lucid_validation.dart';
 class GroupNotifyChannelValidator extends LucidValidator {
   GroupNotifyChannelValidator() {
     ruleFor(
-      (request) => request['offerLink'] as String?,
-      key: 'offerLink',
+      (request) => request['groupId'] as String?,
+      key: 'groupId',
     ).isNotNull().notEmpty();
 
     ruleFor(

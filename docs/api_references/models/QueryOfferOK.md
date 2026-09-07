@@ -18,5 +18,4 @@
 | **didcommMessage** | **String** | The didcomm message connected to this offer | **`Required`**   |
 | **maximumUsage** | **BigDecimal** | maximum number of times this offer can be claimed, or 0 for unlimited |   |
 | **groupId** | **String** |  |   |
-| **groupDid** | **String** |  |   |
 

@@ -2218,7 +2218,7 @@ void main() {
     final response = await dio.post(
       '$apiEndpoint/v1/group-notify-channel',
       data: {
-        'offerLink': registerOfferResponse.data['offerLink'],
+        'groupId': registerOfferResponse.data['groupId'],
         'type': 'chat-activity',
       },
       options: Options(
@@ -2294,7 +2294,7 @@ void main() {
       final response = await dio.post(
         '$apiEndpoint/v1/group-notify-channel',
         data: {
-          'offerLink': registerOfferResponse.data['offerLink'],
+          'groupId': registerOfferResponse.data['groupId'],
           'type': 'chat-activity',
           'memberDid': BobDevice.offerAcceptanceDid,
         },
@@ -2335,7 +2335,7 @@ void main() {
         () => dio.post(
           '$apiEndpoint/v1/group-notify-channel',
           data: {
-            'offerLink': registerOfferResponse.data['offerLink'],
+            'groupId': registerOfferResponse.data['groupId'],
             'type': 'chat-activity',
             'memberDid': 'did:key:not-a-member',
           },
@@ -2363,7 +2363,7 @@ void main() {
       () => dio.post(
         '$apiEndpoint/v1/group-notify-channel',
         data: {
-          'offerLink': 'non-existent-offer-link',
+          'groupId': 'non-existent-group-id',
           'type': 'chat-activity',
         },
         options: Options(
@@ -2421,7 +2421,7 @@ void main() {
       () => dio.post(
         '$apiEndpoint/v1/group-notify-channel',
         data: {
-          'offerLink': registerOfferResponse.data['offerLink'],
+          'groupId': registerOfferResponse.data['groupId'],
           'type': 'chat-activity',
         },
         options: Options(
@@ -2466,7 +2466,7 @@ void main() {
       () => dio.post(
         '$apiEndpoint/v1/group-notify-channel',
         data: {
-          'offerLink': registerOfferResponse.data['offerLink'],
+          'groupId': registerOfferResponse.data['groupId'],
           'type': 'chat-activity',
         },
         options: Options(

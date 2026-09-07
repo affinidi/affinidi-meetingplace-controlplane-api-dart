@@ -8,14 +8,14 @@ part of 'request_model.dart';
 
 GroupNotifyChannel _$GroupNotifyChannelFromJson(Map<String, dynamic> json) =>
     GroupNotifyChannel(
-      offerLink: json['offerLink'] as String,
+      groupId: json['groupId'] as String,
       type: json['type'] as String,
       memberDid: json['memberDid'] as String?,
     );
 
 Map<String, dynamic> _$GroupNotifyChannelToJson(GroupNotifyChannel instance) =>
     <String, dynamic>{
-      'offerLink': instance.offerLink,
+      'groupId': instance.groupId,
       'type': instance.type,
       'memberDid': instance.memberDid,
     };

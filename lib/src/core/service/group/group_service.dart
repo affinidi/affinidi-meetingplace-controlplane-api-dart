@@ -179,13 +179,11 @@ class GroupService {
   }
 
   Future<void> notifyChannel({
-    required String offerLink,
+    required String groupId,
     required String controllingDid,
     required String type,
     String? memberDid,
   }) async {
-    final groupId = GroupUtils.generateGroupId(offerLink: offerLink);
-
     await getGroup(groupId);
 
     final sender = await getGroupMemberByControllingDid(
