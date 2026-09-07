@@ -665,10 +665,7 @@ void main() {
         request.toJson(),
       );
       expect(result.isValid, false);
-      expect(
-        result.exceptions.any((e) => e.key == 'challenge_response'),
-        true,
-      );
+      expect(result.exceptions.any((e) => e.key == 'challenge_response'), true);
     });
   });
 

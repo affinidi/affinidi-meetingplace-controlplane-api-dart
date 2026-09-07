@@ -2362,10 +2362,7 @@ void main() {
     expect(
       () => dio.post(
         '$apiEndpoint/v1/group-notify-channel',
-        data: {
-          'groupId': 'non-existent-group-id',
-          'type': 'chat-activity',
-        },
+        data: {'groupId': 'non-existent-group-id', 'type': 'chat-activity'},
         options: Options(
           headers: {
             Headers.contentTypeHeader: 'application/json',
@@ -3138,9 +3135,7 @@ void main() {
 
     final actual = await dio.post(
       '$apiEndpoint/v1/group-delete',
-      data: GroupDeleteRequest(
-        groupId: response.data!['groupId'],
-      ).toJson(),
+      data: GroupDeleteRequest(groupId: response.data!['groupId']).toJson(),
       options: Options(
         headers: {
           Headers.contentTypeHeader: 'application/json',
@@ -3155,9 +3150,7 @@ void main() {
     expect(
       () => dio.post(
         '$apiEndpoint/v1/group-delete',
-        data: GroupDeleteRequest(
-          groupId: response.data!['groupId'],
-        ).toJson(),
+        data: GroupDeleteRequest(groupId: response.data!['groupId']).toJson(),
         options: Options(
           headers: {
             Headers.contentTypeHeader: 'application/json',
@@ -3199,9 +3192,7 @@ void main() {
     try {
       await dio.post(
         '$apiEndpoint/v1/group-delete',
-        data: GroupDeleteRequest(
-          groupId: response.data!['groupId'],
-        ).toJson(),
+        data: GroupDeleteRequest(groupId: response.data!['groupId']).toJson(),
         options: Options(
           headers: {
             Headers.contentTypeHeader: 'application/json',
