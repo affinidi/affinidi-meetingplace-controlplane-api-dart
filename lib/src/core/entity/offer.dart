@@ -64,7 +64,6 @@ class Offer extends Entity {
     this.customPhrase,
     this.metadata,
     this.groupId,
-    this.groupDid,
     this.score,
     this.transport = Transport.didcomm,
   }) {
@@ -93,7 +92,6 @@ class Offer extends Entity {
 
   int? score;
   String? groupId;
-  String? groupDid;
 
   int queryCount = 0;
   int claimCount = 0;

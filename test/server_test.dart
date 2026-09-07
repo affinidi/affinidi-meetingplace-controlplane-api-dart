@@ -35,10 +35,7 @@ import 'package:meeting_place_control_plane_api/src/core/entity/offer.dart';
 import 'package:meeting_place_control_plane_api/src/core/entity/transport.dart';
 import 'package:meeting_place_control_plane_api/src/utils/date_time.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
-import 'package:didcomm/didcomm.dart';
 import 'package:dio/dio.dart';
-import 'package:meeting_place_core/meeting_place_core.dart'
-    show MeetingPlaceProtocol;
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:ssi/ssi.dart' as ssi;
 import 'package:ssi/ssi.dart';
@@ -1663,7 +1660,6 @@ void main() {
       ),
     );
 
-    final mediatorDid = registerOfferRequest.mediatorDid;
     final keyPair = await bobWallet.generateKey(keyId: "m/44'/60'/0'/1");
 
     final didManager = DidKeyManager(
@@ -1673,32 +1669,6 @@ void main() {
 
     await didManager.addVerificationMethod(keyPair.id);
     final bobDidDoc = await didManager.getDidDocument();
-
-    final sdk = MeetingPlaceMediatorSDK(
-      mediatorDid: mediatorDid,
-      didResolver: CachedDidResolver(),
-    );
-
-    await sdk.updateAcl(
-      ownerDidManager: didManager,
-      acl: AccessListAdd(
-        ownerDid: bobDidDoc.id,
-        granteeDids: [registerOfferResponse.data['groupDid']],
-      ),
-      mediatorDid: mediatorDid,
-    );
-
-    final channel = await sdk.subscribeToMessages(
-      didManager,
-      mediatorDid: mediatorDid,
-    );
-
-    final receivedMessageCompleter = Completer<PlainTextMessage>();
-    channel.listen((message) {
-      if (message.type.toString() == MeetingPlaceProtocol.groupMessage.value) {
-        receivedMessageCompleter.complete(message);
-      }
-    });
 
     final response = await dio.post(
       '$apiEndpoint/v1/group-add-member',
@@ -1767,7 +1737,6 @@ void main() {
       'status': OfferStatus.created.value,
       'contactAttributes': registerOfferRequestMock.contactAttributes,
       'groupId': null,
-      'groupDid': null,
       'score': null,
       'transport': Transport.didcomm.value,
     });
@@ -1811,7 +1780,7 @@ void main() {
     },
   );
 
-  test('query-offer: group did and group id set if group offer', () async {
+  test('query-offer: group id set if group offer', () async {
     final registerOfferRequestMock = await getRegisterOfferGroupRequestMock(
       deviceToken: AliceDevice.deviceToken,
       platformType: AliceDevice.platformType,
@@ -1844,7 +1813,6 @@ void main() {
 
     expect(response.statusCode, HttpStatus.ok);
     expect(response.data['groupId'], isNotEmpty);
-    expect(response.data['groupDid'], isNotEmpty);
     expect(response.data['transport'], Transport.matrix.value);
   });
 
@@ -2251,7 +2219,6 @@ void main() {
       '$apiEndpoint/v1/group-notify-channel',
       data: {
         'offerLink': registerOfferResponse.data['offerLink'],
-        'groupDid': registerOfferResponse.data['groupDid'],
         'type': 'chat-activity',
       },
       options: Options(
@@ -2328,7 +2295,6 @@ void main() {
         '$apiEndpoint/v1/group-notify-channel',
         data: {
           'offerLink': registerOfferResponse.data['offerLink'],
-          'groupDid': registerOfferResponse.data['groupDid'],
           'type': 'chat-activity',
           'memberDid': BobDevice.offerAcceptanceDid,
         },
@@ -2370,7 +2336,6 @@ void main() {
           '$apiEndpoint/v1/group-notify-channel',
           data: {
             'offerLink': registerOfferResponse.data['offerLink'],
-            'groupDid': registerOfferResponse.data['groupDid'],
             'type': 'chat-activity',
             'memberDid': 'did:key:not-a-member',
           },
@@ -2399,7 +2364,6 @@ void main() {
         '$apiEndpoint/v1/group-notify-channel',
         data: {
           'offerLink': 'non-existent-offer-link',
-          'groupDid': 'did:key:non-existent',
           'type': 'chat-activity',
         },
         options: Options(
@@ -2458,7 +2422,6 @@ void main() {
         '$apiEndpoint/v1/group-notify-channel',
         data: {
           'offerLink': registerOfferResponse.data['offerLink'],
-          'groupDid': registerOfferResponse.data['groupDid'],
           'type': 'chat-activity',
         },
         options: Options(
@@ -2504,7 +2467,6 @@ void main() {
         '$apiEndpoint/v1/group-notify-channel',
         data: {
           'offerLink': registerOfferResponse.data['offerLink'],
-          'groupDid': registerOfferResponse.data['groupDid'],
           'type': 'chat-activity',
         },
         options: Options(

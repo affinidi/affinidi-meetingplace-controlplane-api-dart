@@ -30,7 +30,6 @@ Offer _$OfferFromJson(Map<String, dynamic> json) =>
         customPhrase: json['customPhrase'] as String?,
         metadata: json['metadata'] as String?,
         groupId: json['groupId'] as String?,
-        groupDid: json['groupDid'] as String?,
         score: (json['score'] as num?)?.toInt(),
         transport:
             $enumDecodeNullable(_$TransportEnumMap, json['transport']) ??
@@ -58,7 +57,6 @@ Map<String, dynamic> _$OfferToJson(Offer instance) => <String, dynamic>{
   'metadata': instance.metadata,
   'score': instance.score,
   'groupId': instance.groupId,
-  'groupDid': instance.groupDid,
   'queryCount': instance.queryCount,
   'claimCount': instance.claimCount,
   'maximumClaims': instance.maximumClaims,

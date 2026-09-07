@@ -115,7 +115,6 @@ class ApplicationFacade {
     _groupService = GroupService(
       storage: config.storage,
       notificationService: _notificationService,
-      groupDidManager: config.groupDidManager,
       didResolver: config.didResolver,
       logger: _logger,
     );
@@ -270,7 +269,6 @@ class ApplicationFacade {
       );
 
       offer.groupId = group.id;
-      offer.groupDid = group.groupDid;
 
       await _offerService.updateOffer(offer);
 
@@ -561,7 +559,6 @@ class ApplicationFacade {
   Future<void> notifyGroupChannel(GroupNotifyChannel request, String authDid) {
     return _groupService.notifyChannel(
       offerLink: request.offerLink,
-      groupDid: request.groupDid,
       controllingDid: authDid,
       type: request.type,
       memberDid: request.memberDid,

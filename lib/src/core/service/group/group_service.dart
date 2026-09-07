@@ -1,9 +1,7 @@
 import 'package:mutex/mutex.dart';
 
-import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:ssi/ssi.dart';
 
-import '../../did_manager/group_did_manager.dart';
 import '../../entity/group.dart';
 import '../../entity/group_member.dart';
 import '../../logger/logger.dart';
@@ -43,19 +41,16 @@ class GroupService {
   GroupService({
     required Storage storage,
     required NotificationService notificationService,
-    required GroupDidManager groupDidManager,
     required DidResolver didResolver,
     required Logger logger,
   }) : _storage = storage,
        _notificationService = notificationService,
-       _groupDidManager = groupDidManager,
        _didResolver = didResolver,
        _logger = logger;
 
   final Storage _storage;
   final NotificationService _notificationService;
-  final GroupDidManager _groupDidManager;
-final DidResolver _didResolver;
+  final DidResolver _didResolver;
   final Logger _logger;
 
   final _groupCreationMutex = Mutex();
@@ -66,16 +61,10 @@ final DidResolver _didResolver;
       _groupCreationMutex.protect(action);
 
   Future<Group> createGroup(CreateGroupInput input) async {
-    final groupDidDoc = await _groupDidManager.createDid(input.offerLink);
-
     final group = Group(
-      id: GroupUtils.generateGroupId(
-        offerLink: input.offerLink,
-        groupDid: groupDidDoc.id,
-      ),
+      id: GroupUtils.generateGroupId(offerLink: input.offerLink),
       offerLink: input.offerLink,
       conrollingDid: input.controllingDid,
-      groupDid: groupDidDoc.id,
       name: input.groupName,
       mediatorDid: input.mediatorDid,
       createdBy: input.createdBy,
@@ -135,11 +124,6 @@ final DidResolver _didResolver;
         ),
       );
 
-      await _allowMemberToMessageGroup(
-        groupId: input.groupId,
-        memberDid: input.memberDid,
-      );
-
       return groupMember;
     } on GroupPermissionDenied {
       rethrow;
@@ -196,15 +180,11 @@ final DidResolver _didResolver;
 
   Future<void> notifyChannel({
     required String offerLink,
-    required String groupDid,
     required String controllingDid,
     required String type,
     String? memberDid,
   }) async {
-    final groupId = GroupUtils.generateGroupId(
-      offerLink: offerLink,
-      groupDid: groupDid,
-    );
+    final groupId = GroupUtils.generateGroupId(offerLink: offerLink);
 
     await getGroup(groupId);
 
@@ -267,31 +247,6 @@ final DidResolver _didResolver;
     group.status = GroupStatus.deleted;
     await _storage.update(group);
     await _storage.delete(GroupMember.entityName, input.groupId);
-    await _groupDidManager.removeKeys(input.groupId);
-  }
-
-  Future<void> _allowMemberToMessageGroup({
-    required String groupId,
-    required String memberDid,
-  }) async {
-    final group = await getGroup(groupId);
-
-    final groupDidManager = await _groupDidManager.get(groupId);
-    final didManagerDidDoc = await groupDidManager.getDidDocument();
-
-    final mediatorSDK = MeetingPlaceMediatorSDK(
-      mediatorDid: group.mediatorDid,
-      didResolver: _didResolver,
-    );
-
-    await mediatorSDK.updateAcl(
-      ownerDidManager: groupDidManager,
-      acl: AccessListAdd(
-        ownerDid: didManagerDidDoc.id,
-        granteeDids: [memberDid],
-      ),
-      mediatorDid: group.mediatorDid,
-    );
   }
 
   _checkPermissionToRunGroupAction({

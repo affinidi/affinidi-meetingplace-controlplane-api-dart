@@ -23,12 +23,10 @@ class GroupNotifyChannel {
 
   GroupNotifyChannel({
     required this.offerLink,
-    required this.groupDid,
     required this.type,
     this.memberDid,
   });
   final String offerLink;
-  final String groupDid;
   final String type;
 
   /// When set, notify only this single group member instead of all members.

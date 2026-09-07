@@ -15,10 +15,7 @@ class GroupUtils {
     return base64String;
   }
 
-  static String generateGroupId({
-    required String offerLink,
-    required String groupDid,
-  }) {
-    return generateHashedId('${offerLink}_$groupDid', Config().hashSecret());
+  static String generateGroupId({required String offerLink}) {
+    return generateHashedId(offerLink, Config().hashSecret());
   }
 }

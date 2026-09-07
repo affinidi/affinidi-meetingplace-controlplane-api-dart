@@ -8,11 +8,6 @@ class GroupNotifyChannelValidator extends LucidValidator {
     ).isNotNull().notEmpty();
 
     ruleFor(
-      (request) => request['groupDid'] as String?,
-      key: 'groupDid',
-    ).isNotNull().notEmpty();
-
-    ruleFor(
       (request) => request['type'] as String?,
       key: 'type',
     ).isNotNull().notEmpty();

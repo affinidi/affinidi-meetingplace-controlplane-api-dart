@@ -9,7 +9,6 @@ import 'group_service_fakes.dart';
 GroupService buildService() => GroupService(
   storage: FakeStorage(),
   notificationService: FakeNotificationService(),
-  groupDidManager: FakeGroupDidManager(),
   didResolver: FakeDidResolver(),
   logger: NoOpLogger(),
 );

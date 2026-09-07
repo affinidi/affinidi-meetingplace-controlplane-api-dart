@@ -21,7 +21,6 @@ class QueryOfferResponse {
     required this.status,
     required this.contactAttributes,
     required this.groupId,
-    required this.groupDid,
     required this.transport,
     this.score,
   });
@@ -41,7 +40,6 @@ class QueryOfferResponse {
       status: offer.status.value,
       contactAttributes: offer.contactAttributes,
       groupId: offer.groupId,
-      groupDid: offer.groupDid,
       score: offer.score,
       transport: offer.transport,
     );
@@ -60,7 +58,6 @@ class QueryOfferResponse {
   final String? validUntil;
   final int? maximumUsage;
   final String? groupId;
-  final String? groupDid;
   final int? score;
   final Transport transport;
 
