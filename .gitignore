@@ -16,3 +16,4 @@ did.json
 .DS_Store
 coverage/*
 config.yml
+node_modules/
