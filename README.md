@@ -46,7 +46,7 @@ The Control Plane API is built on Dart for a high-performance server, which prov
 
 - **Device Registration and Notification:** Secure device registration ensures seamless delivery of notifications on key events, including push notifications on the user's device.
 
-- **Group Chat**: Provides group chat functionality, including management of members and sending messages to group members.
+- **Group Chat**: Provides group chat functionality, including management of members and sending notifications to group members.
 
 - **Matrix Authentication**: Acts as the sole trusted issuer of short-lived JWTs that authorise participants to authenticate directly with a Matrix homeserver. Tokens are cryptographically bound to the caller's DID and the target homeserver using a deterministic derivation, keeping Matrix credentials fully managed server-side.
 

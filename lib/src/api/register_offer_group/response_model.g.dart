@@ -14,7 +14,6 @@ RegisterOfferGroupResponse _$RegisterOfferGroupResponseFromJson(
   validUntil: json['validUntil'] as String?,
   maximumUsage: (json['maximumUsage'] as num?)?.toInt(),
   groupId: json['groupId'] as String,
-  groupDid: json['groupDid'] as String,
 );
 
 Map<String, dynamic> _$RegisterOfferGroupResponseToJson(
@@ -25,5 +24,4 @@ Map<String, dynamic> _$RegisterOfferGroupResponseToJson(
   'validUntil': instance.validUntil,
   'maximumUsage': instance.maximumUsage,
   'groupId': instance.groupId,
-  'groupDid': instance.groupDid,
 };

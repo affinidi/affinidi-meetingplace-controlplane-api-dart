@@ -13,7 +13,6 @@ class RegisterOfferGroupResponse {
     required this.validUntil,
     required this.maximumUsage,
     required this.groupId,
-    required this.groupDid,
   });
 
   factory RegisterOfferGroupResponse.fromOfferAndGroup(
@@ -26,7 +25,6 @@ class RegisterOfferGroupResponse {
       validUntil: offer.validUntil,
       maximumUsage: offer.maximumClaims,
       groupId: group.id,
-      groupDid: group.groupDid,
     );
   }
 
@@ -36,7 +34,6 @@ class RegisterOfferGroupResponse {
       mnemonic: '',
       validUntil: null,
       groupId: '',
-      groupDid: '',
       maximumUsage: null,
     );
   }
@@ -46,7 +43,6 @@ class RegisterOfferGroupResponse {
   final String? validUntil;
   final int? maximumUsage;
   final String groupId;
-  final String groupDid;
 
   @override
   String toString() =>

@@ -99,7 +99,6 @@ GroupMember _member({
 Group _group() => Group(
   id: 'group-1',
   offerLink: 'offer-1',
-  groupDid: 'did:group',
   conrollingDid: 'did:alice-ctrl',
   name: 'Test Group',
   mediatorDid: 'did:mediator',
@@ -131,7 +130,6 @@ void main() {
     return GroupService(
       storage: _FakeStorage(group: _group(), members: [alice, bob, carol]),
       notificationService: notificationService,
-      groupDidManager: FakeGroupDidManager(),
       didResolver: _FakeDidResolver(),
       logger: NoOpLogger(),
     );
@@ -142,8 +140,7 @@ void main() {
       final service = buildService();
 
       await service.notifyChannel(
-        offerLink: 'offer-1',
-        groupDid: 'did:group',
+        groupId: 'group-1',
         controllingDid: 'did:alice-ctrl',
         type: 'chat-activity',
       );
@@ -158,8 +155,7 @@ void main() {
       final service = buildService();
 
       await service.notifyChannel(
-        offerLink: 'offer-1',
-        groupDid: 'did:group',
+        groupId: 'group-1',
         controllingDid: 'did:alice-ctrl',
         type: 'chat-activity',
         memberDid: 'did:bob',
@@ -173,8 +169,7 @@ void main() {
 
       expect(
         () => service.notifyChannel(
-          offerLink: 'offer-1',
-          groupDid: 'did:group',
+          groupId: 'group-1',
           controllingDid: 'did:alice-ctrl',
           type: 'chat-activity',
           memberDid: 'did:not-a-member',

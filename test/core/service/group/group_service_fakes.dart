@@ -1,4 +1,3 @@
-import 'package:meeting_place_control_plane_api/src/core/did_manager/group_did_manager.dart';
 import 'package:meeting_place_control_plane_api/src/core/logger/logger.dart';
 import 'package:meeting_place_control_plane_api/src/core/service/notification/notification_service.dart';
 import 'package:meeting_place_control_plane_api/src/core/storage/storage.dart';
@@ -16,11 +15,6 @@ class NoOpLogger implements Logger {
   void warn(String message, {Object? error, StackTrace? stackTrace}) {}
   @override
   void error(String message, {Object? error, StackTrace? stackTrace}) {}
-}
-
-class FakeGroupDidManager implements GroupDidManager {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class FakeStorage implements Storage {

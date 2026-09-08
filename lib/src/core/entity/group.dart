@@ -24,7 +24,6 @@ class Group extends Entity {
     super.ttl,
     required this.id,
     required this.offerLink,
-    required this.groupDid,
     required this.conrollingDid,
     required this.name,
     required this.mediatorDid,
@@ -37,7 +36,6 @@ class Group extends Entity {
 
   final String id;
   final String offerLink;
-  final String groupDid;
   final String name;
   final String mediatorDid;
   final String conrollingDid;

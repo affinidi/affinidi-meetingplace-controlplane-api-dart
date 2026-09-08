@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 import '../../config/config.dart';
 import '../../../utils/hash.dart';
 
@@ -15,10 +17,12 @@ class GroupUtils {
     return base64String;
   }
 
-  static String generateGroupId({
-    required String offerLink,
-    required String groupDid,
-  }) {
-    return generateHashedId('${offerLink}_$groupDid', Config().hashSecret());
+  /// Mixes in a fresh UUID so groups created for the same [offerLink] never
+  /// collide.
+  static String generateGroupId({required String offerLink}) {
+    return generateHashedId(
+      '${offerLink}_${Uuid().v4()}',
+      Config().hashSecret(),
+    );
   }
 }

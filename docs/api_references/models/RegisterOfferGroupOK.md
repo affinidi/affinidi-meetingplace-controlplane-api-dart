@@ -9,5 +9,4 @@
 | **maximumUsage** | **BigDecimal** |  |   |
 | **offerLink** | **String** |  | **`Required`**   |
 | **groupId** | **String** |  | **`Required`**   |
-| **groupDid** | **String** |  | **`Required`**   |
 
