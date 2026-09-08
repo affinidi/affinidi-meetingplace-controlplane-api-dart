@@ -122,7 +122,6 @@ If AWS SNS is used for push notification integration, configure the following en
 | AWS_PLATFORM_APPLICATION_ARN    | Specifies the ARN of the AWS Platform Application configured to forward requests to push notification services such as Firebase. |
 |                   |
 
-
 ### Local Setup using SSI Persistent Wallet
 
 Run the Control Plane API server using the persistent wallet provided by [Affinidi SSI](https://pub.dev/packages/ssi) library.
