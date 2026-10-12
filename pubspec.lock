@@ -17,6 +17,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  affinidi_tdk_didcomm_mediator_client:
+    dependency: transitive
+    description:
+      name: affinidi_tdk_didcomm_mediator_client
+      sha256: ef9df1c5c061f773187efd4e9034bf901a3969d78b71cc001a1d9658a2af97a8
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
+  affinidi_tdk_vdip:
+    dependency: transitive
+    description:
+      name: affinidi_tdk_vdip
+      sha256: bc16a2d2f5fff9d3a960adcafcad2b2f5cc55f5b224bb74054b9b5843eb30962
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.4"
+  affinidi_tdk_vdsp:
+    dependency: transitive
+    description:
+      name: affinidi_tdk_vdsp
+      sha256: "0000e19f8791ade711086303f0995a585d489f1aa97d9f403eb2348031d36a22"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.4"
   analyzer:
     dependency: "direct dev"
     description:
@@ -337,14 +361,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
+  dcql:
+    dependency: transitive
+    description:
+      name: dcql
+      sha256: c0c9d1ae3065b45c8959461eec043cdda59fa34b334d1cdb5b65a03e1a08b66a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   didcomm:
     dependency: "direct main"
     description:
       name: didcomm
-      sha256: "8a6de5c8e2406603071b866b2e478028e16062596f68805f196a40ef58d31d62"
+      sha256: "3345d647b38a5f031eb23829ee8fd7f4aa195781c6bd46fc8b26f364ad95a8c9"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.0"
+    version: "2.3.4"
   dio:
     dependency: "direct dev"
     description:
@@ -581,26 +613,26 @@ packages:
     dependency: transitive
     description:
       name: meeting_place_control_plane
-      sha256: "73139ae964cfcf467d1092e484b538c48bd090e253622c00f14d3baf22205bae"
+      sha256: "92b14eacbdc65dba8944981bc55bb6fb7173136cfcc0b72473c022a67b4e48f2"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1-dev.11"
+    version: "1.0.0"
   meeting_place_core:
     dependency: "direct main"
     description:
       name: meeting_place_core
-      sha256: "1a95dcc5ab79a52777eba7b5843548351d2945bc85187aa31187fe7f5c232b94"
+      sha256: eb855b105dd9cedde29582b6d7686b0380ec732c496ed9f7826ae0433fad08a0
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1-dev.17"
+    version: "1.0.1"
   meeting_place_mediator:
     dependency: "direct main"
     description:
       name: meeting_place_mediator
-      sha256: efaa724b1bb8b5f5db3fa5a6c4b87e76aa553f1dffe236879ba10a16afb98b95
+      sha256: e9212450f01b1dafb5a14d3d0b26b7fe36c6bdc107f958ba583dfb7132c40e76
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1-dev.10"
+    version: "1.0.0"
   melos:
     dependency: "direct dev"
     description:
@@ -753,14 +785,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  proxy_recrypt:
-    dependency: transitive
-    description:
-      name: proxy_recrypt
-      sha256: "83518bfcd488f161b5b967ae862454154a166ff3b6e9af532e58d79786175587"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.4"
   pub_semver:
     dependency: transitive
     description:
@@ -917,10 +941,10 @@ packages:
     dependency: "direct main"
     description:
       name: ssi
-      sha256: "056d36059a7510f57b2b1088cfcd6f7db45743a79875c62905c489b4b4cdbe07"
+      sha256: "6069c8a3feba2d9df020eafe0a2af1e10cc9e3b90e07c852f89b4570ce6c602d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.20.0"
+    version: "3.9.5"
   stack_trace:
     dependency: transitive
     description:
@@ -1098,4 +1122,4 @@ packages:
     source: hosted
     version: "2.2.3"
 sdks:
-  dart: ">=3.9.0 <4.0.0"
+  dart: ">=3.11.0 <4.0.0"
