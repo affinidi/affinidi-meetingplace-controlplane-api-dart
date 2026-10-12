@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import '../../../../utils/date_time.dart';
 import 'package:meeting_place_core/meeting_place_core.dart';
-import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../../meeting_place_control_plane_api.dart';
@@ -120,14 +119,16 @@ class DidComm extends Platform implements IPlatform {
 
     final recipientDidDoc = await CachedDidResolver().resolveDid(recipientDid);
     await _mediatorSDK.sendMessage(
-      PlainTextMessage.fromJson({
-        ...jsonDecode(payload.build()),
-        'from': senderDidDoc.id,
-        'to': [recipientDidDoc.id],
-      }),
-      senderDidManager: authDidManager.didManager,
-      recipientDidDocument: recipientDidDoc,
-      mediatorDid: mediatorDid,
+      MediatorMessageRequest(
+        message: PlainTextMessage.fromJson({
+          ...jsonDecode(payload.build()),
+          'from': senderDidDoc.id,
+          'to': [recipientDidDoc.id],
+        }),
+        senderDidManager: authDidManager.didManager,
+        recipientDidDocument: recipientDidDoc,
+        mediatorDid: mediatorDid,
+      ),
     );
 
     _logger.info('notification sent');
