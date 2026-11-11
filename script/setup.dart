@@ -85,7 +85,11 @@ Map<String, dynamic> generateDidDocument({
     "verificationMethod": jwks,
     "authentication": jwks.map((vm) => vm['id']).toList(),
     "assertionMethod": jwks.map((vm) => vm['id']).toList(),
-    "keyAgreement": jwks.map((vm) => vm['id']).toList(),
+    // Ed25519 is a signing-only curve; DIDComm clients reject it here.
+    "keyAgreement": jwks
+        .where((vm) => vm['publicKeyJwk']['crv'] != 'Ed25519')
+        .map((vm) => vm['id'])
+        .toList(),
     "service": [
       {
         "id": "$didWeb#auth",
