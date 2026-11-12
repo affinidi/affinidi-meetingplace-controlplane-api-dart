@@ -66,6 +66,10 @@ void main() async {
   );
 }
 
+// Curves DIDComm can use for key agreement. Signing-only curves such as
+// Ed25519 make clients fail while matching key agreement curves.
+const keyAgreementCurves = {'P-256', 'P-384', 'P-521', 'secp256k1', 'X25519'};
+
 Map<String, dynamic> generateDidDocument({
   required List<Map<String, dynamic>> jwks,
   required String didWeb,
@@ -85,9 +89,11 @@ Map<String, dynamic> generateDidDocument({
     "verificationMethod": jwks,
     "authentication": jwks.map((vm) => vm['id']).toList(),
     "assertionMethod": jwks.map((vm) => vm['id']).toList(),
-    // Ed25519 is a signing-only curve; DIDComm clients reject it here.
     "keyAgreement": jwks
-        .where((vm) => vm['publicKeyJwk']['crv'] != 'Ed25519')
+        .where(
+          (vm) =>
+              keyAgreementCurves.contains((vm['publicKeyJwk'] as Map?)?['crv']),
+        )
         .map((vm) => vm['id'])
         .toList(),
     "service": [
