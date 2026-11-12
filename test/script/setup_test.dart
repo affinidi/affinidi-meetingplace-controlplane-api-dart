@@ -56,4 +56,36 @@ void main() {
       expect(didDocument['keyAgreement'], ['$didWeb#2']);
     });
   });
+
+  group('updateKeyAgreement', () {
+    test('removes signing-only curves from an existing DID document', () {
+      final verificationMethods = [
+        verificationMethod('1', 'P-256'),
+        verificationMethod('2', 'secp256k1'),
+        verificationMethod('3', 'Ed25519'),
+      ];
+      final allIds = ['$didWeb#1', '$didWeb#2', '$didWeb#3'];
+      final existingDidDocument = {
+        'id': didWeb,
+        'verificationMethod': verificationMethods,
+        'authentication': allIds,
+        'assertionMethod': allIds,
+        'keyAgreement': allIds,
+      };
+
+      final updated = updateKeyAgreement(existingDidDocument);
+
+      expect(updated['keyAgreement'], ['$didWeb#1', '$didWeb#2']);
+      expect(updated['verificationMethod'], verificationMethods);
+      expect(updated['authentication'], allIds);
+      expect(updated['assertionMethod'], allIds);
+    });
+
+    test('throws when verificationMethod is missing', () {
+      expect(
+        () => updateKeyAgreement({'id': didWeb}),
+        throwsA(isA<FormatException>()),
+      );
+    });
+  });
 }
