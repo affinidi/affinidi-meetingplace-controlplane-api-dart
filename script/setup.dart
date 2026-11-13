@@ -20,7 +20,22 @@ import 'package:cryptography/helpers.dart';
 
 const updateKeyAgreementFlag = '--update-key-agreement';
 
+// Rejecting unknown arguments matters because a mistyped flag would otherwise
+// fall through to the full setup and rotate the signing key and hash secret.
+List<String> unknownArgs(List<String> args) =>
+    args.where((arg) => arg != updateKeyAgreementFlag).toList();
+
 void main(List<String> args) async {
+  final unknown = unknownArgs(args);
+  if (unknown.isNotEmpty) {
+    stderr.writeln('Unknown argument(s): ${unknown.join(' ')}');
+    stderr.writeln(
+      'Usage: dart run script/setup.dart [$updateKeyAgreementFlag]',
+    );
+    exitCode = 1;
+    return;
+  }
+
   if (args.contains(updateKeyAgreementFlag)) {
     updateKeyAgreementInFile(File('./params/did_document.json'));
     return;

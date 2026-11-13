@@ -19,6 +19,23 @@ void main() {
         serviceEndpoint: 'https://example.com/v1',
       );
 
+  group('unknownArgs', () {
+    test('accepts no arguments', () {
+      expect(unknownArgs([]), isEmpty);
+    });
+
+    test('accepts the update key agreement flag', () {
+      expect(unknownArgs([updateKeyAgreementFlag]), isEmpty);
+    });
+
+    test('returns mistyped and extra arguments', () {
+      expect(
+        unknownArgs(['--update-keyagreement', updateKeyAgreementFlag, 'x']),
+        ['--update-keyagreement', 'x'],
+      );
+    });
+  });
+
   group('generateDidDocument keyAgreement', () {
     test('includes only key agreement curves', () {
       final didDocument = buildDidDocument([
