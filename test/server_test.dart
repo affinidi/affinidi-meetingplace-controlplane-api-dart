@@ -36,6 +36,8 @@ import 'package:meeting_place_control_plane_api/src/core/entity/transport.dart';
 import 'package:meeting_place_control_plane_api/src/utils/date_time.dart';
 import 'package:meeting_place_control_plane_api/src/utils/platform_type.dart';
 import 'package:dio/dio.dart';
+import 'package:meeting_place_core/meeting_place_core.dart'
+    show MeetingPlaceNotificationProtocol;
 import 'package:meeting_place_mediator/meeting_place_mediator.dart';
 import 'package:ssi/ssi.dart' as ssi;
 import 'package:ssi/ssi.dart';
@@ -3305,12 +3307,13 @@ void main() {
       );
 
       final expectedMessageType =
-          'https://affinidi.com/didcomm/protocols/mpx/1.0/notification-invitation-accept';
+          MeetingPlaceNotificationProtocol.invitationAcceptance.value;
 
       channel.listen((message) {
         if (message.type.toString() == expectedMessageType) {
           completer.complete();
         }
+        return MediatorStreamProcessingResult(keepMessage: false);
       });
 
       final deviceToken = '$mediatorDid::${didDoc.id}';

@@ -4,7 +4,7 @@ version: 0.0.1-dev.1
 publish_to: none
 
 environment:
-  sdk: ">=3.9.0 <4.0.0"
+  sdk: ^3.11.0
 
 dependencies:
   aws_dynamodb_api: ^2.0.0
@@ -17,15 +17,15 @@ dependencies:
   convert: ^3.1.2
   crypto: ^3.0.6
   dart_jsonwebtoken: ^3.1.1
-  didcomm: ^2.0.2
+  didcomm: ^2.3.3
   dotenv: ^4.2.0
   elliptic: ^0.3.11
   http: ^1.3.0
   json_annotation: ^4.9.0
   logging: ^1.3.0
   lucid_validation: ^1.3.1
-  meeting_place_core: ^0.0.1-dev.17
-  meeting_place_mediator: ^0.0.1-dev.10
+  meeting_place_core: ^1.0.1
+  meeting_place_mediator: ^1.0.0
   mutex: ^3.1.0
   redis: ^4.0.0
   retry: ^3.1.2
@@ -33,7 +33,7 @@ dependencies:
   shelf: ^1.4.0
   shelf_router: ^1.1.0
   shelf_static: ^1.1.3
-  ssi: ^2.19.1
+  ssi: ^3.9.4
   uuid: ^4.5.1
   yaml: ^3.1.3
 
