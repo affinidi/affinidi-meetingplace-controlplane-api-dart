@@ -14,8 +14,33 @@ import 'package:cryptography/helpers.dart';
 
 // openssl genpkey -algorithm Ed25519 -out ./keys/ed25519.pem
 // openssl pkey -in keys/ed25519.pem -pubout -out ./keys/ed25519-pub.pem
+//
+// Pass --update-key-agreement to only fix keyAgreement in an existing
+// ./params/did_document.json. It keeps all keys, so issued tokens stay valid.
 
-void main() async {
+const updateKeyAgreementFlag = '--update-key-agreement';
+
+// Rejecting unknown arguments matters because a mistyped flag would otherwise
+// fall through to the full setup and rotate the signing key and hash secret.
+List<String> unknownArgs(List<String> args) =>
+    args.where((arg) => arg != updateKeyAgreementFlag).toList();
+
+void main(List<String> args) async {
+  final unknown = unknownArgs(args);
+  if (unknown.isNotEmpty) {
+    stderr.writeln('Unknown argument(s): ${unknown.join(' ')}');
+    stderr.writeln(
+      'Usage: dart run script/setup.dart [$updateKeyAgreementFlag]',
+    );
+    exitCode = 1;
+    return;
+  }
+
+  if (args.contains(updateKeyAgreementFlag)) {
+    updateKeyAgreementInFile(File('./params/did_document.json'));
+    return;
+  }
+
   final didWeb = getEnv('CONTROL_PLANE_DID');
   final serviceEndpoint = '${getEnv('API_ENDPOINT')}/v1';
 
@@ -66,6 +91,42 @@ void main() async {
   );
 }
 
+// Curves DIDComm can use for key agreement. Signing-only curves such as
+// Ed25519 make clients fail while matching key agreement curves.
+const keyAgreementCurves = {'P-256', 'P-384', 'P-521', 'secp256k1', 'X25519'};
+
+List<dynamic> keyAgreementIds(List<dynamic> verificationMethods) {
+  return verificationMethods
+      .where(
+        (vm) =>
+            keyAgreementCurves.contains((vm['publicKeyJwk'] as Map?)?['crv']),
+      )
+      .map((vm) => vm['id'])
+      .toList();
+}
+
+Map<String, dynamic> updateKeyAgreement(Map<String, dynamic> didDocument) {
+  final verificationMethods = didDocument['verificationMethod'];
+  if (verificationMethods is! List) {
+    throw FormatException('DID document has no verificationMethod list');
+  }
+
+  return {...didDocument, 'keyAgreement': keyAgreementIds(verificationMethods)};
+}
+
+void updateKeyAgreementInFile(File didDocumentFile) {
+  if (!didDocumentFile.existsSync()) {
+    stderr.writeln('${didDocumentFile.path} not found; run setup first.');
+    exitCode = 1;
+    return;
+  }
+
+  final didDocument = jsonDecode(didDocumentFile.readAsStringSync());
+  didDocumentFile.writeAsStringSync(
+    jsonEncode(updateKeyAgreement(didDocument)),
+  );
+}
+
 Map<String, dynamic> generateDidDocument({
   required List<Map<String, dynamic>> jwks,
   required String didWeb,
@@ -85,7 +146,7 @@ Map<String, dynamic> generateDidDocument({
     "verificationMethod": jwks,
     "authentication": jwks.map((vm) => vm['id']).toList(),
     "assertionMethod": jwks.map((vm) => vm['id']).toList(),
-    "keyAgreement": jwks.map((vm) => vm['id']).toList(),
+    "keyAgreement": keyAgreementIds(jwks),
     "service": [
       {
         "id": "$didWeb#auth",
